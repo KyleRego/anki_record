@@ -16,3 +16,6 @@ Layout/LineLength:
 Metrics/BlockLength:
   Exclude:
     - "spec/anki_record/*"
+
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods

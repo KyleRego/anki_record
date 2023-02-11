@@ -5,21 +5,83 @@ require "pry"
 require_relative "anki_schema_definition"
 
 module AnkiRecord
-  # This class represents the Anki database we are creating or updating.
+  # Represents the Anki database we are creating or interacting with.
   class AnkiDatabase
-    # Constructs a new Anki SQLite3 database file `name.apkg`
-    def initialize(name:)
-      setup_anki_database_object(name)
+    # The constructor method
+    # When passed a block:
+    # - Yields execution to the block
+    # - When the block is done, zips the database files and closes the database
+    # When not passed a block:
+    # - #zip and #close must be used explicitly
+    def initialize(name:, directory: Dir.pwd)
+      setup_instance_variables(name: name, directory: directory)
 
       return unless block_given?
 
       begin
         yield self
+      rescue StandardError => e
+        puts e
       ensure
-        zip
-        close
+        zip_and_close
       end
     end
+
+    private
+
+      def setup_instance_variables(name:, directory:)
+        @name = check_name_is_valid(name: name)
+        @directory = directory
+        @tmp_files = []
+        @anki21_database = setup_anki21_database_object
+      end
+
+      def check_name_is_valid(name:)
+        raise ArgumentError unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
+
+        name
+      end
+
+      def setup_anki21_database_object
+        random_file_name = "#{SecureRandom.hex(10)}.anki21"
+        db = SQLite3::Database.new "#{@directory}/#{random_file_name}", options: {}
+        @tmp_files << random_file_name
+        db.execute_batch ANKI_SCHEMA_DEFINITION
+        db
+      end
+
+    public
+
+    # Zips the Anki database, deletes the temporary *.anki21 file, and closes the database
+    def zip_and_close(destroy_temporary_files: true)
+      zip && close(destroy_temporary_files: destroy_temporary_files)
+    end
+
+    private
+
+      def zip
+        Zip::File.open(target_zip_file, create: true) do |zip_file|
+          @tmp_files.each do |file_name|
+            zip_file.add(file_name, File.join(@directory, file_name))
+          end
+        end
+        true
+      end
+
+      def target_zip_file
+        "#{@directory}/#{@name}.apkg"
+      end
+
+      def close(destroy_temporary_files:)
+        destroy_tmp_files if destroy_temporary_files
+        @anki21_database.close
+      end
+
+      def destroy_tmp_files
+        @tmp_files.each { |file_name| File.delete("#{@directory}/#{file_name}") }
+      end
+
+    public
 
     # Opens the Anki SQLite3 database file at `path`
     def open(path)
@@ -29,64 +91,14 @@ module AnkiRecord
       # unzip the file and assign instance variables
     end
 
-    def open?; end
-
-    def closed?; end
-
-    # Closes the Anki SQLite3 database file and optionally deletes the temporary files
-    def close(destroy_temporary_files: true)
-      destroy_tmp_files if destroy_temporary_files
-      @database.close
+    # Returns true if the database is open and false if it is closed
+    def open?
+      !closed?
     end
 
-    # Zips the Anki SQLite3 database to prepare it for import into Anki
-    def zip(directory = Dir.pwd)
-      Zip::File.open(target_zip_file_name, create: true) do |zip_file|
-        @tmp_files.each do |file_name|
-          zip_file.add(file_name, File.join(directory, file_name))
-        end
-      end
-    end
-
-    private
-
-    def setup_anki_database_object(name)
-      @name = name
-      check_name_is_valid
-
-      @tmp_files = []
-      @database = initialize_collection_anki21
-      # initialize_collection_anki2
-      # initialize_media
-    end
-
-    def check_name_is_valid
-      raise NameError unless @name
-      raise NameError if @name.include?(" ")
-    end
-
-    def initialize_collection_anki21
-      random_file_name = "#{SecureRandom.hex(10)}.anki21"
-      db = SQLite3::Database.new random_file_name, options: {}
-      @tmp_files << random_file_name
-      db.execute_batch ANKI_SCHEMA_DEFINITION
-      db
-    end
-
-    def initialize_collection_anki2
-      raise NotImplementedError
-    end
-
-    def initialize_media
-      raise NotImplementedError
-    end
-
-    def target_zip_file_name
-      "#{@name}.apkg"
-    end
-
-    def destroy_tmp_files
-      @tmp_files.each { |file_name| File.delete(file_name) }
+    # Returns true if the database is closed and true if it is open
+    def closed?
+      @anki21_database.closed?
     end
   end
 end

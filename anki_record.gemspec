@@ -8,8 +8,10 @@ Gem::Specification.new do |spec|
   spec.authors = ["Kyle Rego"]
   spec.email = ["regoky@outlook.com"]
 
-  spec.summary = "Create and update Anki notes/flashcards with the Ruby programming language."
-  spec.description = "This Ruby library provides an interface to interact with Anki SQLite3 databases (*.apkg files)."
+  spec.summary = "Automate Anki flashcard editing with the Ruby programming language."
+  spec.description = <<-DESC
+  This Ruby library provides an interface to inspect, update, and create Anki SQLite3 databases (*.apkg files).
+  DESC
   spec.homepage = "https://github.com/KyleRego/anki_record"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
