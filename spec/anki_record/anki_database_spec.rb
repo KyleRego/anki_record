@@ -33,137 +33,103 @@ RSpec.describe AnkiRecord::AnkiDatabase do
     files_created_by_tests.each { |file| File.delete("#{directory}/#{file}") }
   end
 
-  describe "#new with invalid arguments" do
-    context "when the name argument is nil" do
-      let(:database_name) { nil }
-      it "raises a ArgumentError" do
-        expect { anki_database }.to raise_error ArgumentError
-      end
-    end
-
-    context "when the name argument is an empty string" do
-      let(:database_name) { "" }
-      it "raises a ArgumentError" do
-        expect { anki_database }.to raise_error ArgumentError
-      end
-    end
-
-    context "when the name argument has spaces" do
-      let(:database_name) { "this is invalid" }
-      it "raises a ArgumentError" do
-        expect { anki_database }.to raise_error ArgumentError
-      end
-    end
-
-    context "when the name argument is not a string" do
-      invalid_name_arguments = [[], ["a"], [1], 10, {}, { my_key: "my_value" }]
+  describe "::new with invalid name arguments" do
+    context "where the name argument is nil, an empty string, a string with spaces,
+    or not a string (array, number, or hash)" do
+      invalid_name_arguments = [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }]
       invalid_name_arguments.each do |invalid_name|
         let(:database_name) { invalid_name }
-        it "raises a ArgumentError" do
+        it "raises an ArgumentError" do
           expect { anki_database }.to raise_error ArgumentError
         end
       end
     end
   end
 
-  describe "#new with valid arguments" do
-    context "when there is no block argument" do
-      it "saves one *.anki21 file where * is randomly generated" do
-        anki_database
-        expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 1
-      end
+  context "::new with no block argument" do
+    it "saves one *.anki21 file where * is randomly generated" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 1
+    end
+    it "does not save a *.apkg zip file" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 0
+    end
+    it "does not close the database" do
+      expect(anki_database.open?).to eq true
+      expect(anki_database.closed?).to eq false
+    end
+  end
 
+  context "::new with a block argument" do
+    let(:closure_argument) { proc {} }
+
+    it "deletes the *.anki21 that was created" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
+    end
+    it "saves a *.apkg zip file" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 1
+    end
+    it "closes the database" do
+      expect(anki_database.open?).to eq false
+      expect(anki_database.closed?).to eq true
+    end
+  end
+
+  context "::new with a block argument that throws an error" do
+    let(:closure_argument) { proc { raise "runtime error" } }
+
+    # silence output from the rescue clause which puts the error
+    before { expect($stdout).to receive(:write) }
+
+    it "deletes the *.anki21 that was created" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
+    end
+    it "does not save a *.apkg zip file" do
+      anki_database
+      expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 0
+    end
+    it "closes the database" do
+      expect(anki_database.open?).to eq false
+      expect(anki_database.closed?).to eq true
+    end
+  end
+
+  context "::new with a directory argument" do
+    let(:directory_argument) { "tmp" }
+
+    context "and no block argument" do
+      it "saves one *.anki21 file in the specified directory" do
+        anki_database
+        expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 1
+      end
       it "does not save a *.apkg zip file" do
         anki_database
-        expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 0
+        expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 0
       end
-
       it "does not close the database" do
         expect(anki_database.open?).to eq true
         expect(anki_database.closed?).to eq false
       end
     end
 
-    context "when there is a block argument" do
-      let(:closure_argument) do
-        proc do
-          # do nothing
-        end
-      end
+    context "and a block argument" do
+      let(:closure_argument) { proc {} }
 
-      it "deletes the *.anki21 that was created" do
+      it "deletes the *.anki21 file that was created" do
         anki_database
-        expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
+        expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
       end
-
+      it "saves a *.apkg zip file in the specified directory" do
+        anki_database
+        expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 1
+      end
       it "closes the database" do
         expect(anki_database.open?).to eq false
         expect(anki_database.closed?).to eq true
-      end
-    end
-
-    context "when there is a block argument that throws an error" do
-      let(:closure_argument) do
-        proc do
-          raise "runtime error"
-        end
-      end
-
-      # silence output from the rescue clause which puts the error
-      before { expect($stdout).to receive(:write) }
-
-      it "deletes the *.anki21 that was created" do
-        anki_database
-        expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
-      end
-
-      it "closes the database" do
-        expect(anki_database.open?).to eq false
-        expect(anki_database.closed?).to eq true
-      end
-    end
-
-    context "when there is a directory argument" do
-      let(:directory_argument) { "tmp" }
-
-      context "and no block argument" do
-        it "saves one *.anki21 file in that directory" do
-          anki_database
-          expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 1
-        end
-
-        it "does not save a *.apkg zip file" do
-          anki_database
-          expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 0
-        end
-
-        it "does not close the database" do
-          expect(anki_database.open?).to eq true
-          expect(anki_database.closed?).to eq false
-        end
-      end
-
-      context "and a block argument" do
-        let(:closure_argument) do
-          proc do
-            # do nothing
-          end
-        end
-
-        it "does not save a *.anki21 file in that directory" do
-          anki_database
-          expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 0
-        end
-
-        it "saves a *.apkg zip file in that directory" do
-          anki_database
-          expect(Dir.entries(directory_argument).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq 1
-        end
-
-        it "closes the database" do
-          expect(anki_database.open?).to eq false
-          expect(anki_database.closed?).to eq true
-        end
       end
     end
   end
@@ -183,7 +149,7 @@ RSpec.describe AnkiRecord::AnkiDatabase do
         expect(anki_database.closed?).to eq true
       end
     end
-    context "with destroy_temporary_files: false" do
+    context "with a destroy_temporary_files: false argument" do
       before { anki_database.zip_and_close(destroy_temporary_files: false) }
 
       it "saves one *.apkg file where * is the name argument" do
@@ -196,6 +162,69 @@ RSpec.describe AnkiRecord::AnkiDatabase do
         expect(anki_database.open?).to eq false
         expect(anki_database.closed?).to eq true
       end
+    end
+  end
+
+  subject(:anki_database_from_existing) do
+    if defined?(closure_argument) && defined?(create_backup_argument)
+      AnkiRecord::AnkiDatabase.open(path: path_argument, create_backup: create_backup_argument, &closure_argument)
+    elsif defined?(closure_argument)
+      AnkiRecord::AnkiDatabase.open(path: path_argument, &closure_argument)
+    elsif defined?(create_backup_argument)
+      AnkiRecord::AnkiDatabase.open(path: path_argument, create_backup: create_backup_argument)
+    else
+      AnkiRecord::AnkiDatabase.open(path: path_argument)
+    end
+  end
+
+  let(:path_argument) { "." }
+
+  describe "::new with invalid path argument" do
+    it "throws error"
+  end
+
+  describe "::new with no block argument" do
+    it "creates a backup of the *.apkg file"
+    it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
+    it "does not save a new *.apkg zip file"
+    it "does not close the database"
+  end
+
+  context "::new with a block argument" do
+    let(:closure_argument) { proc {} }
+
+    it "creates a backup of the *.apkg file"
+    it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
+    it "saves a new *.apkg zip file"
+    it "closes the database"
+  end
+
+  context "::open with a block argument that throws an error" do
+    let(:closure_argument) { proc { raise "runtime error" } }
+
+    # silence output from the rescue clause which puts the error
+    # before { expect($stdout).to receive(:write) }
+    it "creates a backup of the *.apkg file"
+    it "deletes the *.anki21 that was created by unzipping the *.apkg file"
+    it "does not save a new *.apkg zip file"
+    it "closes the database"
+  end
+
+  context "::open with create_backup: false" do
+    context "and no block argument" do
+      it "does not create a backup of the *.apkg file"
+      it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
+      it "does not save a new *.apkg zip file"
+      it "does not close the database"
+    end
+
+    context "and a block argument" do
+      let(:closure_argument) { proc {} }
+
+      it "does not create a backup of the *.apkg file"
+      it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
+      it "saves a new *.apkg zip file"
+      it "closes the database"
     end
   end
 end

@@ -5,14 +5,33 @@ require "pry"
 require_relative "anki_schema_definition"
 
 module AnkiRecord
-  # Represents the Anki database we are creating or interacting with.
+  ##
+  # Represents an Anki SQLite3 database
+  #
+  # Use ::new to create an empty one or #open to create an object from an existing one
   class AnkiDatabase
-    # The constructor method
+    NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
+    STANDARD_ERROR_MESSAGE = <<-MSG
+    An error occurred.
+    The temporary *.anki21 database has been deleted.
+    No *.apkg zip file has been saved.
+    MSG
+
+    private_constant :NAME_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
+    ##
+    # Creates a new object which represents an Anki SQLite3 database
+    #
     # When passed a block:
-    # - Yields execution to the block
-    # - When the block is done, zips the database files and closes the database
+    # - Yields execution to the block, and then after the block executes:
+    #   - Zips the temporary database into a <name>.apkg file where <name> is the name argument
+    #     - The destination directory is the current working directory by default
+    #     - Or the directory argument (a relative file path is recommended)
+    #   - Closes the temporary database and deletes the temporary database file (the *.anki21 file)
+    # - If the block throws a runtime error:
+    #   - Closes the temporary database and deletes the temporary database file
+    #   - Does not create the zip file
     # When not passed a block:
-    # - #zip and #close must be used explicitly
+    # - #zip_and_close must be called explicitly at the end of your script
     def initialize(name:, directory: Dir.pwd)
       setup_instance_variables(name: name, directory: directory)
 
@@ -21,8 +40,26 @@ module AnkiRecord
       begin
         yield self
       rescue StandardError => e
-        puts e
-      ensure
+        close(destroy_temporary_files: true)
+        puts_error_and_standard_message(error: e)
+      else
+        zip_and_close
+      end
+    end
+
+    ##
+    # Creates a new object which represents the Anki SQLite3 database file at path
+    def self.open(path:, create_backup: true)
+      setup_instance_variables_from_existing(path: path, create_backup: create_backup)
+
+      return unless block_given?
+
+      begin
+        yield self
+      rescue StandardError => e
+        close(destroy_temporary_files: true)
+        puts_error_and_standard_message(error: e)
+      else
         zip_and_close
       end
     end
@@ -37,7 +74,7 @@ module AnkiRecord
       end
 
       def check_name_is_valid(name:)
-        raise ArgumentError unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
+        raise ArgumentError, NAME_ERROR_MESSAGE unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
 
         name
       end
@@ -50,9 +87,34 @@ module AnkiRecord
         db
       end
 
+      def puts_error_and_standard_message(error:)
+        puts "#{error}\n#{STANDARD_ERROR_MESSAGE}"
+      end
+
+      def setup_instance_variables_from_existing(path:, create_backup:)
+        @path = check_file_at_path_is_valid(path: path)
+        copy_apkg_file if create_backup
+        @tmp_files = []
+        @anki21_database = setup_anki21_database_object_from_existing
+      end
+
+      def check_file_at_path_is_valid(path:)
+        raise NotImplementedError
+      end
+
+      def copy_apkg_file
+        raise NotImplementedError
+      end
+
+      def setup_anki21_database_object_from_existing
+        raise NotImplementedError
+      end
+
     public
 
-    # Zips the Anki database, deletes the temporary *.anki21 file, and closes the database
+    ##
+    # Zips the database into a *.apkg file and closes the temporary database.
+    # - With destroy_temporary_files: false, will not delete the temporary database file
     def zip_and_close(destroy_temporary_files: true)
       zip && close(destroy_temporary_files: destroy_temporary_files)
     end
@@ -83,20 +145,14 @@ module AnkiRecord
 
     public
 
-    # Opens the Anki SQLite3 database file at `path`
-    def open(path)
-      # check that the file can be found
-      # if it can't -> throw an error
-
-      # unzip the file and assign instance variables
-    end
-
-    # Returns true if the database is open and false if it is closed
+    ##
+    # Returns true if the database is open
     def open?
       !closed?
     end
 
-    # Returns true if the database is closed and true if it is open
+    ##
+    # Returns true if the database is closed
     def closed?
       @anki21_database.closed?
     end

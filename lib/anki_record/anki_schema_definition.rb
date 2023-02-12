@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AnkiRecord
-  ANKI_SCHEMA_DEFINITION = <<~SQL
+  ANKI_SCHEMA_DEFINITION = <<~SQL # :nodoc:
     CREATE TABLE col (
       id integer PRIMARY KEY,
       crt integer NOT NULL,

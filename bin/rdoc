@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+rdoc --main README.md --exclude="coverage" --exclude="Gemfile" --exclude="anki_record.rbs" --exclude="Rakefile" --exclude="bin" --title="AnkiRecord documentation"
