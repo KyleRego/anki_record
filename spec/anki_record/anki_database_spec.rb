@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 ANKI_PACKAGE_REGEX = /.\.apkg/.freeze
+ANKI_PACKAGE_BACKUP_REGEX = /.\.apkg.copy-\d/.freeze
 ANKI_COLLECTION_21_REGEX = /.\.anki21/.freeze
 
 RSpec.describe AnkiRecord::AnkiDatabase do
@@ -177,54 +178,71 @@ RSpec.describe AnkiRecord::AnkiDatabase do
     end
   end
 
-  let(:path_argument) { "." }
+  describe "::open" do
+    let(:path_argument) { "./test.apkg" }
+    before { AnkiRecord::AnkiDatabase.new(name: "test") { "empty_block" } }
 
-  describe "::new with invalid path argument" do
-    it "throws error"
-  end
+    describe "with an invalid path argument" do
+      context "due to no file being found at the path" do
+        let(:path_argument) { "./test/test.apkg" }
+        it "throws error" do
+          expect { anki_database_from_existing }.to raise_error RuntimeError
+        end
+      end
+      context "due to the path not being for an *.apkg file" do
+        let(:path_argument) { "./test.txt" }
+        it "throws error" do
+          expect { anki_database_from_existing }.to raise_error RuntimeError
+        end
+      end
+    end
 
-  describe "::new with no block argument" do
-    it "creates a backup of the *.apkg file"
-    it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
-    it "does not save a new *.apkg zip file"
-    it "does not close the database"
-  end
-
-  context "::new with a block argument" do
-    let(:closure_argument) { proc {} }
-
-    it "creates a backup of the *.apkg file"
-    it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
-    it "saves a new *.apkg zip file"
-    it "closes the database"
-  end
-
-  context "::open with a block argument that throws an error" do
-    let(:closure_argument) { proc { raise "runtime error" } }
-
-    # silence output from the rescue clause which puts the error
-    # before { expect($stdout).to receive(:write) }
-    it "creates a backup of the *.apkg file"
-    it "deletes the *.anki21 that was created by unzipping the *.apkg file"
-    it "does not save a new *.apkg zip file"
-    it "closes the database"
-  end
-
-  context "::open with create_backup: false" do
-    context "and no block argument" do
-      it "does not create a backup of the *.apkg file"
+    describe "with no block argument" do
+      it "creates a backup of the *.apkg file" do
+        anki_database_from_existing
+        expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 1
+      end
       it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
       it "does not save a new *.apkg zip file"
       it "does not close the database"
     end
 
-    context "and a block argument" do
+    context "with a block argument" do
       let(:closure_argument) { proc {} }
 
-      it "does not create a backup of the *.apkg file"
+      it "creates a backup of the *.apkg file"
       it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
-      it "saves a new *.apkg zip file"
+      it "saves a new version of the *.apkg zip file"
       it "closes the database"
+    end
+
+    context "with a block argument that throws an error" do
+      let(:closure_argument) { proc { raise "runtime error" } }
+
+      # silence output from the rescue clause which puts the error
+      # before { expect($stdout).to receive(:write) }
+      it "creates a backup of the *.apkg file"
+      it "deletes the *.anki21 that was created by unzipping the *.apkg file"
+      it "does not save a new version of the *.apkg zip file"
+      it "closes the database"
+    end
+
+    context "with create_backup: false" do
+      context "and no block argument" do
+        it "does not create a backup of the *.apkg file"
+        it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
+        it "does not save a new version of the *.apkg zip file"
+        it "does not close the database"
+      end
+
+      context "and a block argument" do
+        let(:closure_argument) { proc {} }
+
+        it "does not create a backup of the *.apkg file"
+        it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
+        it "saves a new version of the *.apkg zip file"
+        it "closes the database"
+      end
     end
   end
 end

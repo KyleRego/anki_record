@@ -11,13 +11,14 @@ module AnkiRecord
   # Use ::new to create an empty one or #open to create an object from an existing one
   class AnkiDatabase
     NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
+    PATH_ERROR_MESSAGE = "*No .apkg file was found at the given path."
     STANDARD_ERROR_MESSAGE = <<-MSG
     An error occurred.
     The temporary *.anki21 database has been deleted.
     No *.apkg zip file has been saved.
     MSG
 
-    private_constant :NAME_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
+    private_constant :NAME_ERROR_MESSAGE, :PATH_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
     ##
     # Creates a new object which represents an Anki SQLite3 database
     #
@@ -34,23 +35,6 @@ module AnkiRecord
     # - #zip_and_close must be called explicitly at the end of your script
     def initialize(name:, directory: Dir.pwd)
       setup_instance_variables(name: name, directory: directory)
-
-      return unless block_given?
-
-      begin
-        yield self
-      rescue StandardError => e
-        close(destroy_temporary_files: true)
-        puts_error_and_standard_message(error: e)
-      else
-        zip_and_close
-      end
-    end
-
-    ##
-    # Creates a new object which represents the Anki SQLite3 database file at path
-    def self.open(path:, create_backup: true)
-      setup_instance_variables_from_existing(path: path, create_backup: create_backup)
 
       return unless block_given?
 
@@ -91,26 +75,53 @@ module AnkiRecord
         puts "#{error}\n#{STANDARD_ERROR_MESSAGE}"
       end
 
-      def setup_instance_variables_from_existing(path:, create_backup:)
-        @path = check_file_at_path_is_valid(path: path)
-        copy_apkg_file if create_backup
-        @tmp_files = []
-        @anki21_database = setup_anki21_database_object_from_existing
-      end
-
-      def check_file_at_path_is_valid(path:)
-        raise NotImplementedError
-      end
-
-      def copy_apkg_file
-        raise NotImplementedError
-      end
-
-      def setup_anki21_database_object_from_existing
-        raise NotImplementedError
-      end
-
     public
+
+    ##
+    # Creates a new object which represents the Anki SQLite3 database file at path
+    def self.open(path:, create_backup: true)
+      setup_instance_variables_from_existing(path: path, create_backup: create_backup)
+
+      return unless block_given?
+
+      begin
+        yield self
+      rescue StandardError => e
+        close(destroy_temporary_files: true)
+        puts_error_and_standard_message(error: e)
+      else
+        eigen_zip_and_close
+      end
+    end
+
+    class << self
+      private
+
+        def setup_instance_variables_from_existing(path:, create_backup:)
+          @path = check_file_at_path_is_valid(path: path)
+          copy_apkg_file if create_backup
+          @tmp_files = []
+          # @anki21_database = setup_anki21_database_object_from_existing
+        end
+
+        def check_file_at_path_is_valid(path:)
+          raise PATH_ERROR_MESSAGE unless path.end_with?(".apkg") && File.exist?(path)
+
+          path
+        end
+
+        def copy_apkg_file
+          FileUtils.cp @path, "#{@path}.copy-#{Time.now.to_i}"
+        end
+
+        def setup_anki21_database_object_from_existing
+          raise NotImplementedError
+        end
+
+        def eigen_zip_and_close
+          raise NotImplementedError
+        end
+    end
 
     ##
     # Zips the database into a *.apkg file and closes the temporary database.
