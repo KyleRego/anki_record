@@ -4,16 +4,16 @@ ANKI_PACKAGE_REGEX = /.\.apkg/.freeze
 ANKI_PACKAGE_BACKUP_REGEX = /.\.apkg.copy-\d/.freeze
 ANKI_COLLECTION_21_REGEX = /.\.anki21/.freeze
 
-RSpec.describe AnkiRecord::AnkiDatabase do
+RSpec.describe AnkiRecord::AnkiPackage do
   subject(:anki_database) do
     if defined?(closure_argument) && defined?(directory_argument)
-      AnkiRecord::AnkiDatabase.new(name: database_name, directory: directory_argument, &closure_argument)
+      AnkiRecord::AnkiPackage.new(name: database_name, directory: directory_argument, &closure_argument)
     elsif defined?(closure_argument)
-      AnkiRecord::AnkiDatabase.new(name: database_name, &closure_argument)
+      AnkiRecord::AnkiPackage.new(name: database_name, &closure_argument)
     elsif defined?(directory_argument)
-      AnkiRecord::AnkiDatabase.new(name: database_name, directory: directory_argument)
+      AnkiRecord::AnkiPackage.new(name: database_name, directory: directory_argument)
     else
-      AnkiRecord::AnkiDatabase.new(name: database_name)
+      AnkiRecord::AnkiPackage.new(name: database_name)
     end
   end
 
@@ -168,19 +168,19 @@ RSpec.describe AnkiRecord::AnkiDatabase do
 
   subject(:anki_database_from_existing) do
     if defined?(closure_argument) && defined?(create_backup_argument)
-      AnkiRecord::AnkiDatabase.open(path: path_argument, create_backup: create_backup_argument, &closure_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument, create_backup: create_backup_argument, &closure_argument)
     elsif defined?(closure_argument)
-      AnkiRecord::AnkiDatabase.open(path: path_argument, &closure_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument, &closure_argument)
     elsif defined?(create_backup_argument)
-      AnkiRecord::AnkiDatabase.open(path: path_argument, create_backup: create_backup_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument, create_backup: create_backup_argument)
     else
-      AnkiRecord::AnkiDatabase.open(path: path_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument)
     end
   end
 
   describe "::open" do
     let(:path_argument) { "./test.apkg" }
-    before { AnkiRecord::AnkiDatabase.new(name: "test") { "empty_block" } }
+    before { AnkiRecord::AnkiPackage.new(name: "test") { "empty_block" } }
 
     describe "with an invalid path argument" do
       context "due to no file being found at the path" do
@@ -210,7 +210,10 @@ RSpec.describe AnkiRecord::AnkiDatabase do
     context "with a block argument" do
       let(:closure_argument) { proc {} }
 
-      it "creates a backup of the *.apkg file"
+      it "creates a backup of the *.apkg file" do
+        anki_database_from_existing
+        expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 1
+      end
       it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
       it "saves a new version of the *.apkg zip file"
       it "closes the database"

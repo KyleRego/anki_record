@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "pry"
+require "pathname"
 
 require_relative "anki_schema_definition"
 
@@ -9,7 +10,7 @@ module AnkiRecord
   # Represents an Anki SQLite3 database
   #
   # Use ::new to create an empty one or #open to create an object from an existing one
-  class AnkiDatabase
+  class AnkiPackage
     NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
     PATH_ERROR_MESSAGE = "*No .apkg file was found at the given path."
     STANDARD_ERROR_MESSAGE = <<-MSG
@@ -34,9 +35,9 @@ module AnkiRecord
     # When not passed a block:
     # - #zip_and_close must be called explicitly at the end of your script
     def initialize(name:, directory: Dir.pwd)
-      setup_instance_variables(name: name, directory: directory)
+      @anki21_database = setup_instance_variables(name: name, directory: directory)
 
-      return unless block_given?
+      return self unless block_given?
 
       begin
         yield self
@@ -54,13 +55,13 @@ module AnkiRecord
         @name = check_name_is_valid(name: name)
         @directory = directory
         @tmp_files = []
-        @anki21_database = setup_anki21_database_object
+        setup_anki21_database_object
       end
 
       def check_name_is_valid(name:)
         raise ArgumentError, NAME_ERROR_MESSAGE unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
 
-        name
+        name.end_with?(".apkg") ? name[0, name.length - 5] : name
       end
 
       def setup_anki21_database_object
@@ -80,46 +81,24 @@ module AnkiRecord
     ##
     # Creates a new object which represents the Anki SQLite3 database file at path
     def self.open(path:, create_backup: true)
-      setup_instance_variables_from_existing(path: path, create_backup: create_backup)
-
-      return unless block_given?
-
-      begin
-        yield self
-      rescue StandardError => e
-        close(destroy_temporary_files: true)
-        puts_error_and_standard_message(error: e)
-      else
-        eigen_zip_and_close
-      end
+      pathname = check_file_at_path_is_valid(path: path)
+      copy_apkg_file(pathname: pathname) if create_backup
+      @anki_package = new(name: pathname.basename.to_s, directory: pathname.dirname)
     end
 
     class << self
       private
 
-        def setup_instance_variables_from_existing(path:, create_backup:)
-          @path = check_file_at_path_is_valid(path: path)
-          copy_apkg_file if create_backup
-          @tmp_files = []
-          # @anki21_database = setup_anki21_database_object_from_existing
-        end
-
         def check_file_at_path_is_valid(path:)
-          raise PATH_ERROR_MESSAGE unless path.end_with?(".apkg") && File.exist?(path)
+          pathname = Pathname.new(path)
+          raise PATH_ERROR_MESSAGE unless pathname.file? && pathname.extname == ".apkg"
 
-          path
+          pathname
         end
 
-        def copy_apkg_file
-          FileUtils.cp @path, "#{@path}.copy-#{Time.now.to_i}"
-        end
-
-        def setup_anki21_database_object_from_existing
-          raise NotImplementedError
-        end
-
-        def eigen_zip_and_close
-          raise NotImplementedError
+        def copy_apkg_file(pathname:)
+          path = pathname.to_s
+          FileUtils.cp path, "#{path}.copy-#{Time.now.to_i}"
         end
     end
 
