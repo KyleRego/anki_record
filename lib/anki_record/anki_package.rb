@@ -4,6 +4,7 @@ require "pry"
 require "pathname"
 
 require_relative "anki_schema_definition"
+require_relative "note_type"
 
 module AnkiRecord
   ##
@@ -37,7 +38,7 @@ module AnkiRecord
     def initialize(name:, directory: Dir.pwd)
       @anki21_database = setup_instance_variables(name: name, directory: directory)
 
-      return self unless block_given?
+      return unless block_given?
 
       begin
         yield self

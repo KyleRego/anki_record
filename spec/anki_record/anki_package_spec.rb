@@ -180,7 +180,11 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
   describe "::open" do
     let(:path_argument) { "./test.apkg" }
-    before { AnkiRecord::AnkiPackage.new(name: "test") { "empty_block" } }
+    before do
+      AnkiRecord::AnkiPackage.new(name: "test") do
+        # set up the anki package to open
+      end
+    end
 
     describe "with an invalid path argument" do
       context "due to no file being found at the path" do
@@ -231,8 +235,12 @@ RSpec.describe AnkiRecord::AnkiPackage do
     end
 
     context "with create_backup: false" do
+      let(:create_backup_argument) { false }
       context "and no block argument" do
-        it "does not create a backup of the *.apkg file"
+        it "does not create a backup of the *.apkg file" do
+          anki_database_from_existing
+          expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 0
+        end
         it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
         it "does not save a new version of the *.apkg zip file"
         it "does not close the database"
@@ -241,7 +249,10 @@ RSpec.describe AnkiRecord::AnkiPackage do
       context "and a block argument" do
         let(:closure_argument) { proc {} }
 
-        it "does not create a backup of the *.apkg file"
+        it "does not create a backup of the *.apkg file" do
+          anki_database_from_existing
+          expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 0
+        end
         it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
         it "saves a new version of the *.apkg zip file"
         it "closes the database"
