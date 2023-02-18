@@ -10,7 +10,9 @@ require_relative "anki_record/version"
 ##
 # This module is the namespace for all AnkiRecord classes and modules:
 # - AnkiPackage
+# - Field
 # - NoteType
+# - Template
 # - TimeHelper
 module AnkiRecord
   class Error < StandardError; end # :nodoc:

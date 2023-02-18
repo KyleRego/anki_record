@@ -10,7 +10,7 @@ module AnkiRecord
   ##
   # Represents an Anki SQLite3 database
   #
-  # Use ::new to create an empty one or #open to create an object from an existing one
+  # Use ::new to create an empty one or ::open to create an object from an existing one
   class AnkiPackage
     NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
     PATH_ERROR_MESSAGE = "*No .apkg file was found at the given path."

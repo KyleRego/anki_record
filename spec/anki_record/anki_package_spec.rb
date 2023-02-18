@@ -206,9 +206,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
         anki_database_from_existing
         expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 1
       end
-      it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
-      it "does not save a new *.apkg zip file"
-      it "does not close the database"
+      # it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
+      # it "does not save a new *.apkg zip file"
+      # it "does not close the database"
     end
 
     context "with a block argument" do
@@ -218,9 +218,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
         anki_database_from_existing
         expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 1
       end
-      it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
-      it "saves a new version of the *.apkg zip file"
-      it "closes the database"
+      # it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
+      # it "saves a new version of the *.apkg zip file"
+      # it "closes the database"
     end
 
     context "with a block argument that throws an error" do
@@ -228,10 +228,10 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
       # silence output from the rescue clause which puts the error
       # before { expect($stdout).to receive(:write) }
-      it "creates a backup of the *.apkg file"
-      it "deletes the *.anki21 that was created by unzipping the *.apkg file"
-      it "does not save a new version of the *.apkg zip file"
-      it "closes the database"
+      # it "creates a backup of the *.apkg file"
+      # it "deletes the *.anki21 that was created by unzipping the *.apkg file"
+      # it "does not save a new version of the *.apkg zip file"
+      # it "closes the database"
     end
 
     context "with create_backup: false" do
@@ -241,9 +241,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
           anki_database_from_existing
           expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 0
         end
-        it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
-        it "does not save a new version of the *.apkg zip file"
-        it "does not close the database"
+        # it "does not delete the *.anki21 file that was created by unzipping the *.apkg file"
+        # it "does not save a new version of the *.apkg zip file"
+        # it "does not close the database"
       end
 
       context "and a block argument" do
@@ -253,9 +253,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
           anki_database_from_existing
           expect(Dir.entries(".").select { |file| file.match(ANKI_PACKAGE_BACKUP_REGEX) }.count).to eq 0
         end
-        it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
-        it "saves a new version of the *.apkg zip file"
-        it "closes the database"
+        # it "deletes the *.anki21 file that was created by unzipping the *.apkg file"
+        # it "saves a new version of the *.apkg zip file"
+        # it "closes the database"
       end
     end
   end
