@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe AnkiRecord::Field do
+RSpec.describe AnkiRecord::NoteField do
   let(:name_argument) { "test field" }
   let(:note_type_argument) { AnkiRecord::NoteType.new(name: "test note type for fields") }
-  subject(:field) { AnkiRecord::Field.new(note_type: note_type_argument, name: name_argument) }
+  subject(:field) { AnkiRecord::NoteField.new(note_type: note_type_argument, name: name_argument) }
   describe "::new" do
     context "with valid arguments (a parent note type and name)" do
       it "instantiates a field belonging to that note type" do

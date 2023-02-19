@@ -4,14 +4,14 @@ require "pry"
 
 module AnkiRecord
   ##
-  # Template represents a card template of an Anki note type
-  class Template
+  # CardTemplate represents a card template of an Anki note type
+  class CardTemplate
     attr_accessor :name
 
     attr_reader :note_type, :ordinal_number
 
     ##
-    # Instantiates a new template for the given note type
+    # Instantiates a new card template for the given note type
     def initialize(note_type:, name:)
       @note_type = note_type
       @name = name

@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
 require "pry"
-require_relative "field"
-require_relative "template"
+
+require_relative "card_template"
+require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
+require_relative "note_field"
 
 module AnkiRecord
   ##
   # NoteType represents an Anki note type (also called a model)
   class NoteType
+    include AnkiRecord::SharedConstantsHelper
     include AnkiRecord::TimeHelper
-    NEW_NOTE_TYPE_USN = -1
     NEW_NOTE_TYPE_SORT_FIELD = 0
-    private_constant :NEW_NOTE_TYPE_USN, :NEW_NOTE_TYPE_SORT_FIELD
+    private_constant :NEW_NOTE_TYPE_SORT_FIELD
 
     attr_accessor :name, :cloze_type, :css
     attr_reader :id, :templates, :fields
@@ -28,19 +30,19 @@ module AnkiRecord
     ##
     # Create a new field and adds it to this note type's fields
     #
-    # The field is an instance of AnkiRecord::Field
+    # The field is an instance of AnkiRecord::NoteField
     def new_note_field(name:)
       # TODO: Check if name already used by a field in this note type
-      @fields << AnkiRecord::Field.new(note_type: self, name: name)
+      @fields << AnkiRecord::NoteField.new(note_type: self, name: name)
     end
 
     ##
     # Create a new card template and adds it to this note type's templates
     #
-    # The card template is an instance of AnkiRecord::Template
+    # The card template is an instance of AnkiRecord::CardTemplate
     def new_card_template(name:)
       # TODO: Check if name already used by a template in this note type
-      @templates << AnkiRecord::Template.new(note_type: self, name: name)
+      @templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
     end
 
     private
@@ -51,7 +53,7 @@ module AnkiRecord
         @name = name
         @cloze_type = cloze
         @last_modified_time = seconds_since_epoch
-        @usn = NEW_NOTE_TYPE_USN
+        @usn = NEW_OBJECT_USN
         @sort_field = NEW_NOTE_TYPE_SORT_FIELD
         @deck_id = nil
         @templates = []

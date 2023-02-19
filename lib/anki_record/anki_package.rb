@@ -4,7 +4,7 @@ require "pry"
 require "pathname"
 
 require_relative "anki_schema_definition"
-require_relative "note_type"
+require_relative "collection"
 
 module AnkiRecord
   ##
@@ -36,7 +36,7 @@ module AnkiRecord
     # When not passed a block:
     # - #zip_and_close must be called explicitly at the end of your script
     def initialize(name:, directory: Dir.pwd)
-      @anki21_database = setup_instance_variables(name: name, directory: directory)
+      @anki21_database = setup_package_instance_variables(name: name, directory: directory)
 
       return unless block_given?
 
@@ -52,7 +52,7 @@ module AnkiRecord
 
     private
 
-      def setup_instance_variables(name:, directory:)
+      def setup_package_instance_variables(name:, directory:)
         @name = check_name_is_valid(name: name)
         @directory = directory
         @tmp_files = []

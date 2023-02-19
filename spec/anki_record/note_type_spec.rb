@@ -57,9 +57,9 @@ RSpec.describe AnkiRecord::NoteType do
     it "should increase the number of fields this note type has by 1" do
       expect { new_note_field }.to change { note_type.fields.count }.from(0).to(1)
     end
-    it "should add an object of type AnkiRecord::Field to this note type's fields attribute" do
+    it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
       new_note_field
-      expect(note_type.fields.first.instance_of?(AnkiRecord::Field)).to eq true
+      expect(note_type.fields.first.instance_of?(AnkiRecord::NoteField)).to eq true
     end
   end
 
@@ -70,9 +70,9 @@ RSpec.describe AnkiRecord::NoteType do
     it "should increase the number of templates this note type has by 1" do
       expect { new_card_template }.to change { note_type.templates.count }.from(0).to(1)
     end
-    it "should add an object of type AnkiRecord::Field to this note type's fields attribute" do
+    it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
       new_card_template
-      expect(note_type.templates.first.instance_of?(AnkiRecord::Template)).to eq true
+      expect(note_type.templates.first.instance_of?(AnkiRecord::CardTemplate)).to eq true
     end
   end
 end
