@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-ANKI_PACKAGE_REGEX = /.\.apkg/.freeze
-ANKI_PACKAGE_BACKUP_REGEX = /.\.apkg.copy-\d/.freeze
-ANKI_COLLECTION_21_REGEX = /.\.anki21/.freeze
-
 RSpec.describe AnkiRecord::AnkiPackage do
   subject(:anki_database) do
     if defined?(closure_argument) && defined?(directory_argument)
@@ -19,20 +15,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
   let(:database_name) { "default" }
 
-  after do
-    if defined?(directory_argument)
-      cleanup_test_files(directory: directory_argument)
-    else
-      cleanup_test_files(directory: ".")
-    end
-  end
-
-  def cleanup_test_files(directory:)
-    files_created_by_tests = Dir.entries(directory).select do |file|
-      file.match(ANKI_PACKAGE_REGEX) || file.match(ANKI_COLLECTION_21_REGEX)
-    end
-    files_created_by_tests.each { |file| File.delete("#{directory}/#{file}") }
-  end
+  after { defined?(directory_argument) ? cleanup_test_files(directory: directory_argument) : cleanup_test_files(directory: ".") }
 
   describe "::new with invalid name arguments" do
     context "where the name argument is nil, an empty string, a string with spaces,
@@ -51,6 +34,26 @@ RSpec.describe AnkiRecord::AnkiPackage do
     it "saves one *.anki21 file where * is randomly generated" do
       anki_database
       expect(Dir.entries(".").select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq 1
+    end
+    it "saves the *.anki21 file/database with the following 5 tables: cards, col, graves, notes, revlog" do
+      expected_tables = %w[cards col graves notes revlog]
+      result = anki_database.instance_variable_get(:@anki21_database).execute("select name from sqlite_master where type = 'table'").map do |hash|
+        hash["name"]
+      end.sort
+      expect(result).to eq expected_tables
+    end
+    it "saves the *.anki21 file/database with 7 indexes:
+      ix_cards_nid, ix_cards_sched, ix_cards_usn, ix_notes_csum, ix_notes_usn, ix_revlog_cid, ix_revlog_usn" do
+      expected_indexes = %w[ix_cards_nid ix_cards_sched ix_cards_usn ix_notes_csum ix_notes_usn ix_revlog_cid ix_revlog_usn].sort
+      result = anki_database.instance_variable_get(:@anki21_database).execute("select name from sqlite_master where type = 'index'").map do |hash|
+        hash["name"]
+      end.sort
+      expect(result).to eq expected_indexes
+    end
+    it "saves the *.anki21 file/database with 1 record in the col table" do
+      result = anki_database.instance_variable_get(:@anki21_database).execute("select count(*) from col").first["count(*)"]
+
+      expect(result).to eq 1
     end
     it "does not save a *.apkg zip file" do
       anki_database

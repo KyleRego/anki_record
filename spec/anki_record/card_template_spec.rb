@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::CardTemplate do
+  subject(:template) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, name: name_argument) }
+
   let(:note_type_argument) { AnkiRecord::NoteType.new(name: "test note type for templates") }
   let(:name_argument) { "test template" }
-  subject(:template) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, name: name_argument) }
 
   describe "::new" do
     context "with valid arguments (a parent note type and name)" do

@@ -12,6 +12,8 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+  Exclude:
+    - "spec/anki_record/*"
 
 Metrics/BlockLength:
   Exclude:

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::NoteType do
-  let(:name_argument) { "test note type" }
   subject(:note_type) do
     if defined?(cloze_argument)
       AnkiRecord::NoteType.new name: name_argument, cloze: cloze_argument
@@ -9,6 +8,8 @@ RSpec.describe AnkiRecord::NoteType do
       AnkiRecord::NoteType.new name: name_argument
     end
   end
+
+  let(:name_argument) { "test note type" }
 
   describe "::new" do
     context "with a name argument" do

@@ -3,7 +3,8 @@
 require "pry"
 require "pathname"
 
-require_relative "anki_schema_definition"
+require_relative "db/anki_schema_definition"
+require_relative "db/clean_collection_record"
 require_relative "collection"
 
 module AnkiRecord
@@ -21,6 +22,7 @@ module AnkiRecord
     MSG
 
     private_constant :NAME_ERROR_MESSAGE, :PATH_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
+
     ##
     # Creates a new object which represents an Anki SQLite3 database
     #
@@ -36,7 +38,7 @@ module AnkiRecord
     # When not passed a block:
     # - #zip_and_close must be called explicitly at the end of your script
     def initialize(name:, directory: Dir.pwd)
-      @anki21_database = setup_package_instance_variables(name: name, directory: directory)
+      setup_package_instance_variables(name: name, directory: directory)
 
       return unless block_given?
 
@@ -50,13 +52,22 @@ module AnkiRecord
       end
     end
 
+    ##
+    # Executes a raw SQL statement against the *.anki21 database
+    #
+    # Do not use this to execute DDL SQL statements
+    def execute(raw_sql_string)
+      @anki21_database.execute raw_sql_string
+    end
+
     private
 
       def setup_package_instance_variables(name:, directory:)
         @name = check_name_is_valid(name: name)
         @directory = directory
         @tmp_files = []
-        setup_anki21_database_object
+        @anki21_database = setup_anki21_database_object
+        @collection = Collection.new(anki_database: self)
       end
 
       def check_name_is_valid(name:)
@@ -70,6 +81,8 @@ module AnkiRecord
         db = SQLite3::Database.new "#{@directory}/#{random_file_name}", options: {}
         @tmp_files << random_file_name
         db.execute_batch ANKI_SCHEMA_DEFINITION
+        db.execute CLEAN_COLLECTION_RECORD
+        db.results_as_hash = true
         db
       end
 

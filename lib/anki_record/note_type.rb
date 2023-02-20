@@ -28,6 +28,12 @@ module AnkiRecord
     end
 
     ##
+    # TODO: Instantiates a note type from an existing json object in the col.models column
+    def self.from_existing(model_hash:)
+      model_hash["name"]
+    end
+
+    ##
     # Create a new field and adds it to this note type's fields
     #
     # The field is an instance of AnkiRecord::NoteField
