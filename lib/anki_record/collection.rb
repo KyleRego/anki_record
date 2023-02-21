@@ -14,6 +14,8 @@ module AnkiRecord
   class Collection
     include AnkiRecord::TimeHelper
 
+    attr_reader :note_types, :decks
+
     def initialize(anki_database:)
       setup_collection_instance_variables(anki_database: anki_database)
     end
@@ -32,12 +34,12 @@ module AnkiRecord
         @dty = col_record["dty"]
         @usn = col_record["usn"]
         @ls = col_record["ls"]
-        @collection_configuration = JSON.parse(col_record["conf"])
+        @configuration = JSON.parse(col_record["conf"])
         @note_types = JSON.parse(col_record["models"]).values.map do |model_hash|
-          NoteType.from_existing(model_hash: model_hash)
+          NoteType.from_existing(collection: self, model_hash: model_hash)
         end
         @decks = JSON.parse(col_record["decks"]).values.map do |deck_hash|
-          Deck.from_existing(deck_hash: deck_hash)
+          Deck.from_existing(collection: self, deck_hash: deck_hash)
         end
         @deck_option_groups = JSON.parse(col_record["dconf"]).values.map do |dconf_hash|
           DeckOptionsGroup.from_existing(dconf_hash: dconf_hash)

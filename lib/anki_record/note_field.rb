@@ -11,21 +11,49 @@ module AnkiRecord
     DEFAULT_FIELD_DESCRIPTION = ""
     private_constant :DEFAULT_FIELD_FONT_STYLE, :DEFAULT_FIELD_FONT_SIZE, :DEFAULT_FIELD_DESCRIPTION
 
-    attr_accessor :name, :sticky, :right_to_left, :font_style, :font_size
+    attr_accessor :name, :sticky, :right_to_left, :font_style, :font_size, :description
     # TODO: raise exceptions on invalid assignment to prevent downstream errors and specs testing this
 
     attr_reader :note_type, :ordinal_number
 
+    # TODO: All instance variables should at least be readable
+
     ##
     # Instantiates a new field for the given note type
-    def initialize(note_type:, name:)
+    def initialize(note_type:, name: nil, args: nil)
+      raise ArgumentError unless (name && args.nil?) || (args && args["name"])
+
       @note_type = note_type
-      @name = name
-      @ordinal_number = @note_type.fields.length
-      @sticky = false
-      @right_to_left = false
-      @font_style = DEFAULT_FIELD_FONT_STYLE
-      @font_size = DEFAULT_FIELD_FONT_SIZE
+      if args
+        setup_note_field_instance_variables_from_existing(args: args)
+      else
+        setup_note_field_instance_variables(name: name)
+      end
     end
+
+    def self.from_existing(note_type:, field_hash:)
+      new(note_type: note_type, args: field_hash)
+    end
+
+    private
+
+      def setup_note_field_instance_variables_from_existing(args:)
+        @name = args["name"]
+        @ordinal_number = args["ord"]
+        @sticky = args["sticky"]
+        @right_to_left = args["rtl"]
+        @font_style = args["font"]
+        @font_size = args["size"]
+      end
+
+      def setup_note_field_instance_variables(name:)
+        @name = name
+        @ordinal_number = @note_type.fields.length
+        @sticky = false
+        @right_to_left = false
+        @font_style = DEFAULT_FIELD_FONT_STYLE
+        @font_size = DEFAULT_FIELD_FONT_SIZE
+        @description = DEFAULT_FIELD_DESCRIPTION
+      end
   end
 end

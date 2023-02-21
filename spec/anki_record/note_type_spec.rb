@@ -3,24 +3,30 @@
 RSpec.describe AnkiRecord::NoteType do
   subject(:note_type) do
     if defined?(cloze_argument)
-      AnkiRecord::NoteType.new name: name_argument, cloze: cloze_argument
+      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument, cloze: cloze_argument
     else
-      AnkiRecord::NoteType.new name: name_argument
+      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument
     end
   end
 
+  after { cleanup_test_files(directory: ".") }
+
   let(:name_argument) { "test note type" }
+  let(:collection_argument) do
+    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_database: anki_database)
+  end
 
   describe "::new" do
     context "with a name argument" do
-      it "instantiates a note type with a name" do
+      it "instantiates a note type with name equal to the name argument" do
         expect(note_type.name).to eq name_argument
       end
-      it "instantiates a note type with an integer id using #milliseconds_since_epoch" do
+      it "instantiates a note type with an integer id" do
         expect(note_type.id.class).to eq Integer
       end
       it "instantiates a non-cloze note type" do
-        expect(note_type.cloze_type).to eq false
+        expect(note_type.cloze).to eq false
       end
       context "instantiates a note type with default CSS styling" do
         it "that defines styling for the 'card' CSS class" do
@@ -39,14 +45,19 @@ RSpec.describe AnkiRecord::NoteType do
       context "and with a cloze: true argument" do
         let(:cloze_argument) { true }
         it "instantiates a cloze note type" do
-          expect(note_type.cloze_type).to eq true
+          expect(note_type.cloze).to eq true
         end
       end
     end
     context "without a name argument" do
       let(:name_argument) { nil }
       it "throws an ArgumentError" do
-        expect { subject }.to raise_error ArgumentError
+        expect { note_type }.to raise_error ArgumentError
+      end
+    end
+    context "with a name argument and an args argument" do
+      it "throw an ArgumentError" do
+        expect { AnkiRecord::NoteType.new(collection: collection_argument, name: "test", args: {}) }.to raise_error ArgumentError
       end
     end
   end
@@ -74,6 +85,96 @@ RSpec.describe AnkiRecord::NoteType do
     it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
       new_card_template
       expect(note_type.templates.first.instance_of?(AnkiRecord::CardTemplate)).to eq true
+    end
+  end
+
+  subject(:note_type_from_existing) { AnkiRecord::NoteType.from_existing(collection: collection_argument, model_hash: model_hash) }
+
+  describe "::from_existing" do
+    context "when the model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
+      # rubocop:disable Layout/LineContinuationLeadingSpace
+      let(:model_hash) do
+        { "id" => 1_676_902_364_661,
+          "name" => "Basic",
+          "type" => 0,
+          "mod" => 0,
+          "usn" => 0,
+          "sortf" => 0,
+          "did" => nil,
+          "tmpls" =>
+          [{ "name" => "Card 1",
+             "ord" => 0,
+             "qfmt" => "{{Front}}",
+             "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+             "bqfmt" => "",
+             "bafmt" => "",
+             "did" => nil,
+             "bfont" => "",
+             "bsize" => 0 }],
+          "flds" =>
+          [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
+           { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
+          "css" =>
+          ".card {\n" \
+          "    font-family: arial;\n" \
+          "    font-size: 20px;\n" \
+          "    text-align: center;\n" \
+          "    color: black;\n" \
+          "    background-color: white;\n" \
+          "}\n",
+          "latexPre" =>
+          "\\documentclass[12pt]{article}\n" \
+          "\\special{papersize=3in,5in}\n" \
+          "\\usepackage[utf8]{inputenc}\n" \
+          "\\usepackage{amssymb,amsmath}\n" \
+          "\\pagestyle{empty}\n" \
+          "\\setlength{\\parindent}{0in}\n" \
+          "\\begin{document}\n",
+          "latexPost" => "\\end{document}",
+          "latexsvg" => false,
+          "req" => [[0, "any", [0]]] }
+      end
+      # rubocop:enable Layout/LineContinuationLeadingSpace
+
+      it "instantiates a note type object with id the same as the data" do
+        expect(note_type_from_existing.id).to eq model_hash["id"]
+      end
+      it "instantiates a note type object with name Basic" do
+        expect(note_type_from_existing.name).to eq "Basic"
+      end
+      it "instantiates a non-cloze type note type object" do
+        expect(note_type_from_existing.cloze).to eq false
+      end
+      it "instantiates a note type with an integer id" do
+        expect(note_type_from_existing.id.class).to eq Integer
+      end
+      it "instantiates a note type with NULL deck id" do
+        expect(note_type_from_existing.deck_id).to eq nil
+      end
+      it "instantiates a note type with one template" do
+        expect(note_type_from_existing.templates.count).to eq 1
+      end
+      it "instantiates a note type with a template with the name Card 1" do
+        expect(note_type_from_existing.templates.first.name).to eq "Card 1"
+      end
+      it "instantiates a note type with 2 fields" do
+        expect(note_type_from_existing.fields.count).to eq 2
+      end
+      it "instantiates a note type with a Front field and a Back field" do
+        expect(note_type_from_existing.fields.map(&:name).sort).to eq %w[Back Front]
+      end
+      it "instantiates a note type with the data's CSS styling" do
+        expect(note_type_from_existing.css).to eq model_hash["css"]
+      end
+      it "instantiates a note type with the data's LaTeX preamble" do
+        expect(note_type_from_existing.latex_preamble).to eq model_hash["latexPre"]
+      end
+      it "instantiates a note type with the data's LaTeX postamble" do
+        expect(note_type_from_existing.latex_postamble).to eq model_hash["latexPost"]
+      end
+      it "instantiates a note type with latex_svg false" do
+        expect(note_type_from_existing.latex_svg).to eq false
+      end
     end
   end
 end

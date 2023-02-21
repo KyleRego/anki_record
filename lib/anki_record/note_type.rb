@@ -16,21 +16,31 @@ module AnkiRecord
     NEW_NOTE_TYPE_SORT_FIELD = 0
     private_constant :NEW_NOTE_TYPE_SORT_FIELD
 
-    attr_accessor :name, :cloze_type, :css
-    attr_reader :id, :templates, :fields
+    attr_accessor :name, :cloze, :css, :latex_preamble, :latex_postamble, :latex_svg
+    attr_reader :id, :templates, :fields, :deck_id
+
+    # TODO: All instance variables should at least be readable
 
     ##
     # Instantiates a new note type
-    def initialize(name:, cloze: false)
-      raise ArgumentError unless name
+    def initialize(collection:, name: nil, cloze: false, args: nil)
+      raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
-      setup_note_type_instance_variables(name: name, cloze: cloze)
+      @collection = collection
+
+      if args
+        setup_note_type_instance_variables_from_existing(args: args)
+      else
+        setup_note_type_instance_variables(
+          name: name, cloze: cloze
+        )
+      end
     end
 
     ##
-    # TODO: Instantiates a note type from an existing json object in the col.models column
-    def self.from_existing(model_hash:)
-      model_hash["name"]
+    # Instantiates a note type from an existing JSON object from the Anki col.models column
+    def self.from_existing(collection:, model_hash:)
+      new(collection: collection, args: model_hash)
     end
 
     ##
@@ -54,16 +64,39 @@ module AnkiRecord
     private
 
       # rubocop:disable Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize
+      def setup_note_type_instance_variables_from_existing(args:)
+        @id = args["id"]
+        @name = args["name"]
+        @cloze = args["type"] == 1
+        @last_modified_time = args["mod"]
+        @usn = args["usn"]
+        @sort_field = args["sortf"]
+        @deck_id = args["did"]
+        @fields = args["flds"].map { |fld| NoteField.from_existing(note_type: self, field_hash: fld) }
+        @templates = args["tmpls"].map { |tmpl| CardTemplate.from_existing(note_type: self, template_hash: tmpl) }
+        @css = args["css"]
+        @latex_preamble = args["latexPre"]
+        @latex_postamble = args["latexPost"]
+        @latex_svg = args["latexsvg"]
+        @req = args["req"]
+        @tags = args["tags"]
+        @vers = args["vers"]
+      end
+      # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize
+
+      # rubocop:disable Metrics/MethodLength
       def setup_note_type_instance_variables(name:, cloze:)
         @id = milliseconds_since_epoch
         @name = name
-        @cloze_type = cloze
+        @cloze = cloze
         @last_modified_time = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @sort_field = NEW_NOTE_TYPE_SORT_FIELD
         @deck_id = nil
-        @templates = []
         @fields = []
+        @templates = []
         @css = default_css
         @latex_preamble = default_latex_preamble
         @latex_postamble = default_latex_postamble
