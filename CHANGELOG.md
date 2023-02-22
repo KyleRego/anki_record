@@ -1,5 +1,5 @@
-## [Unreleased] - 2023-02-12
+## [Development started] - 02-02-2023
 
-## [0.1.0] - Future date
+## [Unreleased/0.1.0] - 02-22-2023
 
-- Initial release
+- First version that can be used to create a complete *.apkg file that imports into Anki
