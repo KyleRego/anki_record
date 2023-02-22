@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::Collection do
-  subject(:collection) { AnkiRecord::Collection.new(anki_database: anki_database) }
+  subject(:collection) { AnkiRecord::Collection.new(anki_package: anki_package) }
   # Be aware that AnkiPackage has a Collection as a collaborator upon instantiation
 
   after { cleanup_test_files(directory: ".") }
 
   context "when the *.apkg file is a new empty *.apkg created using this library" do
-    let(:anki_database) { AnkiRecord::AnkiPackage.new(name: "package_to_test_collection") }
+    let(:anki_package) { AnkiRecord::AnkiPackage.new(name: "package_to_test_collection") }
 
     describe "::new" do
       it "instantiates a new Collection object" do

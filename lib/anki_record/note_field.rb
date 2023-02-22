@@ -31,10 +31,6 @@ module AnkiRecord
       end
     end
 
-    def self.from_existing(note_type:, field_hash:)
-      new(note_type: note_type, args: field_hash)
-    end
-
     private
 
       def setup_note_field_instance_variables_from_existing(args:)

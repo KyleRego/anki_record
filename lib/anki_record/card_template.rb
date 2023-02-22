@@ -56,12 +56,6 @@ module AnkiRecord
     public
 
     ##
-    # Instantiate a card template using a JSON object from the database
-    def self.from_existing(note_type:, template_hash:)
-      new(note_type: note_type, args: template_hash)
-    end
-
-    ##
     # Returns the field names that are allowed in the answer format and question format
     #
     # These are the field_name values in {{field_name}}

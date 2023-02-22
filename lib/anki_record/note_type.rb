@@ -38,12 +38,6 @@ module AnkiRecord
     end
 
     ##
-    # Instantiates a note type from an existing JSON object from the Anki col.models column
-    def self.from_existing(collection:, model_hash:)
-      new(collection: collection, args: model_hash)
-    end
-
-    ##
     # Create a new field and adds it to this note type's fields
     #
     # The field is an instance of AnkiRecord::NoteField
@@ -73,8 +67,8 @@ module AnkiRecord
         @usn = args["usn"]
         @sort_field = args["sortf"]
         @deck_id = args["did"]
-        @fields = args["flds"].map { |fld| NoteField.from_existing(note_type: self, field_hash: fld) }
-        @templates = args["tmpls"].map { |tmpl| CardTemplate.from_existing(note_type: self, template_hash: tmpl) }
+        @fields = args["flds"].map { |fld| NoteField.new(note_type: self, args: fld) }
+        @templates = args["tmpls"].map { |tmpl| CardTemplate.new(note_type: self, args: tmpl) }
         @css = args["css"]
         @latex_preamble = args["latexPre"]
         @latex_postamble = args["latexPost"]

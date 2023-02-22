@@ -7,8 +7,8 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
   after { cleanup_test_files(directory: ".") }
 
   let(:collection_argument) do
-    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_database: anki_database)
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
   describe "::new" do
@@ -25,7 +25,7 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
     end
   end
 
-  describe "::from_existing" do
+  describe "::new passed an args hash" do
     subject(:deck_options_group_from_existing) do
       AnkiRecord::DeckOptionsGroup.new(collection: collection_argument, args: deck_options_group_hash)
     end

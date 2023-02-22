@@ -10,11 +10,11 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Automate Anki flashcard editing with the Ruby programming language."
   spec.description = <<-DESC
-  This Ruby library provides an interface to inspect, update, and create Anki SQLite3 databases (*.apkg files).
+  This Ruby library, which is currently in development, will provide an interface to inspect, update, and create Anki SQLite3 databases (*.apkg files).
   DESC
   spec.homepage = "https://github.com/KyleRego/anki_record"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 3.2.1"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
   spec.metadata["rubygems_mfa_required"] = "true"
@@ -33,7 +33,6 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activerecord"
   spec.add_dependency "rubyzip", ">= 2.3"
   spec.add_dependency "sqlite3"
 

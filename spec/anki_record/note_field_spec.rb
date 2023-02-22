@@ -8,8 +8,8 @@ RSpec.describe AnkiRecord::NoteField do
   let(:name_argument) { "test field" }
 
   let(:collection_argument) do
-    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_database: anki_database)
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
   let(:note_type_argument) { AnkiRecord::NoteType.new(collection: collection_argument, name: "test note type for fields") }
 
@@ -57,8 +57,8 @@ RSpec.describe AnkiRecord::NoteField do
     end
   end
 
-  describe "::from_existing" do
-    subject(:note_field_from_existing) { AnkiRecord::NoteField.from_existing(note_type: note_type_argument, field_hash: field_hash) }
+  describe "::new passed an args hash" do
+    subject(:note_field_from_existing) { AnkiRecord::NoteField.new(note_type: note_type_argument, args: field_hash) }
 
     context "when the field JSON object is the first field (with name 'Front') of the default Card 1 template for the default Basic note type" do
       let(:field_hash) do

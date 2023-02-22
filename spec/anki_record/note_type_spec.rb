@@ -13,11 +13,11 @@ RSpec.describe AnkiRecord::NoteType do
 
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
-    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_database: anki_database)
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
-  describe "::new" do
+  describe "::new with name argument" do
     context "with a name argument" do
       it "instantiates a note type with name equal to the name argument" do
         expect(note_type.name).to eq name_argument
@@ -88,9 +88,9 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
-  subject(:note_type_from_existing) { AnkiRecord::NoteType.from_existing(collection: collection_argument, model_hash: model_hash) }
+  subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: model_hash) }
 
-  describe "::from_existing" do
+  describe "::new passed an args hash" do
     context "when the model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
       # rubocop:disable Layout/LineContinuationLeadingSpace
       let(:model_hash) do

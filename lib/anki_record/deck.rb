@@ -36,12 +36,6 @@ module AnkiRecord
       end
     end
 
-    ##
-    # Instantiates a Deck from an existing JSON object from the Anki col.decks column
-    def self.from_existing(collection:, deck_hash:)
-      new(collection: collection, args: deck_hash)
-    end
-
     private
 
       # rubocop:disable Metrics/MethodLength

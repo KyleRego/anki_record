@@ -7,13 +7,16 @@ end
 
 require "anki_record"
 
-ANKI_PACKAGE_REGEX = /.\.apkg/.freeze
-ANKI_PACKAGE_BACKUP_REGEX = /.\.apkg.copy-\d/.freeze
-ANKI_COLLECTION_21_REGEX = /.\.anki21/.freeze
+ANKI_PACKAGE_REGEX = /.\.apkg$/
+ANKI_PACKAGE_BACKUP_REGEX = /.\.apkg\.copy-\d+$/
+ANKI_COLLECTION_21_REGEX = /collection\.anki21$/
+ANKI_COLLECTION_2_REGEX = /collection\.anki2$/
+
+TEST_TMP_DIRECTORY = "test_relative_tmp_dir"
 
 def cleanup_test_files(directory:)
   files_created_by_tests = Dir.entries(directory).select do |file|
-    file.match(ANKI_PACKAGE_REGEX) || file.match(ANKI_COLLECTION_21_REGEX)
+    file.match(ANKI_PACKAGE_REGEX) || file.match(ANKI_PACKAGE_BACKUP_REGEX)
   end
   files_created_by_tests.each { |file| File.delete("#{directory}/#{file}") }
 end

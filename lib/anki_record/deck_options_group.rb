@@ -33,12 +33,6 @@ module AnkiRecord
       end
     end
 
-    ##
-    # TODO: Instantiates a note type from an existing JSON object in the col.dconf column
-    def self.from_existing(dconf_hash:)
-      dconf_hash["name"]
-    end
-
     private
 
       # rubocop:disable Metrics/MethodLength

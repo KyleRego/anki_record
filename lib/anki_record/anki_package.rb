@@ -4,7 +4,8 @@ require "pry"
 require "pathname"
 
 require_relative "db/anki_schema_definition"
-require_relative "db/clean_collection_record"
+require_relative "db/clean_collection2_record"
+require_relative "db/clean_collection21_record"
 require_relative "collection"
 
 module AnkiRecord
@@ -30,7 +31,7 @@ module AnkiRecord
     # - Yields execution to the block, and then after the block executes:
     #   - Zips the temporary database into a <name>.apkg file where <name> is the name argument
     #     - The destination directory is the current working directory by default
-    #     - Or the directory argument (a relative file path is recommended)
+    #     - Or the directory argument (as a relative file path)
     #   - Closes the temporary database and deletes the temporary database file (the *.anki21 file)
     # - If the block throws a runtime error:
     #   - Closes the temporary database and deletes the temporary database file
@@ -45,7 +46,7 @@ module AnkiRecord
       begin
         yield self
       rescue StandardError => e
-        close(destroy_temporary_files: true)
+        close
         puts_error_and_standard_message(error: e)
       else
         zip_and_close
@@ -55,7 +56,9 @@ module AnkiRecord
     ##
     # Executes a raw SQL statement against the *.anki21 database
     #
-    # Do not use this to execute DDL SQL statements
+    # Do not use this to execute data definition language SQL statements
+    # (i.e. do not create, alter, or drop tables or indexes)
+    # unless you have a good reason to change the database schema.
     def execute(raw_sql_string)
       @anki21_database.execute raw_sql_string
     end
@@ -64,10 +67,13 @@ module AnkiRecord
 
       def setup_package_instance_variables(name:, directory:)
         @name = check_name_is_valid(name: name)
-        @directory = directory
+        @directory = directory # TODO: check directory is valid
+        @tmpdir = Dir.mktmpdir
         @tmp_files = []
         @anki21_database = setup_anki21_database_object
-        @collection = Collection.new(anki_database: self)
+        @anki2_database = setup_anki2_database_object
+        @media_file = setup_media
+        @collection = Collection.new(anki_package: self)
       end
 
       def check_name_is_valid(name:)
@@ -77,13 +83,32 @@ module AnkiRecord
       end
 
       def setup_anki21_database_object
-        random_file_name = "#{SecureRandom.hex(10)}.anki21"
-        db = SQLite3::Database.new "#{@directory}/#{random_file_name}", options: {}
-        @tmp_files << random_file_name
+        anki21_file_name = "collection.anki21"
+        db = SQLite3::Database.new "#{@tmpdir}/#{anki21_file_name}", options: {}
+        @tmp_files << anki21_file_name
         db.execute_batch ANKI_SCHEMA_DEFINITION
-        db.execute CLEAN_COLLECTION_RECORD
+        db.execute CLEAN_COLLECTION_21_RECORD
         db.results_as_hash = true
         db
+      end
+
+      def setup_anki2_database_object
+        anki2_file_name = "collection.anki2"
+        db = SQLite3::Database.new "#{@tmpdir}/#{anki2_file_name}", options: {}
+        @tmp_files << anki2_file_name
+        db.execute_batch ANKI_SCHEMA_DEFINITION
+        db.execute CLEAN_COLLECTION_2_RECORD
+        db.close
+        db
+      end
+
+      def setup_media
+        media_file_path = FileUtils.touch("#{@tmpdir}/media")[0]
+        media_file = File.open(media_file_path, mode: "w")
+        media_file.write("{}")
+        media_file.close
+        @tmp_files << "media"
+        media_file
       end
 
       def puts_error_and_standard_message(error:)
@@ -117,10 +142,11 @@ module AnkiRecord
     end
 
     ##
-    # Zips the database into a *.apkg file and closes the temporary database.
-    # - With destroy_temporary_files: false, will not delete the temporary database file
-    def zip_and_close(destroy_temporary_files: true)
-      zip && close(destroy_temporary_files: destroy_temporary_files)
+    # Saves and closes the temporary database, zips it into the *.apkg file
+    #
+    # After that, it also deletes the temporary directory and files
+    def zip_and_close
+      zip && close
     end
 
     private
@@ -128,7 +154,7 @@ module AnkiRecord
       def zip
         Zip::File.open(target_zip_file, create: true) do |zip_file|
           @tmp_files.each do |file_name|
-            zip_file.add(file_name, File.join(@directory, file_name))
+            zip_file.add(file_name, File.join(@tmpdir, file_name))
           end
         end
         true
@@ -138,13 +164,9 @@ module AnkiRecord
         "#{@directory}/#{@name}.apkg"
       end
 
-      def close(destroy_temporary_files:)
-        destroy_tmp_files if destroy_temporary_files
+      def close
         @anki21_database.close
-      end
-
-      def destroy_tmp_files
-        @tmp_files.each { |file_name| File.delete("#{@directory}/#{file_name}") }
+        FileUtils.rm_rf(@tmpdir)
       end
 
     public

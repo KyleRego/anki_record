@@ -7,11 +7,11 @@ RSpec.describe AnkiRecord::Deck do
   after { cleanup_test_files(directory: ".") }
 
   let(:collection_argument) do
-    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_database: anki_database)
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
-  describe "::new" do
+  describe "::new used with a name argument" do
     it "instantiates a new Deck object" do
       expect(deck.instance_of?(AnkiRecord::Deck)).to eq true
     end
@@ -22,9 +22,9 @@ RSpec.describe AnkiRecord::Deck do
     end
   end
 
-  subject(:deck_from_existing) { AnkiRecord::Deck.from_existing(collection: collection_argument, deck_hash: deck_hash) }
+  subject(:deck_from_existing) { AnkiRecord::Deck.new(collection: collection_argument, args: deck_hash) }
 
-  describe "::from_existing" do
+  describe "::new passed an args hash" do
     context "when the deck JSON object is the default deck from a fresh Anki profile" do
       let(:deck_hash) do
         { "id" => 1,

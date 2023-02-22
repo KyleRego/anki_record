@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
+ruby "3.2.1"
+
 # Specify your gem's dependencies in anki_record.gemspec
 gemspec
 

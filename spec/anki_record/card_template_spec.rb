@@ -8,14 +8,14 @@ RSpec.describe AnkiRecord::CardTemplate do
   let(:collection_argument) do
     # TODO: since this exact helper is used in many spec files, extract it to a shared one
     # TODO: in future, certain (most) tests should use a double of this to decrease the test suite run time
-    anki_database = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_database: anki_database)
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
   let(:note_type_argument) { AnkiRecord::NoteType.new(collection: collection_argument, name: "test note type for templates") }
   let(:name_argument) { "test template" }
 
-  describe "::new" do
+  describe "::new used to instantiate a card template with a name argument" do
     context "with valid arguments (a parent note type and name)" do
       it "instantiates a template belonging to that note type" do
         expect(template.note_type).to eq note_type_argument
@@ -86,11 +86,11 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
   end
 
-  describe "::from_existing" do
-    subject(:card_template_from_existing) { AnkiRecord::CardTemplate.from_existing(note_type: note_type_argument, template_hash: template_hash) }
+  describe "::new passed an args hash" do
+    subject(:card_template_from_existing) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, args: card_template_hash) }
 
-    context "when the template object is the default Card 1 template for the default Basic note type" do
-      let(:template_hash) do
+    context "when the args hash is the default Card 1 template JSON object for the default Basic note type from a new Anki 2.1.54 profile" do
+      let(:card_template_hash) do
         { "name" => "Card 1",
           "ord" => 0,
           "qfmt" => "{{Front}}",
