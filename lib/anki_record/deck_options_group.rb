@@ -12,14 +12,18 @@ module AnkiRecord
     include SharedConstantsHelper
     include TimeHelper
 
+    ##
+    # The name of the options group
     attr_accessor :name
 
+    ##
+    # One of many attributes that is currently read-only and needs to be documented.
     attr_reader :collection, :id, :last_modified_time, :usn, :max_taken, :auto_play, :timer, :replay_question,
                 :new_options, :review_options, :lapse_options, :dyn, :new_mix, :new_per_day_minimum,
                 :interday_learning_mix, :review_order, :new_sort_order, :new_gather_priority, :bury_interday_learning
 
     ##
-    # Instantiates a new deck options group with defaults
+    # Instantiates a new deck options group called +name+ with defaults
     def initialize(collection:, name: nil, args: nil)
       # TODO: extract this check to a shared helper
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])

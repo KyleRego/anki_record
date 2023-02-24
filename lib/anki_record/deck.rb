@@ -5,6 +5,8 @@ require "pry"
 require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 
+# TODO: All instance variables should at least be readable
+
 module AnkiRecord
   ##
   # Deck represents an Anki deck
@@ -15,13 +17,19 @@ module AnkiRecord
     DEFAULT_DECK_TODAY_ARRAY = [0, 0].freeze
     DEFAULT_COLLAPSED = false
 
-    attr_accessor :name, :description
-
-    attr_reader :collection, :id, :last_modified_time, :deck_options_group_id
-
-    # TODO: All instance variables should at least be readable
-
     private_constant :DEFAULT_DECK_TODAY_ARRAY, :DEFAULT_COLLAPSED
+
+    ##
+    # The name of the deck
+    attr_accessor :name
+
+    ##
+    # The description of the deck
+    attr_accessor :description
+
+    ##
+    # One of many attributes that is currently read-only and needs to be documented.
+    attr_reader :collection, :id, :last_modified_time, :deck_options_group_id
 
     ##
     # Instantiate a new Deck

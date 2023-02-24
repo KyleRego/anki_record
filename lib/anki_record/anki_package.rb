@@ -10,9 +10,9 @@ require_relative "collection"
 
 module AnkiRecord
   ##
-  # Represents an Anki SQLite3 database
+  # Represents an Anki SQLite3 package/database
   #
-  # Use ::new to create an empty one or ::open to create an object from an existing one
+  # Use ::new to create a new object or ::open to create an object from an existing one
   class AnkiPackage
     NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
     PATH_ERROR_MESSAGE = "*No .apkg file was found at the given path."
@@ -27,17 +27,14 @@ module AnkiRecord
     ##
     # Creates a new object which represents an Anki SQLite3 database
     #
-    # When passed a block:
-    # - Yields execution to the block, and then after the block executes:
-    #   - Zips the temporary database into a <name>.apkg file where <name> is the name argument
-    #     - The destination directory is the current working directory by default
-    #     - Or the directory argument (as a relative file path)
-    #   - Closes the temporary database and deletes the temporary database file (the *.anki21 file)
-    # - If the block throws a runtime error:
-    #   - Closes the temporary database and deletes the temporary database file
-    #   - Does not create the zip file
-    # When not passed a block:
-    # - #zip_and_close must be called explicitly at the end of your script
+    # This method takes an optional block argument.
+    #
+    # When a block argument is used, execution is yielded to the block.
+    # After the block executes, the temporary files are zipped into the +name+.apkg file
+    # which is saved in +directory+. +directory+ is the current working directory by default.
+    # If the block throws a runtime error, the temporary files are deleted but the zip file is not created.
+    #
+    # When no block argument is used, #zip_and_close must be called explicitly at the end of your script.
     def initialize(name:, directory: Dir.pwd)
       setup_package_instance_variables(name: name, directory: directory)
 
@@ -118,7 +115,9 @@ module AnkiRecord
     public
 
     ##
-    # Creates a new object which represents the Anki SQLite3 database file at path
+    # Creates a new object which represents the Anki SQLite3 database file at +path+
+    #
+    # Development has focused on ::new so this method is not recommended at this time
     def self.open(path:, create_backup: true)
       pathname = check_file_at_path_is_valid(path: path)
       copy_apkg_file(pathname: pathname) if create_backup
@@ -142,9 +141,7 @@ module AnkiRecord
     end
 
     ##
-    # Saves and closes the temporary database, zips it into the *.apkg file
-    #
-    # After that, it also deletes the temporary directory and files
+    # Zips the temporary files into the *.apkg package and deletes the temporary files.
     def zip_and_close
       zip && close
     end

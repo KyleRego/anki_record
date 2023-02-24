@@ -7,6 +7,8 @@ require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 require_relative "note_field"
 
+# TODO: All instance variables should at least be readable
+
 module AnkiRecord
   ##
   # NoteType represents an Anki note type (also called a model)
@@ -16,10 +18,21 @@ module AnkiRecord
     NEW_NOTE_TYPE_SORT_FIELD = 0
     private_constant :NEW_NOTE_TYPE_SORT_FIELD
 
-    attr_accessor :name, :cloze, :css, :latex_preamble, :latex_postamble, :latex_svg
-    attr_reader :id, :templates, :fields, :deck_id
+    ##
+    # The name of this note type
+    attr_accessor :name
 
-    # TODO: All instance variables should at least be readable
+    ##
+    # true if the note type is a cloze note type and false if it is not
+    attr_accessor :cloze
+
+    ##
+    # One of many attributes that is readable and writeable but needs to be documented
+    attr_accessor :css, :latex_preamble, :latex_postamble, :latex_svg
+
+    ##
+    # One of many attributes that is currently read-only and needs to be documented.
+    attr_reader :id, :templates, :fields, :deck_id
 
     ##
     # Instantiates a new note type

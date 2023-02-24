@@ -14,8 +14,16 @@ module AnkiRecord
   class Collection
     include AnkiRecord::TimeHelper
 
-    attr_reader :note_types, :decks
+    ##
+    # An array of the collection's note type objects
+    attr_reader :note_types
 
+    ##
+    # An array of the collection's deck objects
+    attr_reader :decks
+
+    ##
+    # Instantiates the collection object for the +anki_package+
     def initialize(anki_package:)
       setup_collection_instance_variables(anki_package: anki_package)
     end

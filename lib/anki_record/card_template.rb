@@ -2,19 +2,42 @@
 
 require "pry"
 
+# TODO: All instance variables should at least be readable
+
 module AnkiRecord
   ##
   # CardTemplate represents a card template of an Anki note type
   class CardTemplate
-    attr_accessor :name, :question_format, :answer_format, :browser_font_style, :browser_font_size
-
-    attr_reader :note_type, :ordinal_number
-
-    # TODO: All instance variables should at least be readable
+    ##
+    # The name of this card template
+    attr_accessor :name
 
     ##
-    # Instantiates a new card template for the given note type
-    #
+    # The question format
+    attr_accessor :question_format
+
+    ##
+    # The answer format
+    attr_accessor :answer_format
+
+    ##
+    # The font style shown for this card template in the browser
+    attr_accessor :browser_font_style
+
+    ##
+    # The font size used for this card template in the browser
+    attr_accessor :browser_font_size
+
+    ##
+    # The note type that this card template belongs to
+    attr_reader :note_type
+
+    ##
+    # 0 for the first card template of the note type, 1 for the second, etc.
+    attr_reader :ordinal_number
+
+    ##
+    # Instantiates a new card template called +name+ for the given note type
     #
     def initialize(note_type:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
@@ -58,8 +81,9 @@ module AnkiRecord
     ##
     # Returns the field names that are allowed in the answer format and question format
     #
-    # These are the field_name values in {{field_name}}
-    # andnd are equivalent to the names of the fields of the template's note type
+    # These are the field_name values in {{field_name}} in those formats.
+    #
+    # They are equivalent to the names of the fields of the template's note type.
     def allowed_field_names
       @note_type.fields.map(&:name)
     end

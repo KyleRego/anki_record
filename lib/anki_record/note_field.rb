@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# TODO: raise exceptions on invalid assignment to prevent downstream errors and specs for the writeable attributes
+# TODO: All instance variables should at least be readable
+
 require "pry"
 
 module AnkiRecord
@@ -11,12 +14,17 @@ module AnkiRecord
     DEFAULT_FIELD_DESCRIPTION = ""
     private_constant :DEFAULT_FIELD_FONT_STYLE, :DEFAULT_FIELD_FONT_SIZE, :DEFAULT_FIELD_DESCRIPTION
 
-    attr_accessor :name, :sticky, :right_to_left, :font_style, :font_size, :description
-    # TODO: raise exceptions on invalid assignment to prevent downstream errors and specs testing this
+    ##
+    # The name of the note field
+    attr_accessor :name
 
+    ##
+    # One of many attributes that is readable and writeable but needs to be documented
+    attr_accessor :sticky, :right_to_left, :font_style, :font_size, :description
+
+    ##
+    # One of many attributes that is currently read-only and needs to be documented.
     attr_reader :note_type, :ordinal_number
-
-    # TODO: All instance variables should at least be readable
 
     ##
     # Instantiates a new field for the given note type
