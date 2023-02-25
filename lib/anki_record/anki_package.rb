@@ -34,20 +34,11 @@ module AnkiRecord
     # which is saved in +directory+. +directory+ is the current working directory by default.
     # If the block throws a runtime error, the temporary files are deleted but the zip file is not created.
     #
-    # When no block argument is used, #zip_and_close must be called explicitly at the end of your script.
-    def initialize(name:, directory: Dir.pwd)
+    # When no block argument is used, #zip must be called explicitly at the end of your script.
+    def initialize(name:, directory: Dir.pwd, &closure)
       setup_package_instance_variables(name: name, directory: directory)
 
-      return unless block_given?
-
-      begin
-        yield self
-      rescue StandardError => e
-        close
-        puts_error_and_standard_message(error: e)
-      else
-        zip_and_close
-      end
+      execute_closure_and_zip(&closure) if block_given?
     end
 
     ##
@@ -61,6 +52,15 @@ module AnkiRecord
     end
 
     private
+
+      def execute_closure_and_zip(&closure)
+        closure.call
+      rescue StandardError => e
+        destroy_temporary_directory
+        puts_error_and_standard_message(error: e)
+      else
+        zip
+      end
 
       def setup_package_instance_variables(name:, directory:)
         @name = check_name_is_valid(name: name)
@@ -118,13 +118,23 @@ module AnkiRecord
     # Creates a new object which represents the Anki SQLite3 database file at +path+
     #
     # Development has focused on ::new so this method is not recommended at this time
-    def self.open(path:, create_backup: true)
+    def self.open(path:, target_directory: nil, &closure)
       pathname = check_file_at_path_is_valid(path: path)
-      copy_apkg_file(pathname: pathname) if create_backup
-      @anki_package = new(name: pathname.basename.to_s, directory: pathname.dirname)
+      new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
+
+      @anki_package = if target_directory
+                        new(name: new_apkg_name,
+                            directory: target_directory)
+                      else
+                        new(name: new_apkg_name)
+                      end
+      @anki_package.send :execute_closure_and_zip, &closure if block_given?
+      @anki_package
     end
 
     class << self
+      include TimeHelper
+
       private
 
         def check_file_at_path_is_valid(path:)
@@ -134,7 +144,7 @@ module AnkiRecord
           pathname
         end
 
-        def copy_apkg_file(pathname:)
+        def create_apkg_backup(pathname:)
           path = pathname.to_s
           FileUtils.cp path, "#{path}.copy-#{Time.now.to_i}"
         end
@@ -142,13 +152,13 @@ module AnkiRecord
 
     ##
     # Zips the temporary files into the *.apkg package and deletes the temporary files.
-    def zip_and_close
-      zip && close
+    def zip
+      create_zip_file && destroy_temporary_directory
     end
 
     private
 
-      def zip
+      def create_zip_file
         Zip::File.open(target_zip_file, create: true) do |zip_file|
           @tmp_files.each do |file_name|
             zip_file.add(file_name, File.join(@tmpdir, file_name))
@@ -161,7 +171,7 @@ module AnkiRecord
         "#{@directory}/#{@name}.apkg"
       end
 
-      def close
+      def destroy_temporary_directory
         @anki21_database.close
         FileUtils.rm_rf(@tmpdir)
       end

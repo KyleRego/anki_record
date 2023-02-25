@@ -21,9 +21,9 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ```ruby
 require "anki_record"
 
-db = AnkiRecord::AnkiPackage.new name: "test1"
-db.execute "any valid SQL statement"
-db.zip_and_close # creates test.apkg file in the current working directory
+apkg = AnkiRecord::AnkiPackage.new name: "test1"
+apkg.execute "any valid SQL statement"
+apkg.zip # creates test1.apkg file in the current working directory
 
 ```
 
@@ -38,7 +38,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ### Release checklist
 - Bump version
 - Update changelog
-- Regenerate documentation
+- Ensure specs written in similar style
+- Update usage examples
+- Update and regenerate documentation
+- Release gem
 
 <!-- ## Contributing
 
@@ -50,4 +53,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the AnkiRecord project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/KyleRegoanki_record/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the AnkiRecord project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/KyleRego/anki_record/blob/main/CODE_OF_CONDUCT.md).

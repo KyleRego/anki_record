@@ -5,10 +5,18 @@ RSpec.describe AnkiRecord do
     expect(true).to eq true
   end
 
+  before(:all) { cleanup_test_files directory: "." }
+
   context "end to end tests" do
-    it "should generate a new, empty Anki package (test1.apkg) that should import into Anki correctly" do
-      db = AnkiRecord::AnkiPackage.new name: "test1"
-      db.zip_and_close
+    describe "::new and ::open without block arguments" do
+      it "should zip a new, empty Anki package (test1.apkg)
+          and then it should open that file and zip an updated version (test1-number.apkg)
+          and both of these should import into Anki correctly" do
+        apkg = AnkiRecord::AnkiPackage.new name: "test1"
+        apkg.zip
+        apkg2 = AnkiRecord::AnkiPackage.open path: "test1.apkg"
+        apkg2.zip
+      end
     end
   end
 end
