@@ -14,12 +14,12 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
   describe "::new" do
     context "without a name argument" do
       let(:name_argument) { nil }
-      it "raises an ArgumentError" do
+      it "should raise an ArgumentError" do
         expect { deck_options_group }.to raise_error ArgumentError
       end
     end
     context "with a name argument" do
-      it "instantiates a new deck options group" do
+      it "should instantiate a new deck options group" do
         expect(deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)).to eq true
       end
     end
@@ -51,13 +51,16 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
           "newGatherPriority" => 0,
           "buryInterdayLearning" => false }
       end
-      it "instantiates a deck options group belonging to the collection" do
+      it "should instantiate a deck options group belonging to the collection" do
         expect(deck_options_group_from_existing.collection).to eq collection_argument
       end
-      it "instantiates a deck options group with an id from the JSON data" do
+      it "should instantiate a deck options group with name from the JSON data" do
+        expect(deck_options_group_from_existing.name).to eq "Default"
+      end
+      it "should instantiate a deck options group with id from the JSON data" do
         expect(deck_options_group_from_existing.id).to eq 1
       end
-      it "instantiates a deck options group with an last modified time from the JSON data" do
+      it "should instantiate a deck options group with a last modified time from the JSON data" do
         expect(deck_options_group_from_existing.last_modified_time).to eq 0
       end
       # TODO: - specs for every attribute of DeckOptionsGroup

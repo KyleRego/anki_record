@@ -2,33 +2,56 @@
 
 RSpec.describe AnkiRecord::Collection do
   subject(:collection) { AnkiRecord::Collection.new(anki_package: anki_package) }
-  # Be aware that AnkiPackage has a Collection as a collaborator upon instantiation
 
   after { cleanup_test_files(directory: ".") }
 
-  context "when the *.apkg file is a new empty *.apkg created using this library" do
+  context "when the AnkiPackage represents a new empty *.apkg file created using this library" do
     let(:anki_package) { AnkiRecord::AnkiPackage.new(name: "package_to_test_collection") }
 
     describe "::new" do
-      it "instantiates a new Collection object" do
+      it "should instantiate a new Collection object" do
         expect(collection.instance_of?(AnkiRecord::Collection)).to eq true
       end
-      # These specs may need to change if it is problematic to make new packages with all the default note
-      # types of a new Anki installation; this could cause issues creating extra note types that
-      # people do not want in the import even if they are unused by any notes.
-      it "instantiates a new Collection object with the 5 default note types" do
+      it "should instantiate a new Collection object which belongs to the given AnkiPackage object" do
+        expect(collection.anki_package).to eq anki_package
+      end
+      it "should instantiate a new Collection object with an id of 1" do
+        expect(collection.id).to eq 1
+      end
+      it "should instantiate a new Collection object with the creation_timestamp attribute having an integer value" do
+        expect(collection.creation_timestamp.instance_of?(Integer)).to eq true
+      end
+      it "should instantiate a new Collection object with the last_modified_time attribute having an integer value" do
+        expect(collection.last_modified_time.instance_of?(Integer)).to eq true
+      end
+      it "should instantiate a new Collection object with 5 note types" do
         expect(collection.note_types.count).to eq 5
       end
-      it "instantiates a new Collection object with note_types that are instances of NoteType" do
-        expect(collection.note_types.all? { |nt| nt.instance_of?(AnkiRecord::NoteType) }).to eq true
+      it "should instantiate a new Collection object with the 5 default note types" do
+        default_note_type_names_array = ["Basic", "Basic (and reversed card)", "Basic (optional reversed card)", "Basic (type in the answer)", "Cloze"]
+        expect(collection.note_types.map(&:name).sort).to eq default_note_type_names_array
       end
-      it "instantiates a new Collection object with the 1 default deck" do
+      it "should instantiate a new Collection object with note_types that are all instances of NoteType" do
+        expect(collection.note_types.all? { |note_type| note_type.instance_of?(AnkiRecord::NoteType) }).to eq true
+      end
+      it "should instantiate a new Collection object with 1 deck" do
         expect(collection.decks.count).to eq 1
       end
-      it "instantiates a new Collection object with decks that are instances of Deck" do
-        expect(collection.decks.first.instance_of?(AnkiRecord::Deck)).to eq true
+      it "should instantiate a new Collection object with a deck called 'Default'" do
+        expect(collection.decks.first.name).to eq "Default"
       end
-      # TODO: specs for deck option groups that are created
+      it "should instantiate a new Collection object with decks that are all instances of Deck" do
+        expect(collection.decks.all? { |deck| deck.instance_of?(AnkiRecord::Deck) }).to eq true
+      end
+      it "should instantiate a new Collection object with 1 deck options group" do
+        expect(collection.deck_options_groups.count).to eq 1
+      end
+      it "should instantiate a new Collection object with a deck options group called 'Default'" do
+        expect(collection.deck_options_groups.first.name).to eq "Default"
+      end
+      it "should instantiate a new Collection object with deck_options_groups that are all instances of DeckOptionsGroup" do
+        expect(collection.deck_options_groups.all? { |deck_opts| deck_opts.instance_of?(AnkiRecord::DeckOptionsGroup) }).to eq true
+      end
     end
   end
 end

@@ -123,8 +123,7 @@ module AnkiRecord
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
 
       @anki_package = if target_directory
-                        new(name: new_apkg_name,
-                            directory: target_directory)
+                        new(name: new_apkg_name, directory: target_directory)
                       else
                         new(name: new_apkg_name)
                       end

@@ -15,15 +15,43 @@ module AnkiRecord
     include AnkiRecord::TimeHelper
 
     ##
-    # An array of the collection's note type objects
+    # The instance of AnkiRecord::AnkiPackage that this collection object belongs to
+    attr_reader :anki_package
+
+    ##
+    # The id attribute will become, or is the same as, the primary key id of this record in the database
+    #
+    # Since there should be only one col record, this attribute should be 1
+    attr_reader :id
+
+    ##
+    # The time in milliseconds that the col record was created since the 1970 epoch
+    attr_reader :creation_timestamp
+
+    ##
+    # The last time that the col record was modified in milliseconds since the 1970 epoch
+    attr_reader :last_modified_time
+
+    ##
+    # An array of the collection's note type objects, which are instances of AnkiRecord::NoteType
     attr_reader :note_types
 
     ##
-    # An array of the collection's deck objects
+    # An array of the collection's deck objects, which are instances of AnkiRecord::Deck
     attr_reader :decks
 
     ##
+    # An array of the collection's deck options group objects, which are instances of AnkiRecord::DeckOptionsGroup
+    #
+    # These represent groups of settings that can be applied to a deck.
+    attr_reader :deck_options_groups
+
+    ##
     # Instantiates the collection object for the +anki_package+
+    #
+    # The collection object represents the single record of the collection.anki21 database col table.
+    #
+    # This record stores the note types used by the notes and the decks that they belong to.
     def initialize(anki_package:)
       setup_collection_instance_variables(anki_package: anki_package)
     end
@@ -35,7 +63,7 @@ module AnkiRecord
       def setup_collection_instance_variables(anki_package:)
         @anki_package = anki_package
         @id = col_record["id"]
-        @crt = col_record["crt"]
+        @creation_timestamp = col_record["crt"]
         @last_modified_time = (mod = col_record["mod"]).zero? ? milliseconds_since_epoch : mod
         @scm = col_record["scm"]
         @ver = col_record["ver"]
@@ -49,7 +77,7 @@ module AnkiRecord
         @decks = JSON.parse(col_record["decks"]).values.map do |deck_hash|
           Deck.new(collection: self, args: deck_hash)
         end
-        @deck_option_groups = JSON.parse(col_record["dconf"]).values.map do |dconf_hash|
+        @deck_options_groups = JSON.parse(col_record["dconf"]).values.map do |dconf_hash|
           DeckOptionsGroup.new(collection: self, args: dconf_hash)
         end
         @tags = JSON.parse(col_record["tags"])

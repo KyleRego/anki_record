@@ -17,10 +17,18 @@ module AnkiRecord
     attr_accessor :name
 
     ##
-    # One of many attributes that is currently read-only and needs to be documented.
-    attr_reader :collection, :id, :last_modified_time, :usn, :max_taken, :auto_play, :timer, :replay_question,
-                :new_options, :review_options, :lapse_options, :dyn, :new_mix, :new_per_day_minimum,
-                :interday_learning_mix, :review_order, :new_sort_order, :new_gather_priority, :bury_interday_learning
+    # The collection object that this deck options group belongs to
+    attr_reader :collection
+    
+    ##
+    # The id of this deck options group
+    #
+    # Since the deck options group is nested JSON data in the database, this may not be stricly considered a primary key.
+    attr_reader :id
+
+    ##
+    # The last time that this deck options group was modified in milliseconds since the 1970 epoch
+    attr_reader :last_modified_time
 
     ##
     # Instantiates a new deck options group called +name+ with defaults
