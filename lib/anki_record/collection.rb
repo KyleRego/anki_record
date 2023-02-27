@@ -64,7 +64,7 @@ module AnkiRecord
         @anki_package = anki_package
         @id = col_record["id"]
         @creation_timestamp = col_record["crt"]
-        @last_modified_time = (mod = col_record["mod"]).zero? ? milliseconds_since_epoch : mod
+        @last_modified_time = col_record["mod"]
         @scm = col_record["scm"]
         @ver = col_record["ver"]
         @dty = col_record["dty"]

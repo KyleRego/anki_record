@@ -38,7 +38,7 @@ module AnkiRecord
     def initialize(name:, directory: Dir.pwd, &closure)
       setup_package_instance_variables(name: name, directory: directory)
 
-      execute_closure_and_zip(&closure) if block_given?
+      execute_closure_and_zip(self, &closure) if block_given?
     end
 
     ##
@@ -53,8 +53,8 @@ module AnkiRecord
 
     private
 
-      def execute_closure_and_zip(&closure)
-        closure.call
+      def execute_closure_and_zip(object_to_yield, &closure)
+        closure.call(object_to_yield)
       rescue StandardError => e
         destroy_temporary_directory
         puts_error_and_standard_message(error: e)
@@ -127,7 +127,7 @@ module AnkiRecord
                       else
                         new(name: new_apkg_name)
                       end
-      @anki_package.send :execute_closure_and_zip, &closure if block_given?
+      @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
       @anki_package
     end
 

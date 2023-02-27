@@ -130,6 +130,12 @@ RSpec.describe AnkiRecord::AnkiPackage do
   context "::new with a block argument" do
     let(:closure_argument) { proc {} }
 
+    it "yields self, an instance of AnkiPackage, to the block" do
+      AnkiRecord::AnkiPackage.new(name: "test") do |yielded_object|
+        expect(yielded_object.instance_of?(AnkiRecord::AnkiPackage)).to eq true
+      end
+    end
+
     it "should delete the temporary directory" do
       expect_the_temporary_directory_to_not_exist
     end
