@@ -7,8 +7,6 @@ require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 require_relative "note_field"
 
-# TODO: All instance variables should at least be readable
-
 module AnkiRecord
   ##
   # NoteType represents an Anki note type (also called a model)
@@ -19,7 +17,15 @@ module AnkiRecord
     private_constant :NEW_NOTE_TYPE_SORT_FIELD
 
     ##
-    # The name of this note type
+    # The collection object that the note type belongs to
+    attr_reader :collection
+
+    ##
+    # The id of the note type
+    attr_reader :id
+
+    ##
+    # The name of the note type
     attr_accessor :name
 
     ##
@@ -27,12 +33,36 @@ module AnkiRecord
     attr_accessor :cloze
 
     ##
-    # One of many attributes that is readable and writeable but needs to be documented
-    attr_accessor :css, :latex_preamble, :latex_postamble, :latex_svg
+    # The CSS styling of the note type
+    attr_reader :css
 
     ##
-    # One of many attributes that is currently read-only and needs to be documented.
-    attr_reader :id, :templates, :fields, :deck_id
+    # The LaTeX preamble of the note type
+    attr_reader :latex_preamble
+
+    ##
+    # The LaTeX postamble of the note type
+    attr_reader :latex_postamble
+
+    ##
+    # TODO: Investigate what this does. It is probably related to something with LaTeX and SVG
+    attr_reader :latex_svg
+
+    ##
+    # An array of the card template objects belonging to the note type
+    attr_reader :card_templates
+
+    ##
+    # An array of the field names of the card template
+    attr_reader :fields
+
+    ##
+    # TODO: Investigate the meaning of the deck id of a note type
+    attr_reader :deck_id
+
+    ##
+    # TODO: Investigate the meaning of tags of a note type
+    attr_reader :tags
 
     ##
     # Instantiates a new note type
@@ -65,7 +95,7 @@ module AnkiRecord
     # The card template is an instance of AnkiRecord::CardTemplate
     def new_card_template(name:)
       # TODO: Check if name already used by a template in this note type
-      @templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
+      @card_templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
     end
 
     private
@@ -81,7 +111,7 @@ module AnkiRecord
         @sort_field = args["sortf"]
         @deck_id = args["did"]
         @fields = args["flds"].map { |fld| NoteField.new(note_type: self, args: fld) }
-        @templates = args["tmpls"].map { |tmpl| CardTemplate.new(note_type: self, args: tmpl) }
+        @card_templates = args["tmpls"].map { |tmpl| CardTemplate.new(note_type: self, args: tmpl) }
         @css = args["css"]
         @latex_preamble = args["latexPre"]
         @latex_postamble = args["latexPost"]
@@ -103,7 +133,7 @@ module AnkiRecord
         @sort_field = NEW_NOTE_TYPE_SORT_FIELD
         @deck_id = nil
         @fields = []
-        @templates = []
+        @card_templates = []
         @css = default_css
         @latex_preamble = default_latex_preamble
         @latex_postamble = default_latex_postamble
@@ -114,7 +144,6 @@ module AnkiRecord
       end
       # rubocop:enable Metrics/MethodLength
 
-      # TODO: use constant here
       def default_css
         <<-CSS
         .card {
@@ -125,7 +154,6 @@ module AnkiRecord
         CSS
       end
 
-      # TODO: use constant here
       def default_latex_preamble
         <<-LATEX_PRE
         \\documentclass[12pt]{article}
@@ -137,7 +165,6 @@ module AnkiRecord
         LATEX_PRE
       end
 
-      # TODO: use constant here
       def default_latex_postamble
         <<-LATEX_POST
         \\end{document}

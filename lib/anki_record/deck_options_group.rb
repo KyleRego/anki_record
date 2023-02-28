@@ -19,11 +19,12 @@ module AnkiRecord
     ##
     # The collection object that this deck options group belongs to
     attr_reader :collection
-    
+
     ##
     # The id of this deck options group
     #
-    # Since the deck options group is nested JSON data in the database, this may not be stricly considered a primary key.
+    # Since the deck options group is nested JSON data in the database
+    # so this may not be strictly considered a primary key.
     attr_reader :id
 
     ##

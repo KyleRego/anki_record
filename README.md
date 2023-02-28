@@ -35,6 +35,21 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Development todos:
+- Document all readable or writable attributes 
+- Refactor specs to use should (expectation rather than assertion)
+- Work on AnkiRecord::Card
+  - Reading, updating, saving cards to the collection.anki21 database
+  - Need validation logic of what makes the card valid based on the note type's card templates and fields
+  - Not all cards can be in memory at once
+- Work on saving the collection (persist all changes)
+  - Save updated deck
+  - Save updated deck options group
+  - Save updated note type
+    - Card templates and fields
+- Methods for querying the database for cards
+
+
 ### Release checklist
 - Bump version
 - Update changelog

@@ -66,7 +66,7 @@ module AnkiRecord
 
       def setup_card_template_instance_variables(name:)
         @name =  name
-        @ordinal_number = @note_type.templates.length
+        @ordinal_number = @note_type.card_templates.length
         @question_format = ""
         @answer_format = ""
         @bqfmt =  ""
