@@ -5,8 +5,6 @@ require "pry"
 require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 
-# TODO: All instance variables should at least be readable
-
 module AnkiRecord
   ##
   # Deck represents an Anki deck
@@ -20,6 +18,10 @@ module AnkiRecord
     private_constant :DEFAULT_DECK_TODAY_ARRAY, :DEFAULT_COLLAPSED
 
     ##
+    # The collection object that the deck belongs to
+    attr_reader :collection
+
+    ##
     # The name of the deck
     attr_accessor :name
 
@@ -28,11 +30,21 @@ module AnkiRecord
     attr_accessor :description
 
     ##
-    # One of many attributes that is currently read-only and needs to be documented.
-    attr_reader :collection, :id, :last_modified_time, :deck_options_group_id
+    # The id of the deck
+    attr_reader :id
 
     ##
-    # Instantiate a new Deck
+    # The last time the deck was modified in number of seconds since the epoch
+    #
+    # TODO: is this really supposed to be seconds? Should it be milliseconds?
+    attr_reader :last_modified_time
+
+    ##
+    # The id of the eck options/settings group that is applied to the deck
+    attr_reader :deck_options_group_id
+
+    ##
+    # Instantiates a new Deck object
     def initialize(collection:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
@@ -79,7 +91,8 @@ module AnkiRecord
         @collapsed_in_browser = DEFAULT_COLLAPSED
         @description = ""
         @dyn = NON_FILTERED_DECK_DYN
-        @deck_options_group_id = nil # TODO
+        @deck_options_group_id = nil # TODO: Set id to the default deck options group?
+        # TODO: alternatively, if this is nil when the deck is saved, it can be set to the default options group id
         @extend_new = 0
         @extend_review = 0
       end

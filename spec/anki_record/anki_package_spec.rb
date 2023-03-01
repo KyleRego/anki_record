@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: Use consistent language in the examples
-
 RSpec.describe AnkiRecord::AnkiPackage do
   subject(:anki_package) do
     if defined?(closure_argument) && defined?(directory_argument)
@@ -130,7 +128,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
   context "::new with a block argument" do
     let(:closure_argument) { proc {} }
 
-    it "yields self, an instance of AnkiPackage, to the block" do
+    it "should yield an instance of AnkiPackage to the block argument" do
       AnkiRecord::AnkiPackage.new(name: "test") do |yielded_object|
         expect(yielded_object.instance_of?(AnkiRecord::AnkiPackage)).to eq true
       end

@@ -9,27 +9,31 @@ module AnkiRecord
   # CardTemplate represents a card template of an Anki note type
   class CardTemplate
     ##
-    # The name of this card template
+    # The name of the card template
     attr_accessor :name
 
     ##
-    # The question format
-    attr_accessor :question_format
-
-    ##
-    # The answer format
-    attr_accessor :answer_format
-
-    ##
-    # The font style shown for this card template in the browser
+    # The font style shown for the card template in the browser
     attr_accessor :browser_font_style
 
     ##
-    # The font size used for this card template in the browser
+    # The font size used for the card template in the browser
     attr_accessor :browser_font_size
 
     ##
-    # The note type that this card template belongs to
+    # The question format of the card template
+    #
+    # TODO: A custom setter method for this with validation
+    attr_reader :question_format
+
+    ##
+    # The answer format of the card template
+    #
+    # TODO: A custom setter method for this with validation
+    attr_reader :answer_format
+
+    ##
+    # The note type that the card template belongs to
     attr_reader :note_type
 
     ##

@@ -164,7 +164,7 @@ RSpec.describe AnkiRecord::NoteType do
       it "should instantiate a note type with the same id as the data" do
         expect(note_type_from_existing.id).to eq 1_676_902_364_661
       end
-      it "should instantiates a note type with the same deck id as the data (NULL or nil)" do
+      it "should instantiate a note type with the same deck id as the data (NULL or nil)" do
         expect(note_type_from_existing.deck_id).to eq nil
       end
       it "should instantiate a note type with one card template" do
@@ -173,8 +173,14 @@ RSpec.describe AnkiRecord::NoteType do
       it "should instantiate a note type with a template with the name Card 1" do
         expect(note_type_from_existing.card_templates.first.name).to eq "Card 1"
       end
+      it "should instantiate a note type with a template that is of type CardTemplate" do
+        expect(note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
+      end
       it "should instantiate a note type with 2 fields" do
         expect(note_type_from_existing.fields.count).to eq 2
+      end
+      it "should instantiate a note type with 2 fields that are of class NoteField" do
+        expect(note_type_from_existing.fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
       end
       it "should instantiate a note type with a 'Front' field and a 'Back' field" do
         expect(note_type_from_existing.fields.map(&:name).sort).to eq %w[Back Front]

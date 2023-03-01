@@ -29,7 +29,7 @@ module AnkiRecord
     attr_accessor :name
 
     ##
-    # true if the note type is a cloze note type and false if it is not
+    # A boolean that indicates if this note type is a cloze-deletion note type
     attr_accessor :cloze
 
     ##
@@ -45,7 +45,9 @@ module AnkiRecord
     attr_reader :latex_postamble
 
     ##
-    # TODO: Investigate what this does. It is probably related to something with LaTeX and SVG
+    # A boolean probably related to something with LaTeX and SVG.
+    #
+    # TODO: Investigate what this does
     attr_reader :latex_svg
 
     ##
@@ -74,18 +76,16 @@ module AnkiRecord
       if args
         setup_note_type_instance_variables_from_existing(args: args)
       else
-        setup_note_type_instance_variables(
-          name: name, cloze: cloze
-        )
+        setup_note_type_instance_variables(name: name, cloze: cloze)
       end
     end
 
     ##
-    # Create a new field and adds it to this note type's fields
+    # Creates a new field and adds it to this note type's fields
     #
     # The field is an instance of AnkiRecord::NoteField
     def new_note_field(name:)
-      # TODO: Check if name already used by a field in this note type
+      # TODO: Raise an exception if the name is already used by a field in this note type
       @fields << AnkiRecord::NoteField.new(note_type: self, name: name)
     end
 
@@ -94,7 +94,7 @@ module AnkiRecord
     #
     # The card template is an instance of AnkiRecord::CardTemplate
     def new_card_template(name:)
-      # TODO: Check if name already used by a template in this note type
+      # TODO: Raise an exception if the name is already used by a template in this note type
       @card_templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
     end
 

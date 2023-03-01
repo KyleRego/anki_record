@@ -13,18 +13,15 @@ module AnkiRecord
     include TimeHelper
 
     ##
-    # The name of the options group
-    attr_accessor :name
-
-    ##
-    # The collection object that this deck options group belongs to
+    # The collection object that the deck options group belongs to
     attr_reader :collection
 
     ##
-    # The id of this deck options group
-    #
-    # Since the deck options group is nested JSON data in the database
-    # so this may not be strictly considered a primary key.
+    # The name of the deck options group
+    attr_accessor :name
+
+    ##
+    # The id of the deck options group
     attr_reader :id
 
     ##

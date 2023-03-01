@@ -17,39 +17,78 @@ RSpec.describe AnkiRecord::CardTemplate do
 
   describe "::new used to instantiate a card template with a name argument" do
     context "with valid arguments (a parent note type and name)" do
-      it "instantiates a template belonging to that note type" do
+      it "should instantiate a card template belonging to that note type" do
         expect(template.note_type).to eq note_type_argument
       end
-      it "instantiates a template with the given name" do
+      it "should instantiate a card template with the given name" do
         expect(template.name).to eq name_argument
       end
-      it "instantiates a template with an empty question format" do
+      it "should instantiate a card template with an empty question format (an empty string)" do
         expect(template.question_format).to eq ""
       end
-      it "instantiates a template with an empty answer format" do
+      it "should instantiate a card template with an empty answer format (an empty string)" do
         expect(template.answer_format).to eq ""
       end
-      it "instantiates a template with an empty browser font style" do
+      it "should instantiate a card template with an empty browser font style (an empty string)" do
         expect(template.browser_font_style).to eq ""
       end
-      it "instantiates a template with a browser font size of 0" do
+      it "should instantiate a card template with a browser font size of 0" do
         expect(template.browser_font_size).to eq 0
       end
     end
-    context "and it is the first template of the note type" do
-      it "instantiates a template with ordinal number 0" do
+    context "and the note type does not already have any card templates" do
+      it "should instantiate a card template with ordinal number 0" do
         expect(template.ordinal_number).to eq 0
       end
     end
-    context "and it is the second template of the note type" do
+    context "and the note type already had one card template" do
       before { note_type_argument.new_card_template(name: "the first card template") }
-      it "instantiates a template with ordinal number 1" do
+      it "should instantiate a card template with ordinal number 1" do
         expect(template.ordinal_number).to eq 1
       end
     end
     context "with a name argument and an args argument" do
-      it "throw an ArgumentError" do
+      it "should throw an ArgumentError" do
         expect { AnkiRecord::CardTemplate.new(note_type: note_type_argument, name: "test", args: {}) }.to raise_error ArgumentError
+      end
+    end
+  end
+
+  describe "::new passed an args hash" do
+    subject(:card_template_from_existing) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, args: card_template_hash) }
+
+    context "when the args hash is the default Card 1 template JSON object for the default Basic note type from a new Anki 2.1.54 profile" do
+      let(:card_template_hash) do
+        { "name" => "Card 1",
+          "ord" => 0,
+          "qfmt" => "{{Front}}",
+          "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+          "bqfmt" => "",
+          "bafmt" => "",
+          "did" => nil,
+          "bfont" => "",
+          "bsize" => 0 }
+      end
+      it "should instantiate a card template for the argument note type" do
+        expect(card_template_from_existing.note_type).to eq note_type_argument
+      end
+      it "should instantiate a card template with the name Card 1" do
+        expect(card_template_from_existing.name).to eq "Card 1"
+      end
+      it "should instantiate a card template with ordinal number 0" do
+        expect(card_template_from_existing.ordinal_number).to eq 0
+      end
+      it "should instantiate a card template with the data's question format" do
+        expect(card_template_from_existing.question_format).to eq "{{Front}}"
+      end
+      it "should instantiate a card template with data's answer format" do
+        expect(card_template_from_existing.answer_format).to eq "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}"
+      end
+      it "should instantiate a template with an empty browser font style" do
+        expect(template.browser_font_style).to eq ""
+      end
+      it "should instantiate a template with a browser font size of 0" do
+        expect(template.browser_font_size).to eq 0
       end
     end
   end
@@ -82,45 +121,6 @@ RSpec.describe AnkiRecord::CardTemplate do
       end
       it "should return an array containing the names of the note type's fields" do
         expect(template.allowed_field_names).to include field_name1, field_name2
-      end
-    end
-  end
-
-  describe "::new passed an args hash" do
-    subject(:card_template_from_existing) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, args: card_template_hash) }
-
-    context "when the args hash is the default Card 1 template JSON object for the default Basic note type from a new Anki 2.1.54 profile" do
-      let(:card_template_hash) do
-        { "name" => "Card 1",
-          "ord" => 0,
-          "qfmt" => "{{Front}}",
-          "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
-          "bqfmt" => "",
-          "bafmt" => "",
-          "did" => nil,
-          "bfont" => "",
-          "bsize" => 0 }
-      end
-      it "instantiates a card template for the argument note type" do
-        expect(card_template_from_existing.note_type).to eq note_type_argument
-      end
-      it "instantiates a card template with the name Card 1" do
-        expect(card_template_from_existing.name).to eq "Card 1"
-      end
-      it "instantiates a card template with ordinal number 0" do
-        expect(card_template_from_existing.ordinal_number).to eq 0
-      end
-      it "instantiates a card template with the data's question format" do
-        expect(card_template_from_existing.question_format).to eq "{{Front}}"
-      end
-      it "instantiates a card template with data's answer format" do
-        expect(card_template_from_existing.answer_format).to eq "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}"
-      end
-      it "instantiates a template with an empty browser font style" do
-        expect(template.browser_font_style).to eq ""
-      end
-      it "instantiates a template with a browser font size of 0" do
-        expect(template.browser_font_size).to eq 0
       end
     end
   end

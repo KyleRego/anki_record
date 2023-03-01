@@ -142,11 +142,6 @@ module AnkiRecord
 
           pathname
         end
-
-        def create_apkg_backup(pathname:)
-          path = pathname.to_s
-          FileUtils.cp path, "#{path}.copy-#{Time.now.to_i}"
-        end
     end
 
     ##
