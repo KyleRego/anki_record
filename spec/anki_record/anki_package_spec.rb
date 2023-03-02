@@ -79,6 +79,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
   end
 
   context "::new with no block argument" do
+    it "should instantiate an Anki package object with a collection attribute which is an instance of Collection" do
+      expect(anki_package.collection.instance_of?(AnkiRecord::Collection)).to eq true
+    end
     it "should save one collection.anki21 file to a temporary directory" do
       anki_package
       expect_num_anki21_files_in_package_tmp_directory num: 1

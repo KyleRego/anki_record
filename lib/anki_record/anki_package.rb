@@ -25,6 +25,10 @@ module AnkiRecord
     private_constant :NAME_ERROR_MESSAGE, :PATH_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
 
     ##
+    # The collection object of the package
+    attr_reader :collection
+
+    ##
     # Creates a new object which represents an Anki SQLite3 database
     #
     # This method takes an optional block argument.

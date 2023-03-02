@@ -38,10 +38,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ### Development todos:
 - Document all readable or writable attributes 
 - Refactor specs to use should (expectation rather than assertion)
-- Work on AnkiRecord::Card
-  - Reading, updating, saving cards to the collection.anki21 database
-  - Need validation logic of what makes the card valid based on the note type's card templates and fields
-  - Not all cards can be in memory at once
+- Work on AnkiRecord::Note
+  - Reading, updating, saving notes to the collection.anki21 database
+  - Need validation logic of what makes the note valid based on the note type's card templates and fields
+  - Not all notes can be in memory at once
 - Work on saving the collection (persist all changes)
   - Save updated deck
   - Save updated deck options group
