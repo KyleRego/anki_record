@@ -3,6 +3,9 @@
 require "pry"
 require "pathname"
 
+require_relative "card"
+require_relative "note"
+
 require_relative "db/anki_schema_definition"
 require_relative "db/clean_collection2_record"
 require_relative "db/clean_collection21_record"

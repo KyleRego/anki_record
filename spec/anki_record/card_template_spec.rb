@@ -54,21 +54,22 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
   end
 
-  describe "::new passed an args hash" do
-    subject(:card_template_from_existing) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, args: card_template_hash) }
+  subject(:card_template_from_existing) { AnkiRecord::CardTemplate.new(note_type: note_type_argument, args: card_template_hash) }
 
+  let(:card_template_hash) do
+    { "name" => "Card 1",
+      "ord" => 0,
+      "qfmt" => "{{Front}}",
+      "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+      "bqfmt" => "",
+      "bafmt" => "",
+      "did" => nil,
+      "bfont" => "",
+      "bsize" => 0 }
+  end
+
+  describe "::new passed an args hash" do
     context "when the args hash is the default Card 1 template JSON object for the default Basic note type from a new Anki 2.1.54 profile" do
-      let(:card_template_hash) do
-        { "name" => "Card 1",
-          "ord" => 0,
-          "qfmt" => "{{Front}}",
-          "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
-          "bqfmt" => "",
-          "bafmt" => "",
-          "did" => nil,
-          "bfont" => "",
-          "bsize" => 0 }
-      end
       it "should instantiate a card template for the argument note type" do
         expect(card_template_from_existing.note_type).to eq note_type_argument
       end
@@ -93,35 +94,62 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
   end
 
-  # describe "#allowed_field_names" do
-  #   context "when the template's note type has no fields" do
-  #     it "should return an empty array" do
-  #       expect(template.allowed_field_names).to eq []
-  #     end
-  #   end
-  #   context "when the template's note type has one field" do
-  #     let(:field_name) { "field 1 name" }
-  #     before { note_type_argument.new_note_field(name: field_name) }
-  #     it "should return an array with a length of 1" do
-  #       expect(template.allowed_field_names.length).to eq 1
-  #     end
-  #     it "should return an array containing the name of the note type's field" do
-  #       expect(template.allowed_field_names).to eq [field_name]
-  #     end
-  #   end
-  #   context "when the template's note type has two fields" do
-  #     let(:field_name1) { "field 1 name" }
-  #     let(:field_name2) { "field 2 name" }
-  #     before do
-  #       note_type_argument.new_note_field(name: field_name1)
-  #       note_type_argument.new_note_field(name: field_name2)
-  #     end
-  #     it "should return an array with a length of 2" do
-  #       expect(template.allowed_field_names.length).to eq 2
-  #     end
-  #     it "should return an array containing the names of the note type's fields" do
-  #       expect(template.allowed_field_names).to include field_name1, field_name2
-  #     end
-  #   end
-  # end
+  describe "#question_format=" do
+    context "when the format specifies a field name that the card template's note type does not have a field for" do
+      it "should throw an ArgumentError" do
+        expect { card_template_from_existing.question_format = "{{unknown field}}" }.to raise_error ArgumentError
+      end
+    end
+    context "when the format specifies two field names and the card template's note type has fields for both" do
+      it "should set the question_format attribute to the argument" do
+        note_type_argument.new_note_field name: "Front"
+        note_type_argument.new_note_field name: "Back"
+        card_template_from_existing.question_format = "{{Front}} and {{Back}}"
+        expect(card_template_from_existing.question_format).to eq "{{Front}} and {{Back}}"
+      end
+    end
+    context "when the format specifies a cloze field but the note type is not a cloze type" do
+      it "should throw an ArgumentError" do
+        note_type_argument.new_note_field name: "Front"
+        expect { card_template_from_existing.question_format = "{{cloze:Front}}" }.to raise_error ArgumentError
+      end
+    end
+    context "when the format specifies a cloze field and the note type is not a cloze type" do
+      it "should set the question_format attribute to the argument" do
+        note_type_argument.cloze = true
+        note_type_argument.new_note_field name: "Front"
+        card_template_from_existing.question_format = "{{cloze:Front}}"
+        expect(card_template_from_existing.question_format).to eq "{{cloze:Front}}"
+      end
+    end
+  end
+  describe "#answer_format=" do
+    context "when the format specifies a field name that the card template's note type does not have a field for" do
+      it "should throw an ArgumentError" do
+        expect { card_template_from_existing.answer_format = "{{unknown field}}" }.to raise_error ArgumentError
+      end
+    end
+    context "when the format specifies two field names and the card template's note type has fields for both" do
+      it "should set the answer_format attribute to the argument" do
+        note_type_argument.new_note_field name: "Front"
+        note_type_argument.new_note_field name: "Back"
+        card_template_from_existing.answer_format = "{{Front}} and {{Back}}"
+        expect(card_template_from_existing.answer_format).to eq "{{Front}} and {{Back}}"
+      end
+    end
+    context "when the format specifies a cloze field but the note type is not a cloze type" do
+      it "should throw an ArgumentError" do
+        note_type_argument.new_note_field name: "Front"
+        expect { card_template_from_existing.answer_format = "{{cloze:Front}}" }.to raise_error ArgumentError
+      end
+    end
+    context "when the format specifies a cloze field and the note type is not a cloze type" do
+      it "should set the answer_format attribute to the argument" do
+        note_type_argument.cloze = true
+        note_type_argument.new_note_field name: "Front"
+        card_template_from_existing.answer_format = "{{cloze:Front}}"
+        expect(card_template_from_existing.answer_format).to eq "{{cloze:Front}}"
+      end
+    end
+  end
 end

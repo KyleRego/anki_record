@@ -18,8 +18,7 @@ RSpec.describe AnkiRecord do
       #   apkg2.zip
       # end
 
-      it "should zip a new, empty Anki package (test2.apkg) with 2 Basic notes in the Default deck",
-         skip: "this API is unimplemented" do
+      it "should zip a new, empty Anki package (test2.apkg) with 2 Basic notes in the Default deck" do
         apkg = AnkiRecord::AnkiPackage.new name: "test2"
 
         note_type = apkg.collection.find_note_type_by name: "Basic"

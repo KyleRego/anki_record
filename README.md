@@ -38,9 +38,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ### Development todos: 
 - Work on AnkiRecord::Note
   - Reading, updating, saving notes/cards to the collection.anki21 database
-    - Need to calculate the sha1 hash of the first field for checksum of note
   - Need validation logic of what makes the note valid based on the note type's card templates and fields
-  - Not all notes can be in memory at once
   - Creating note objects from existing records
 - Work on saving the collection (persist all changes)
   - Save updated deck

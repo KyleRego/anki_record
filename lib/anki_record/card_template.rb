@@ -22,15 +22,37 @@ module AnkiRecord
 
     ##
     # The question format of the card template
-    #
-    # TODO: A custom setter method for this with validation
     attr_reader :question_format
 
     ##
+    # Sets the question format and raises an ArgumentError if the specified format uses invalid fields
+    def question_format=(format)
+      fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
+        capture.chomp("}}").reverse.chomp("{{").reverse
+      end
+      raise ArgumentError if fields_in_specified_format.any? do |field_name|
+                               !note_type.allowed_card_template_question_format_field_names.include?(field_name)
+                             end
+
+      @question_format = format
+    end
+
+    ##
     # The answer format of the card template
-    #
-    # TODO: A custom setter method for this with validation
     attr_reader :answer_format
+
+    ##
+    # Sets the answer format and raises an ArgumentError if the specified format uses invalid fields
+    def answer_format=(format)
+      fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
+        capture.chomp("}}").reverse.chomp("{{").reverse
+      end
+      raise ArgumentError if fields_in_specified_format.any? do |field_name|
+                               !note_type.allowed_card_template_answer_format_field_names.include?(field_name)
+                             end
+
+      @answer_format = format
+    end
 
     ##
     # The note type that the card template belongs to
@@ -79,16 +101,5 @@ module AnkiRecord
         @browser_font_style = ""
         @browser_font_size = 0
       end
-
-    ##
-    # Returns the field names that are allowed in the answer format and question format
-    #
-    # These are the field_name values in {{field_name}} in those formats.
-    #
-    # They are equivalent to the names of the fields of the template's note type.
-    # TODO: this should be a method of note type e.g. note_type.allowed_field_names
-    # def allowed_field_names
-    #   @note_type.fields.map(&:name)
-    # end
   end
 end

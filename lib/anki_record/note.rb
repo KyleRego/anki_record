@@ -3,12 +3,14 @@
 require "pry"
 require "securerandom"
 
+require_relative "helpers/checksum_helper"
 require_relative "helpers/time_helper"
 
 module AnkiRecord
   ##
   # Note represents an Anki note
   class Note
+    include ChecksumHelper
     include TimeHelper
     include SharedConstantsHelper
 
@@ -39,10 +41,18 @@ module AnkiRecord
     attr_reader :note_type
 
     ##
+    # The card objects of the note
+    attr_reader :cards
+
+    ##
     # Instantiate a new note for a deck and note type
     # or TODO: instantiate a new object from an already existing record
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize
     def initialize(deck:, note_type:)
-      raise ArgumentError unless deck && note_type
+      raise ArgumentError unless deck && note_type && deck.collection == note_type.collection
+
+      @apkg = deck.collection.anki_package
 
       @id = milliseconds_since_epoch
       @guid = globally_unique_id
@@ -51,7 +61,21 @@ module AnkiRecord
       @tags = []
       @deck = deck
       @note_type = note_type
-      @field_contents = {}
+      @field_contents = setup_field_contents
+      @cards = @note_type.card_templates.map { |card_template| Card.new(note: self, card_template: card_template) }
+    end
+    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
+
+    ##
+    # Save the note to the collection.anki21 database
+    def save
+      @apkg.execute <<~SQL
+        insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
+                    values ('#{@id}', '#{@guid}', '#{note_type.id}', '#{@last_modified_time}', '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}', '#{checksum(sort_field_value)}', '0', '')
+      SQL
+      cards.each(&:save)
+      true
     end
 
     ##
@@ -66,9 +90,9 @@ module AnkiRecord
       return @field_contents[method_name] unless method_name.end_with?("=")
 
       method_name = method_name.chomp("=")
-      valid_field_setters = note_type.snake_case_field_names
-      unless valid_field_setters.include?(method_name)
-        raise ArgumentError, "Valid fields for this not type are one of #{valid_field_setters.join(", ")}"
+      valid_fields_snake_names = @field_contents.keys
+      unless valid_fields_snake_names.include?(method_name)
+        raise ArgumentError, "Valid fields for this not type are one of #{valid_fields_snake_names.join(", ")}"
       end
 
       @field_contents[method_name] = field_content
@@ -87,8 +111,25 @@ module AnkiRecord
 
     private
 
+      def setup_field_contents
+        field_contents = {}
+        note_type.snake_case_field_names.each do |field_name|
+          field_contents[field_name] = ""
+        end
+        field_contents
+      end
+
       def globally_unique_id
         SecureRandom.uuid.slice(5...15)
+      end
+
+      def field_values_separated_by_us
+        # The ASCII control code represented by hexadecimal 1F is the Unit Separator (US)
+        note_type.snake_case_field_names.map { |field_name| @field_contents[field_name] }.join("\x1F")
+      end
+
+      def sort_field_value
+        @field_contents[note_type.snake_case_sort_field_name]
       end
   end
 end

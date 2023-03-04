@@ -86,6 +86,12 @@ RSpec.describe AnkiRecord::NoteType do
       new_note_field
       expect(note_type.fields.first.instance_of?(AnkiRecord::NoteField)).to eq true
     end
+    it "should return a new NoteField object (the same as was added to the note type's note_fields attribute)" do
+      expect(new_note_field.instance_of?(AnkiRecord::NoteField)).to eq true
+    end
+    it "should return a new NoteField object with name equal to the name argument" do
+      expect(new_note_field.name).to eq field_name_argument
+    end
   end
 
   let(:template_name_argument) { "test template name argument" }
@@ -98,6 +104,12 @@ RSpec.describe AnkiRecord::NoteType do
     it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
       new_card_template
       expect(note_type.card_templates.first.instance_of?(AnkiRecord::CardTemplate)).to eq true
+    end
+    it "should return a new CardTemplate object (the same as was added to the note type's card_templates attribute)" do
+      expect(new_card_template.instance_of?(AnkiRecord::CardTemplate)).to eq true
+    end
+    it "should return a new CardTemplate object with name equal to the name argument" do
+      expect(new_card_template.name).to eq template_name_argument
     end
   end
 
@@ -202,22 +214,105 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
+  describe "#field_names_in_order" do
+    context "for the default Basic note type" do
+      it "should return an array ['Front', 'Back'] which are the field names in the correct order" do
+        expect(note_type_from_existing.field_names_in_order).to eq %w[Front Back]
+      end
+    end
+    context "for a note type with four custom fields" do
+      it "should return an array with the field names in the correct order" do
+        note_type.new_note_field name: "Field 1"
+        note_type.new_note_field name: "Field 2"
+        note_type.new_note_field name: "Field 3"
+        note_type.new_note_field name: "Field 4"
+        expect(note_type.field_names_in_order).to eq ["Field 1", "Field 2", "Field 3", "Field 4"]
+      end
+    end
+  end
+
   describe "#snake_case_field_names" do
     context "for the default Basic note type" do
-      it "returns an array including the values 'front' and 'back'" do
-        expect(note_type_from_existing.snake_case_field_names.sort).to eq %w[back front]
+      it "should return an array including the values 'front' and 'back'" do
+        expect(note_type_from_existing.snake_case_field_names).to eq %w[front back]
       end
     end
     context "for a note type with a note field called 'Crazy Note Field Name'" do
-      it "returns an array including the value 'crazy_note_field_name'" do
+      it "should return an array including the value 'crazy_note_field_name'" do
         note_type.new_note_field name: "Crazy Note Field Name"
         expect(note_type.snake_case_field_names).to eq ["crazy_note_field_name"]
       end
     end
     context "for a note type with a note field called 'Double  Spaces'" do
-      it "returns an array including the value 'crazy_note_field_name'" do
+      it "should return an array including the value 'crazy_note_field_name'" do
         note_type.new_note_field name: "Double  Spaces"
         expect(note_type.snake_case_field_names).to eq ["double__spaces"]
+      end
+    end
+  end
+
+  describe "#sort_field_name" do
+    context "for the default Basic note type" do
+      it "should return the name of the field used to sort, 'Front'" do
+        expect(note_type_from_existing.sort_field_name).to eq "Front"
+      end
+    end
+  end
+
+  describe "#snake_case_sort_field_name" do
+    context "for the default Basic note type" do
+      it "should return the name of the field used to sort, 'Front', but in snake_case: front" do
+        expect(note_type_from_existing.snake_case_sort_field_name).to eq "front"
+      end
+    end
+    context "for a note type with a note field called 'Crazy Note Field Name' which is the sort field" do
+      it "should return 'crazy_note_field_name'" do
+        note_type.new_note_field name: "Crazy Note Field Name"
+        expect(note_type.snake_case_sort_field_name).to eq "crazy_note_field_name"
+      end
+    end
+  end
+
+  describe "#allowed_card_template_answer_format_field_names" do
+    context "for a non-cloze note type" do
+      it "should return an array with the string names of the note type's fields' names and 'FrontSide'" do
+        expect(note_type_from_existing.allowed_card_template_answer_format_field_names).to eq %w[Front Back FrontSide]
+      end
+    end
+    context "for a cloze note type" do
+      it "should return an array with the string names of the note type's fields' names, 'FrontSide', and the note type's fields' names prepended with 'cloze:'" do
+        note_type_from_existing.cloze = true
+        expect(note_type_from_existing.allowed_card_template_answer_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back", "FrontSide"]
+      end
+    end
+  end
+
+  describe "#allowed_card_template_question_format_field_names" do
+    context "for a non-cloze note type" do
+      it "should return an array with the string names of the note type's fields' names" do
+        expect(note_type_from_existing.allowed_card_template_question_format_field_names).to eq %w[Front Back]
+      end
+    end
+    context "for a cloze note type" do
+      it "should return an array with the string names of the note type's fields' names and the note type's fields' names prepended with 'cloze:'" do
+        note_type_from_existing.cloze = true
+        expect(note_type_from_existing.allowed_card_template_question_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back"]
+      end
+    end
+  end
+
+  describe "#find_card_template_by" do
+    context "when passed a name argument where the note type does not have a card template with that name" do
+      it "should return nil" do
+        expect(note_type_from_existing.find_card_template_by(name: "does not exist")).to eq nil
+      end
+    end
+    context "when passed a name argument where the note type has a card template with that name" do
+      it "should return a card template object" do
+        expect(note_type_from_existing.find_card_template_by(name: "Card 1").instance_of?(AnkiRecord::CardTemplate)).to eq true
+      end
+      it "should return a card template object with name equal to the name argument" do
+        expect(note_type_from_existing.find_card_template_by(name: "Card 1").name).to eq "Card 1"
       end
     end
   end

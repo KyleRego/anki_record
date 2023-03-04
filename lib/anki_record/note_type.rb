@@ -86,7 +86,9 @@ module AnkiRecord
     # The field is an instance of AnkiRecord::NoteField
     def new_note_field(name:)
       # TODO: Raise an exception if the name is already used by a field in this note type
-      @fields << AnkiRecord::NoteField.new(note_type: self, name: name)
+      note_field = AnkiRecord::NoteField.new(note_type: self, name: name)
+      @fields << note_field
+      note_field
     end
 
     ##
@@ -95,7 +97,21 @@ module AnkiRecord
     # The card template is an instance of AnkiRecord::CardTemplate
     def new_card_template(name:)
       # TODO: Raise an exception if the name is already used by a template in this note type
-      @card_templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
+      card_template = AnkiRecord::CardTemplate.new(note_type: self, name: name)
+      @card_templates << card_template
+      card_template
+    end
+
+    ##
+    # Find one of the note type's card templates by name
+    def find_card_template_by(name:)
+      card_templates.find { |template| template.name == name }
+    end
+
+    ##
+    # The field names of the note type ordered by their ordinal values
+    def field_names_in_order
+      @fields.sort_by(&:ordinal_number).map(&:name)
     end
 
     ##
@@ -103,7 +119,42 @@ module AnkiRecord
     #
     # TODO: make this more robust... what happens when the note type name has non-alphabetic characters?
     def snake_case_field_names
-      @fields.map { |field| field.name.downcase.gsub(" ", "_") }
+      field_names_in_order.map { |field_name| field_name.downcase.gsub(" ", "_") }
+    end
+
+    ##
+    # The name of the field used to sort notes of the note type in the Anki browser
+    def sort_field_name
+      @fields.find { |field| field.ordinal_number == @sort_field }&.name
+    end
+
+    ##
+    # The name of the sort field in snake_case
+    def snake_case_sort_field_name
+      sort_field_name.downcase.gsub(" ", "_")
+    end
+
+    ##
+    # The allowed field_name values in {{field_name}} of the note type's card templates' question format
+    #
+    # These are the note type's fields' names, and if the note type is a cloze type,
+    # these also include the note type's fields' names prepended with 'cloze:'.
+    #
+    # TODO: research if other special field names like e.g. 'FrontSide' are allowed
+    def allowed_card_template_question_format_field_names
+      allowed = field_names_in_order
+      cloze ? allowed + field_names_in_order.map { |field_name| "cloze:#{field_name}" } : allowed
+    end
+
+    ##
+    # The allowed field_name values in {{field_name}} of the note type's card templates' answer format
+    #
+    # These are the note type's fields' names, and if the note type is a cloze type,
+    # these also include the note type's fields' names prepended with 'cloze:'.
+    #
+    # TODO: research if other special field names like e.g. 'FrontSide' are allowed
+    def allowed_card_template_answer_format_field_names
+      allowed_card_template_question_format_field_names + ["FrontSide"]
     end
 
     private

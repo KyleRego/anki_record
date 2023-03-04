@@ -4,12 +4,12 @@ require "sqlite3"
 require "zip"
 
 require_relative "anki_record/anki_package"
-require_relative "anki_record/note"
 require_relative "anki_record/version"
 
 ##
 # This module is the namespace for all AnkiRecord classes:
 # - AnkiPackage
+# - Card
 # - CardTemplate
 # - Collection
 # - DeckOptionsGroup

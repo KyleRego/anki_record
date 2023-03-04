@@ -24,6 +24,13 @@ RSpec.describe AnkiRecord::Note do
           expect { AnkiRecord::Note.new deck: default_deck }.to raise_error ArgumentError
         end
       end
+      context "when the note type and deck belong to different collections" do
+        it "should throw an ArgumentError" do
+          second_apkg = AnkiRecord::AnkiPackage.new(name: "second_package")
+          second_collection_deck = second_apkg.collection.find_deck_by name: "Default"
+          expect { AnkiRecord::Note.new note_type: basic_note_type, deck: second_collection_deck }.to raise_error ArgumentError
+        end
+      end
     end
     it "should instantiate a note" do
       expect(note.instance_of?(AnkiRecord::Note)).to eq true
@@ -48,6 +55,12 @@ RSpec.describe AnkiRecord::Note do
     end
     it "should instantiate a note with note_type attribute equal to the note_type argument" do
       expect(note.note_type).to eq basic_note_type
+    end
+    it "should instantiate a note with a cards attribute with Card objects" do
+      expect(note.cards.all? { |card| card.instance_of?(AnkiRecord::Card) }).to eq true
+    end
+    it "should instantiate a note with a number of card objects equal to the number of card templates of the note type" do
+      expect(note.cards.size).to eq note.note_type.card_templates.size
     end
   end
 
