@@ -102,53 +102,52 @@ RSpec.describe AnkiRecord::NoteType do
   end
 
   subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: model_hash) }
+  # rubocop:disable Layout/LineContinuationLeadingSpace
+  let(:model_hash) do
+    { "id" => 1_676_902_364_661,
+      "name" => "Basic",
+      "type" => 0,
+      "mod" => 0,
+      "usn" => 0,
+      "sortf" => 0,
+      "did" => nil,
+      "tmpls" =>
+      [{ "name" => "Card 1",
+         "ord" => 0,
+         "qfmt" => "{{Front}}",
+         "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+         "bqfmt" => "",
+         "bafmt" => "",
+         "did" => nil,
+         "bfont" => "",
+         "bsize" => 0 }],
+      "flds" =>
+      [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
+       { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
+      "css" =>
+      ".card {\n" \
+      "    font-family: arial;\n" \
+      "    font-size: 20px;\n" \
+      "    text-align: center;\n" \
+      "    color: black;\n" \
+      "    background-color: white;\n" \
+      "}\n",
+      "latexPre" =>
+      "\\documentclass[12pt]{article}\n" \
+      "\\special{papersize=3in,5in}\n" \
+      "\\usepackage[utf8]{inputenc}\n" \
+      "\\usepackage{amssymb,amsmath}\n" \
+      "\\pagestyle{empty}\n" \
+      "\\setlength{\\parindent}{0in}\n" \
+      "\\begin{document}\n",
+      "latexPost" => "\\end{document}",
+      "latexsvg" => false,
+      "req" => [[0, "any", [0]]] }
+  end
+  # rubocop:enable Layout/LineContinuationLeadingSpace
 
   describe "::new passed an args hash" do
     context "when the model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
-      # rubocop:disable Layout/LineContinuationLeadingSpace
-      let(:model_hash) do
-        { "id" => 1_676_902_364_661,
-          "name" => "Basic",
-          "type" => 0,
-          "mod" => 0,
-          "usn" => 0,
-          "sortf" => 0,
-          "did" => nil,
-          "tmpls" =>
-          [{ "name" => "Card 1",
-             "ord" => 0,
-             "qfmt" => "{{Front}}",
-             "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
-             "bqfmt" => "",
-             "bafmt" => "",
-             "did" => nil,
-             "bfont" => "",
-             "bsize" => 0 }],
-          "flds" =>
-          [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
-           { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
-          "css" =>
-          ".card {\n" \
-          "    font-family: arial;\n" \
-          "    font-size: 20px;\n" \
-          "    text-align: center;\n" \
-          "    color: black;\n" \
-          "    background-color: white;\n" \
-          "}\n",
-          "latexPre" =>
-          "\\documentclass[12pt]{article}\n" \
-          "\\special{papersize=3in,5in}\n" \
-          "\\usepackage[utf8]{inputenc}\n" \
-          "\\usepackage{amssymb,amsmath}\n" \
-          "\\pagestyle{empty}\n" \
-          "\\setlength{\\parindent}{0in}\n" \
-          "\\begin{document}\n",
-          "latexPost" => "\\end{document}",
-          "latexsvg" => false,
-          "req" => [[0, "any", [0]]] }
-      end
-      # rubocop:enable Layout/LineContinuationLeadingSpace
-
       it "should instantiate a note type belonging to the collection argument" do
         expect(note_type.collection).to eq collection_argument
       end
@@ -199,6 +198,26 @@ RSpec.describe AnkiRecord::NoteType do
       end
       it "should instantiate a note type with nil tags attribute because it is missing from the data" do
         expect(note_type_from_existing.tags).to eq nil
+      end
+    end
+  end
+
+  describe "#snake_case_field_names" do
+    context "for the default Basic note type" do
+      it "returns an array including the values 'front' and 'back'" do
+        expect(note_type_from_existing.snake_case_field_names.sort).to eq %w[back front]
+      end
+    end
+    context "for a note type with a note field called 'Crazy Note Field Name'" do
+      it "returns an array including the value 'crazy_note_field_name'" do
+        note_type.new_note_field name: "Crazy Note Field Name"
+        expect(note_type.snake_case_field_names).to eq ["crazy_note_field_name"]
+      end
+    end
+    context "for a note type with a note field called 'Double  Spaces'" do
+      it "returns an array including the value 'crazy_note_field_name'" do
+        note_type.new_note_field name: "Double  Spaces"
+        expect(note_type.snake_case_field_names).to eq ["double__spaces"]
       end
     end
   end

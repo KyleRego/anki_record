@@ -98,6 +98,14 @@ module AnkiRecord
       @card_templates << AnkiRecord::CardTemplate.new(note_type: self, name: name)
     end
 
+    ##
+    # The allowed field names of the note in snake_case
+    #
+    # TODO: make this more robust... what happens when the note type name has non-alphabetic characters?
+    def snake_case_field_names
+      @fields.map { |field| field.name.downcase.gsub(" ", "_") }
+    end
+
     private
 
       # rubocop:disable Metrics/MethodLength

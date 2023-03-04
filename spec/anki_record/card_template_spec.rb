@@ -93,35 +93,35 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
   end
 
-  describe "#allowed_field_names" do
-    context "when the template's note type has no fields" do
-      it "should return an empty array" do
-        expect(template.allowed_field_names).to eq []
-      end
-    end
-    context "when the template's note type has one field" do
-      let(:field_name) { "field 1 name" }
-      before { note_type_argument.new_note_field(name: field_name) }
-      it "should return an array with a length of 1" do
-        expect(template.allowed_field_names.length).to eq 1
-      end
-      it "should return an array containing the name of the note type's field" do
-        expect(template.allowed_field_names).to eq [field_name]
-      end
-    end
-    context "when the template's note type has two fields" do
-      let(:field_name1) { "field 1 name" }
-      let(:field_name2) { "field 2 name" }
-      before do
-        note_type_argument.new_note_field(name: field_name1)
-        note_type_argument.new_note_field(name: field_name2)
-      end
-      it "should return an array with a length of 2" do
-        expect(template.allowed_field_names.length).to eq 2
-      end
-      it "should return an array containing the names of the note type's fields" do
-        expect(template.allowed_field_names).to include field_name1, field_name2
-      end
-    end
-  end
+  # describe "#allowed_field_names" do
+  #   context "when the template's note type has no fields" do
+  #     it "should return an empty array" do
+  #       expect(template.allowed_field_names).to eq []
+  #     end
+  #   end
+  #   context "when the template's note type has one field" do
+  #     let(:field_name) { "field 1 name" }
+  #     before { note_type_argument.new_note_field(name: field_name) }
+  #     it "should return an array with a length of 1" do
+  #       expect(template.allowed_field_names.length).to eq 1
+  #     end
+  #     it "should return an array containing the name of the note type's field" do
+  #       expect(template.allowed_field_names).to eq [field_name]
+  #     end
+  #   end
+  #   context "when the template's note type has two fields" do
+  #     let(:field_name1) { "field 1 name" }
+  #     let(:field_name2) { "field 2 name" }
+  #     before do
+  #       note_type_argument.new_note_field(name: field_name1)
+  #       note_type_argument.new_note_field(name: field_name2)
+  #     end
+  #     it "should return an array with a length of 2" do
+  #       expect(template.allowed_field_names.length).to eq 2
+  #     end
+  #     it "should return an array containing the names of the note type's fields" do
+  #       expect(template.allowed_field_names).to include field_name1, field_name2
+  #     end
+  #   end
+  # end
 end

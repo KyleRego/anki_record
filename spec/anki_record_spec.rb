@@ -28,9 +28,6 @@ RSpec.describe AnkiRecord do
         deck = apkg.collection.find_deck_by name: "Default"
         # or deck = apkg.collection.find_deck_by id: 1
 
-        note = AnkiRecord::Note.new note_type: note_type, deck: deck, front: "Hello world", back: ""
-        note.save
-        # or
         note2 = AnkiRecord::Note.new note_type: note_type, deck: deck
         note2.front = "Hello world"
         note2.back = ""

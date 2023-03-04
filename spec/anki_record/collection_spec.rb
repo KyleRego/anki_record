@@ -53,5 +53,37 @@ RSpec.describe AnkiRecord::Collection do
         expect(collection.deck_options_groups.all? { |deck_opts| deck_opts.instance_of?(AnkiRecord::DeckOptionsGroup) }).to eq true
       end
     end
+
+    describe "#find_note_type_by" do
+      context "when passed a name argument where the collection does not have a note type with that name" do
+        it "should return nil" do
+          expect(collection.find_note_type_by(name: "no-note-type-with-this-name")).to eq nil
+        end
+      end
+      context "when passed a name argument where the collection has a note type with that name" do
+        it "should return a note type object" do
+          expect(collection.find_note_type_by(name: "Basic").instance_of?(AnkiRecord::NoteType)).to eq true
+        end
+        it "should return a note type object with name equal to the name argument" do
+          expect(collection.find_note_type_by(name: "Basic").name).to eq "Basic"
+        end
+      end
+    end
+
+    describe "#find_deck_by" do
+      context "when passed a name argument where the collection does not have a deck with that name" do
+        it "should return nil" do
+          expect(collection.find_deck_by(name: "no-deck-with-this-name")).to eq nil
+        end
+      end
+      context "when passed a name argument where the collection has a deck with that name" do
+        it "should return a deck object" do
+          expect(collection.find_deck_by(name: "Default").instance_of?(AnkiRecord::Deck)).to eq true
+        end
+        it "should return a deck object with name equal to the name argument" do
+          expect(collection.find_deck_by(name: "Default").name).to eq "Default"
+        end
+      end
+    end
   end
 end

@@ -56,6 +56,18 @@ module AnkiRecord
       setup_collection_instance_variables(anki_package: anki_package)
     end
 
+    ##
+    # Find one of the collection's note types by name
+    def find_note_type_by(name: nil)
+      note_types.find { |note_type| note_type.name == name }
+    end
+
+    ##
+    # Find one of the collection's decks by name
+    def find_deck_by(name: nil)
+      decks.find { |deck| deck.name == name }
+    end
+
     private
 
       # rubocop:disable Metrics/MethodLength

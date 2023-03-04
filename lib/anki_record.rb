@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "securerandom"
 require "sqlite3"
 require "zip"
 
 require_relative "anki_record/anki_package"
+require_relative "anki_record/note"
 require_relative "anki_record/version"
 
 ##
@@ -14,6 +14,7 @@ require_relative "anki_record/version"
 # - Collection
 # - DeckOptionsGroup
 # - Deck
+# - Note
 # - NoteField
 # - NoteType
 #

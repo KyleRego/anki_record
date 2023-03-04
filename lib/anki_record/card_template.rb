@@ -80,16 +80,15 @@ module AnkiRecord
         @browser_font_size = 0
       end
 
-    public
-
     ##
     # Returns the field names that are allowed in the answer format and question format
     #
     # These are the field_name values in {{field_name}} in those formats.
     #
     # They are equivalent to the names of the fields of the template's note type.
-    def allowed_field_names
-      @note_type.fields.map(&:name)
-    end
+    # TODO: this should be a method of note type e.g. note_type.allowed_field_names
+    # def allowed_field_names
+    #   @note_type.fields.map(&:name)
+    # end
   end
 end
