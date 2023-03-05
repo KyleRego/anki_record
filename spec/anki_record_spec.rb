@@ -21,15 +21,20 @@ RSpec.describe AnkiRecord do
       it "should zip a new, empty Anki package (test2.apkg) with 2 Basic notes in the Default deck" do
         apkg = AnkiRecord::AnkiPackage.new name: "test2"
 
-        note_type = apkg.collection.find_note_type_by name: "Basic"
-        # or note_type = apkg.collection.find_note_type_by id: 1
-
         deck = apkg.collection.find_deck_by name: "Default"
-        # or deck = apkg.collection.find_deck_by id: 1
 
-        note2 = AnkiRecord::Note.new note_type: note_type, deck: deck
-        note2.front = "Hello world"
-        note2.back = ""
+        note_type = apkg.collection.find_note_type_by name: "Basic"
+
+        note = AnkiRecord::Note.new note_type: note_type, deck: deck
+        note.front = "Hello"
+        note.back = "World"
+        note.save
+
+        note_type2 = apkg.collection.find_note_type_by name: "Cloze"
+
+        note2 = AnkiRecord::Note.new note_type: note_type2, deck: deck
+        note2.text = "Cloze Hello"
+        note2.back_extra = "World"
         note2.save
 
         apkg.zip

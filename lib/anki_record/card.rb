@@ -41,6 +41,7 @@ module AnkiRecord
       @id = milliseconds_since_epoch
       @last_modified_time = seconds_since_epoch
       @usn = NEW_OBJECT_USN
+      @type = 0
       @queue = 0
       @due = 0
       @ivl = 0
@@ -65,16 +66,10 @@ module AnkiRecord
                           due, ivl, factor, reps,
                           lapses, left, odue, odid, flags, data)
                     values ('#{@id}', '#{@note.id}', '#{@note.deck.id}', '#{@card_template.ordinal_number}',
-                           '#{@last_modified_time}', '#{@usn}', '#{type}', '#{@queue}',
+                           '#{@last_modified_time}', '#{@usn}', '#{@type}', '#{@queue}',
                            '#{@due}', '#{@ivl}', '#{@factor}', '#{@reps}',
                            '#{@lapses}', '#{@left}', '#{@odue}', '#{@odid}', '#{@flags}', '#{@data}')
       SQL
     end
-
-    private
-
-      def type
-        note.note_type.cloze ? 1 : 0
-      end
   end
 end
