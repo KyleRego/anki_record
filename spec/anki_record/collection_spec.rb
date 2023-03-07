@@ -12,7 +12,7 @@ RSpec.describe AnkiRecord::Collection do
       it "should instantiate a new Collection object" do
         expect(collection.instance_of?(AnkiRecord::Collection)).to eq true
       end
-      it "should instantiate a new Collection object which belongs to the given AnkiPackage object" do
+      it "should instantiate a new Collection object with anki_package attribute which is the AnkiPackage object argument" do
         expect(collection.anki_package).to eq anki_package
       end
       it "should instantiate a new Collection object with an id of 1" do

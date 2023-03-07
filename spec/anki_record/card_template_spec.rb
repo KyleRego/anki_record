@@ -17,8 +17,11 @@ RSpec.describe AnkiRecord::CardTemplate do
 
   describe "::new used to instantiate a card template with a name argument" do
     context "with valid arguments (a parent note type and name)" do
-      it "should instantiate a card template belonging to that note type" do
+      it "should instantiate a card template with note_type attribute equal to the note type argument" do
         expect(template.note_type).to eq note_type_argument
+      end
+      it "should instantiate a card template that is added to the note type's card_templates attribute" do
+        expect(template.note_type.card_templates).to include template
       end
       it "should instantiate a card template with the given name" do
         expect(template.name).to eq name_argument
@@ -42,7 +45,7 @@ RSpec.describe AnkiRecord::CardTemplate do
       end
     end
     context "and the note type already had one card template" do
-      before { note_type_argument.new_card_template(name: "the first card template") }
+      before { AnkiRecord::CardTemplate.new note_type: note_type_argument, name: "the first card template" }
       it "should instantiate a card template with ordinal number 1" do
         expect(template.ordinal_number).to eq 1
       end
@@ -70,8 +73,11 @@ RSpec.describe AnkiRecord::CardTemplate do
 
   describe "::new passed an args hash" do
     context "when the args hash is the default Card 1 template JSON object for the default Basic note type from a new Anki 2.1.54 profile" do
-      it "should instantiate a card template for the argument note type" do
+      it "should instantiate a card template with note_type attribute equal to the note type argument" do
         expect(card_template_from_existing.note_type).to eq note_type_argument
+      end
+      it "should instantiate a card template that is added to the note type's card_templates attribute" do
+        expect(template.note_type.card_templates).to include template
       end
       it "should instantiate a card template with the name Card 1" do
         expect(card_template_from_existing.name).to eq "Card 1"
@@ -102,22 +108,22 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
     context "when the format specifies two field names and the card template's note type has fields for both" do
       it "should set the question_format attribute to the argument" do
-        note_type_argument.new_note_field name: "Front"
-        note_type_argument.new_note_field name: "Back"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Back"
         card_template_from_existing.question_format = "{{Front}} and {{Back}}"
         expect(card_template_from_existing.question_format).to eq "{{Front}} and {{Back}}"
       end
     end
     context "when the format specifies a cloze field but the note type is not a cloze type" do
       it "should throw an ArgumentError" do
-        note_type_argument.new_note_field name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
         expect { card_template_from_existing.question_format = "{{cloze:Front}}" }.to raise_error ArgumentError
       end
     end
     context "when the format specifies a cloze field and the note type is not a cloze type" do
       it "should set the question_format attribute to the argument" do
         note_type_argument.cloze = true
-        note_type_argument.new_note_field name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
         card_template_from_existing.question_format = "{{cloze:Front}}"
         expect(card_template_from_existing.question_format).to eq "{{cloze:Front}}"
       end
@@ -131,22 +137,22 @@ RSpec.describe AnkiRecord::CardTemplate do
     end
     context "when the format specifies two field names and the card template's note type has fields for both" do
       it "should set the answer_format attribute to the argument" do
-        note_type_argument.new_note_field name: "Front"
-        note_type_argument.new_note_field name: "Back"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Back"
         card_template_from_existing.answer_format = "{{Front}} and {{Back}}"
         expect(card_template_from_existing.answer_format).to eq "{{Front}} and {{Back}}"
       end
     end
     context "when the format specifies a cloze field but the note type is not a cloze type" do
       it "should throw an ArgumentError" do
-        note_type_argument.new_note_field name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
         expect { card_template_from_existing.answer_format = "{{cloze:Front}}" }.to raise_error ArgumentError
       end
     end
     context "when the format specifies a cloze field and the note type is not a cloze type" do
       it "should set the answer_format attribute to the argument" do
         note_type_argument.cloze = true
-        note_type_argument.new_note_field name: "Front"
+        AnkiRecord::NoteField.new note_type: note_type_argument, name: "Front"
         card_template_from_existing.answer_format = "{{cloze:Front}}"
         expect(card_template_from_existing.answer_format).to eq "{{cloze:Front}}"
       end

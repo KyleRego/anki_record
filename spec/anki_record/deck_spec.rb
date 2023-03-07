@@ -16,8 +16,11 @@ RSpec.describe AnkiRecord::Deck do
       it "should instantiate a new Deck object" do
         expect(deck.instance_of?(AnkiRecord::Deck)).to eq true
       end
-      it "should instantiate a deck belonging to the collection" do
+      it "should instantiate a deck with collection attribute which is the collection argument" do
         expect(deck.collection).to eq collection_argument
+      end
+      it "should instantiate a deck which is added to the decks of the collection argument's decks attribute" do
+        expect(deck.collection.decks).to include deck
       end
       it "should instantiate a deck with an empty string description" do
         expect(deck.description).to eq ""
@@ -61,8 +64,11 @@ RSpec.describe AnkiRecord::Deck do
             "extendNew" => 0,
             "extendRev" => 0 }
         end
-        it "should instantiate a deck belonging to the collection argument" do
+        it "should instantiate a deck with collection attribute equal to the collection argument" do
           expect(deck_from_existing.collection).to eq collection_argument
+        end
+        it "should instantiate a deck which is added to the decks of the collection argument's decks attribute" do
+          expect(deck_from_existing.collection.decks).to include deck
         end
         it "should instantiate a deck with the id from the deck JSON" do
           expect(deck_from_existing.id).to eq 1

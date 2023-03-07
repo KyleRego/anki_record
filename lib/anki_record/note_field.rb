@@ -15,7 +15,7 @@ module AnkiRecord
     private_constant :DEFAULT_FIELD_FONT_STYLE, :DEFAULT_FIELD_FONT_SIZE, :DEFAULT_FIELD_DESCRIPTION
 
     ##
-    # The note type that the note field belongs to
+    # The note type object that the note field object belongs to
     attr_reader :note_type
 
     ##
@@ -23,19 +23,19 @@ module AnkiRecord
     attr_accessor :name
 
     ##
-    # A boolean that indicates if this field is sticky when adding cards of the note type in Anki
+    # A boolean that indicates if this field is sticky
     attr_accessor :sticky
 
     ##
-    # A boolean that indicates if this field should be right to left
+    # A boolean that indicates if this field should be right to left in Anki
     attr_accessor :right_to_left
 
     ##
-    # The font style used when editing the note field
+    # The font style used when editing the field in Anki
     attr_accessor :font_style
 
     ##
-    # The font size used when editing the note field
+    # The font size used when editing the field in Anki
     attr_accessor :font_size
 
     ##
@@ -57,6 +57,8 @@ module AnkiRecord
       else
         setup_note_field_instance_variables(name: name)
       end
+
+      @note_type.add note_field: self
     end
 
     private
@@ -73,7 +75,7 @@ module AnkiRecord
 
       def setup_note_field_instance_variables(name:)
         @name = name
-        @ordinal_number = @note_type.fields.length
+        @ordinal_number = @note_type.note_fields.length
         @sticky = false
         @right_to_left = false
         @font_style = DEFAULT_FIELD_FONT_STYLE

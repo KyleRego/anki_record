@@ -18,8 +18,11 @@ RSpec.describe AnkiRecord::NoteType do
   end
 
   describe "::new with name argument" do
-    it "should instantiate a note type belonging to the collection argument" do
+    it "should instantiate a note type with collection attribute equal to the collection argument" do
       expect(note_type.collection).to eq collection_argument
+    end
+    it "should instantiate a new note type which is added to the collection's note_types attribute" do
+      expect(note_type.collection.note_types).to include note_type
     end
     it "should instantiate a note type with an integer id" do
       expect(note_type.id.class).to eq Integer
@@ -33,8 +36,8 @@ RSpec.describe AnkiRecord::NoteType do
     it "should instantiate a note type with the card_templates attribute being an empty array" do
       expect(note_type.card_templates).to eq []
     end
-    it "should instantiate a note type with the fields attribute being an empty array" do
-      expect(note_type.fields).to eq []
+    it "should instantiate a note type with the note_fields attribute being an empty array" do
+      expect(note_type.note_fields).to eq []
     end
     it "should instantiate a note type with a deck_id attribute of nil" do
       expect(note_type.deck_id).to eq nil
@@ -75,43 +78,7 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
-  let(:field_name_argument) { "test field name argument" }
-  subject(:new_note_field) { note_type.new_note_field(name: field_name_argument) }
-
-  describe "#new_note_field with a string name argument" do
-    it "should increase the number of fields this note type has by 1" do
-      expect { new_note_field }.to change { note_type.fields.count }.from(0).to(1)
-    end
-    it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
-      new_note_field
-      expect(note_type.fields.first.instance_of?(AnkiRecord::NoteField)).to eq true
-    end
-    it "should return a new NoteField object (the same as was added to the note type's note_fields attribute)" do
-      expect(new_note_field.instance_of?(AnkiRecord::NoteField)).to eq true
-    end
-    it "should return a new NoteField object with name equal to the name argument" do
-      expect(new_note_field.name).to eq field_name_argument
-    end
-  end
-
   let(:template_name_argument) { "test template name argument" }
-  subject(:new_card_template) { note_type.new_card_template(name: template_name_argument) }
-
-  describe "#new_card_template with a string name argument" do
-    it "should increase the number of card templates this note type has by 1" do
-      expect { new_card_template }.to change { note_type.card_templates.count }.from(0).to(1)
-    end
-    it "should add an object of type AnkiRecord::NoteField to this note type's fields attribute" do
-      new_card_template
-      expect(note_type.card_templates.first.instance_of?(AnkiRecord::CardTemplate)).to eq true
-    end
-    it "should return a new CardTemplate object (the same as was added to the note type's card_templates attribute)" do
-      expect(new_card_template.instance_of?(AnkiRecord::CardTemplate)).to eq true
-    end
-    it "should return a new CardTemplate object with name equal to the name argument" do
-      expect(new_card_template.name).to eq template_name_argument
-    end
-  end
 
   subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: model_hash) }
   # rubocop:disable Layout/LineContinuationLeadingSpace
@@ -160,8 +127,11 @@ RSpec.describe AnkiRecord::NoteType do
 
   describe "::new passed an args hash" do
     context "when the model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
-      it "should instantiate a note type belonging to the collection argument" do
+      it "should instantiate a note type with collection attribute equal to the collection argument" do
         expect(note_type.collection).to eq collection_argument
+      end
+      it "should instantiate a new note type which is added to the collection's note_types attribute" do
+        expect(note_type.collection.note_types).to include note_type
       end
       it "should instantiate a note type object with id the same as the data" do
         expect(note_type_from_existing.id).to eq model_hash["id"]
@@ -188,13 +158,13 @@ RSpec.describe AnkiRecord::NoteType do
         expect(note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
       end
       it "should instantiate a note type with 2 fields" do
-        expect(note_type_from_existing.fields.count).to eq 2
+        expect(note_type_from_existing.note_fields.count).to eq 2
       end
       it "should instantiate a note type with 2 fields that are of class NoteField" do
-        expect(note_type_from_existing.fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
+        expect(note_type_from_existing.note_fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
       end
       it "should instantiate a note type with a 'Front' field and a 'Back' field" do
-        expect(note_type_from_existing.fields.map(&:name).sort).to eq %w[Back Front]
+        expect(note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
       end
       it "should instantiate a note type with the CSS styling from the data" do
         expect(note_type_from_existing.css).to eq model_hash["css"]
@@ -222,10 +192,7 @@ RSpec.describe AnkiRecord::NoteType do
     end
     context "for a note type with four custom fields" do
       it "should return an array with the field names in the correct order" do
-        note_type.new_note_field name: "Field 1"
-        note_type.new_note_field name: "Field 2"
-        note_type.new_note_field name: "Field 3"
-        note_type.new_note_field name: "Field 4"
+        4.times { |i| AnkiRecord::NoteField.new note_type: note_type, name: "Field #{i + 1}" }
         expect(note_type.field_names_in_order).to eq ["Field 1", "Field 2", "Field 3", "Field 4"]
       end
     end
@@ -239,13 +206,13 @@ RSpec.describe AnkiRecord::NoteType do
     end
     context "for a note type with a note field called 'Crazy Note Field Name'" do
       it "should return an array including the value 'crazy_note_field_name'" do
-        note_type.new_note_field name: "Crazy Note Field Name"
+        AnkiRecord::NoteField.new note_type: note_type, name: "Crazy Note Field Name"
         expect(note_type.snake_case_field_names).to eq ["crazy_note_field_name"]
       end
     end
     context "for a note type with a note field called 'Double  Spaces'" do
       it "should return an array including the value 'crazy_note_field_name'" do
-        note_type.new_note_field name: "Double  Spaces"
+        AnkiRecord::NoteField.new note_type: note_type, name: "Double  Spaces"
         expect(note_type.snake_case_field_names).to eq ["double__spaces"]
       end
     end
@@ -267,7 +234,7 @@ RSpec.describe AnkiRecord::NoteType do
     end
     context "for a note type with a note field called 'Crazy Note Field Name' which is the sort field" do
       it "should return 'crazy_note_field_name'" do
-        note_type.new_note_field name: "Crazy Note Field Name"
+        AnkiRecord::NoteField.new note_type: note_type, name: "Crazy Note Field Name"
         expect(note_type.snake_case_sort_field_name).to eq "crazy_note_field_name"
       end
     end

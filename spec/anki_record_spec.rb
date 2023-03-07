@@ -7,37 +7,26 @@ RSpec.describe AnkiRecord do
 
   before(:all) { cleanup_test_files directory: "." }
 
-  context "end to end tests" do
-    describe "::new and ::open without block arguments" do
-      # it "should zip a new, empty Anki package (test1.apkg)
-      #     and then it should open that file and zip an updated version (test1-number.apkg)
-      #     and both of these should import into Anki correctly" do
-      #   apkg = AnkiRecord::AnkiPackage.new name: "test1"
-      #   apkg.zip
-      #   apkg2 = AnkiRecord::AnkiPackage.open path: "test1.apkg"
-      #   apkg2.zip
-      # end
+  describe "an unfinished end to end test" do
+    it "is an example" do
+      AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
+        collection = apkg.collection
 
-      it "should zip a new, empty Anki package (test2.apkg) with 2 Basic notes in the Default deck" do
-        apkg = AnkiRecord::AnkiPackage.new name: "test2"
+        crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
 
-        deck = apkg.collection.find_deck_by name: "Default"
+        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
 
-        note_type = apkg.collection.find_note_type_by name: "Basic"
+        crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+        crazy_card_template.question_format = "{{crazy front}}"
+        crazy_card_template.answer_format = "{{crazy back}}"
 
-        note = AnkiRecord::Note.new note_type: note_type, deck: deck
-        note.front = "Hello"
-        note.back = "World"
-        note.save
+        # crazy_note_type.save # TODO
 
-        note_type2 = apkg.collection.find_note_type_by name: "Cloze"
+        crazy_deck = AnkiRecord::Deck.new collection: collection, name: "crazy deck"
+        expect(crazy_deck.name).to eq "crazy deck"
 
-        note2 = AnkiRecord::Note.new note_type: note_type2, deck: deck
-        note2.text = "Cloze Hello"
-        note2.back_extra = "World"
-        note2.save
-
-        apkg.zip
+        # crazy_deck.save # TODO
       end
     end
   end

@@ -23,8 +23,11 @@ RSpec.describe AnkiRecord::NoteField do
 
   describe "::new" do
     context "when passed a note type and name arguments" do
-      it "should instantiate a field belonging to that note type" do
+      it "should instantiate a field with note_type attribute equal to the note type argument" do
         expect(field.note_type).to eq note_type_argument
+      end
+      it "should instantiate a field which is added to the note type argument's note_fields attribute" do
+        expect(field.note_type.note_fields).to include field
       end
       it "should instantiate a field with the given name" do
         expect(field.name).to eq name_argument
@@ -50,9 +53,7 @@ RSpec.describe AnkiRecord::NoteField do
         end
       end
       context "and the note type it is being added to has one field already" do
-        before do
-          note_type_argument.new_note_field(name: "the first note field")
-        end
+        before { AnkiRecord::NoteField.new note_type: note_type_argument, name: "the first note field" }
         it "should instantiate a field with the ordinal_number attribute being 1" do
           expect(field.ordinal_number).to eq 1
         end
@@ -67,8 +68,11 @@ RSpec.describe AnkiRecord::NoteField do
         let(:field_hash) do
           { "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }
         end
-        it "should instantiate a field belonging to the note type argument" do
+        it "should instantiate a field with note_type attribute equal to the note type argument" do
           expect(note_field_from_existing.note_type).to eq note_type_argument
+        end
+        it "should instantiate a note field that is added to the note_fields attribute of its note type" do
+          expect(note_field_from_existing.note_type.note_fields).to include note_field_from_existing
         end
         it "should instantiate a field with the name 'Front'" do
           expect(note_field_from_existing.name).to eq "Front"

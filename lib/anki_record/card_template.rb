@@ -62,9 +62,6 @@ module AnkiRecord
     # 0 for the first card template of the note type, 1 for the second, etc.
     attr_reader :ordinal_number
 
-    ##
-    # Instantiates a new card template called +name+ for the given note type
-    #
     def initialize(note_type:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
@@ -74,6 +71,8 @@ module AnkiRecord
       else
         setup_card_template_instance_variables(name: name)
       end
+
+      @note_type.add card_template: self
     end
 
     private

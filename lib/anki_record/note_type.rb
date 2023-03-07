@@ -45,29 +45,25 @@ module AnkiRecord
     attr_reader :latex_postamble
 
     ##
-    # A boolean probably related to something with LaTeX and SVG.
-    #
-    # TODO: Investigate what this does
+    # A boolean (probably) related to something related to LaTeX and SVG
     attr_reader :latex_svg
 
     ##
-    # An array of the card template objects belonging to the note type
+    # The array of the card template objects of the note type
     attr_reader :card_templates
 
     ##
-    # An array of the field names of the card template
-    attr_reader :fields
+    # The array of the note field objects of the note type
+    attr_reader :note_fields
 
     ##
-    # TODO: Investigate the meaning of the deck id of a note type
+    # TODO: wat is this
     attr_reader :deck_id
 
     ##
-    # TODO: Investigate the meaning of tags of a note type
+    # TODO: wat is this
     attr_reader :tags
 
-    ##
-    # Instantiates a new note type
     def initialize(collection:, name: nil, cloze: false, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
@@ -78,32 +74,12 @@ module AnkiRecord
       else
         setup_note_type_instance_variables(name: name, cloze: cloze)
       end
+
+      @collection.add note_type: self
     end
 
     ##
-    # Creates a new field and adds it to this note type's fields
-    #
-    # The field is an instance of AnkiRecord::NoteField
-    def new_note_field(name:)
-      # TODO: Raise an exception if the name is already used by a field in this note type
-      note_field = AnkiRecord::NoteField.new(note_type: self, name: name)
-      @fields << note_field
-      note_field
-    end
-
-    ##
-    # Create a new card template and adds it to this note type's templates
-    #
-    # The card template is an instance of AnkiRecord::CardTemplate
-    def new_card_template(name:)
-      # TODO: Raise an exception if the name is already used by a template in this note type
-      card_template = AnkiRecord::CardTemplate.new(note_type: self, name: name)
-      @card_templates << card_template
-      card_template
-    end
-
-    ##
-    # Find one of the note type's card templates by name
+    # Returns the note type object's card template with name +name+ or nil if it is not found
     def find_card_template_by(name:)
       card_templates.find { |template| template.name == name }
     end
@@ -111,26 +87,20 @@ module AnkiRecord
     ##
     # The field names of the note type ordered by their ordinal values
     def field_names_in_order
-      @fields.sort_by(&:ordinal_number).map(&:name)
+      @note_fields.sort_by(&:ordinal_number).map(&:name)
     end
 
-    ##
-    # The allowed field names of the note in snake_case
-    #
-    # TODO: make this more robust... what happens when the note type name has non-alphabetic characters?
-    def snake_case_field_names
+    def snake_case_field_names # :nodoc:
       field_names_in_order.map { |field_name| field_name.downcase.gsub(" ", "_") }
     end
 
     ##
     # The name of the field used to sort notes of the note type in the Anki browser
     def sort_field_name
-      @fields.find { |field| field.ordinal_number == @sort_field }&.name
+      @note_fields.find { |field| field.ordinal_number == @sort_field }&.name
     end
 
-    ##
-    # The name of the sort field in snake_case
-    def snake_case_sort_field_name
+    def snake_case_sort_field_name # :nodoc:
       sort_field_name.downcase.gsub(" ", "_")
     end
 
@@ -157,6 +127,13 @@ module AnkiRecord
       allowed_card_template_question_format_field_names + ["FrontSide"]
     end
 
+    def add(note_field: nil, card_template: nil) # :nodoc:
+      raise ArgumentError unless note_field || card_template # TODO: RSpec examples and check argument classes
+
+      @note_fields << note_field if note_field
+      @card_templates << card_template if card_template
+    end
+
     private
 
       # rubocop:disable Metrics/MethodLength
@@ -169,8 +146,10 @@ module AnkiRecord
         @usn = args["usn"]
         @sort_field = args["sortf"]
         @deck_id = args["did"]
-        @fields = args["flds"].map { |fld| NoteField.new(note_type: self, args: fld) }
-        @card_templates = args["tmpls"].map { |tmpl| CardTemplate.new(note_type: self, args: tmpl) }
+        @note_fields = []
+        args["flds"].each { |fld| NoteField.new(note_type: self, args: fld) }
+        @card_templates = []
+        args["tmpls"].each { |tmpl| CardTemplate.new(note_type: self, args: tmpl) }
         @css = args["css"]
         @latex_preamble = args["latexPre"]
         @latex_postamble = args["latexPost"]
@@ -191,7 +170,7 @@ module AnkiRecord
         @usn = NEW_OBJECT_USN
         @sort_field = NEW_NOTE_TYPE_SORT_FIELD
         @deck_id = nil
-        @fields = []
+        @note_fields = []
         @card_templates = []
         @css = default_css
         @latex_preamble = default_latex_preamble

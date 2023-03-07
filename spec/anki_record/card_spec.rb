@@ -7,9 +7,9 @@ RSpec.describe AnkiRecord::Card do
   end
   let(:note_type_argument) do
     note_type = AnkiRecord::NoteType.new collection: collection_argument, name: "NOTE_TYPE_A"
-    card_template = note_type.new_card_template name: "CARD_TYPE_A"
-    note_type.new_note_field name: "FIELD_A"
-    note_type.new_note_field name: "FIELD_B"
+    card_template = AnkiRecord::CardTemplate.new note_type: note_type, name: "CARD_TYPE_A"
+    AnkiRecord::NoteField.new note_type: note_type, name: "FIELD_A"
+    AnkiRecord::NoteField.new note_type: note_type, name: "FIELD_B"
     card_template.question_format = "{{FIELD_A}}\n\n{{FIELD_B}}"
     card_template.answer_format = "{{FrontSide}}\n\n{{FIELD_B}}\n\n{{FIELD_A}}"
     note_type

@@ -92,7 +92,8 @@ module AnkiRecord
       method_name = method_name.chomp("=")
       valid_fields_snake_names = @field_contents.keys
       unless valid_fields_snake_names.include?(method_name)
-        raise ArgumentError, "Valid fields for the #{note_type.name} note type are one of #{valid_fields_snake_names.join(", ")}"
+        raise ArgumentError,
+              "Valid fields for the #{note_type.name} note type are one of #{valid_fields_snake_names.join(", ")}"
       end
 
       @field_contents[method_name] = field_content

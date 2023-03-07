@@ -28,8 +28,6 @@ module AnkiRecord
     # The last time that this deck options group was modified in milliseconds since the 1970 epoch
     attr_reader :last_modified_time
 
-    ##
-    # Instantiates a new deck options group called +name+ with defaults
     def initialize(collection:, name: nil, args: nil)
       # TODO: extract this check to a shared helper
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
@@ -41,6 +39,8 @@ module AnkiRecord
       else
         setup_deck_options_group_instance_variables(name: name)
       end
+
+      @collection.add deck_options_group: self
     end
 
     private

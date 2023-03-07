@@ -54,6 +54,8 @@ module AnkiRecord
       else
         setup_deck_instance_variables(name: name)
       end
+
+      @collection.add deck: self
     end
 
     private

@@ -22,8 +22,11 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
       it "should instantiate a new deck options group" do
         expect(deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)).to eq true
       end
-      it "should instantiate a new deck options group belonging to the collection" do
+      it "should instantiate a new deck options group with a collection attribute being the collection argument it was instantiated with" do
         expect(deck_options_group.collection).to eq collection_argument
+      end
+      it "should instantiate a new deck options group object that is added to the collection arguments deck_options_groups attribute" do
+        expect(deck_options_group.collection.deck_options_groups).to include deck_options_group
       end
       it "should instantiate a new deck options group with an integer id" do
         expect(deck_options_group.id.instance_of?(Integer)).to eq true
@@ -59,8 +62,11 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
             "newGatherPriority" => 0,
             "buryInterdayLearning" => false }
         end
-        it "should instantiate a deck options group belonging to the collection" do
+        it "should instantiate a deck options group with collection attribute equal to the collection argument" do
           expect(deck_options_group_from_existing.collection).to eq collection_argument
+        end
+        it "should instantiate a new deck options group object that is added to the collection arguments deck_options_groups attribute" do
+          expect(deck_options_group_from_existing.collection.deck_options_groups).to include deck_options_group
         end
         it "should instantiate a deck options group with name from the JSON data" do
           expect(deck_options_group_from_existing.name).to eq "Default"
