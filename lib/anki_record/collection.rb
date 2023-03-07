@@ -15,11 +15,11 @@ module AnkiRecord
     include AnkiRecord::TimeHelper
 
     ##
-    # The Anki Package object that the collection object belongs to
+    # The Anki package object that the collection object belongs to
     attr_reader :anki_package
 
     ##
-    # The id of the collection record the collection object corresponds to (should be 1 normally)
+    # The id of the collection record that the collection object corresponds to (this is usually 1)
     attr_reader :id
 
     ##
@@ -43,22 +43,32 @@ module AnkiRecord
     # These represent groups of settings that can be applied to decks.
     attr_reader :deck_options_groups
 
-    ##
-    # Instantiates the collection object for the +anki_package+
-    #
-    # The collection object represents the single record of the collection.anki21 database col table.
-    #
-    # This record stores the note types used by the notes and the decks that they belong to.
     def initialize(anki_package:)
       setup_collection_instance_variables(anki_package: anki_package)
     end
 
-    def add(note_type: nil, deck: nil, deck_options_group: nil) # :nodoc:
-      raise ArgumentError unless note_type || deck || deck_options_group # TODO: RSpec examples
+    def add_note_type(note_type) # :nodoc:
+      raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
 
-      @note_types << note_type if note_type
-      @decks << deck if deck
-      @deck_options_groups << deck_options_group if deck_options_group
+      # TODO: RSpec example for ArgumentError
+
+      @note_types << note_type
+    end
+
+    def add_deck(deck) # :nodoc:
+      raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
+
+      # TODO: RSpec example for ArgumentError
+
+      @decks << deck
+    end
+
+    def add_deck_options_group(deck_options_group) # :nodoc:
+      raise ArgumentError unless deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)
+
+      # TODO: RSpec example for ArgumentError
+
+      @deck_options_groups << deck_options_group
     end
 
     ##

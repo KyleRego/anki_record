@@ -55,7 +55,7 @@ module AnkiRecord
         setup_deck_instance_variables(name: name)
       end
 
-      @collection.add deck: self
+      @collection.add_deck self
     end
 
     private

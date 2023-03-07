@@ -40,7 +40,7 @@ module AnkiRecord
         setup_deck_options_group_instance_variables(name: name)
       end
 
-      @collection.add deck_options_group: self
+      @collection.add_deck_options_group self
     end
 
     private

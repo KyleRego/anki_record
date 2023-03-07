@@ -58,7 +58,7 @@ module AnkiRecord
         setup_note_field_instance_variables(name: name)
       end
 
-      @note_type.add note_field: self
+      @note_type.add_note_field self
     end
 
     private

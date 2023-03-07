@@ -75,7 +75,7 @@ module AnkiRecord
         setup_note_type_instance_variables(name: name, cloze: cloze)
       end
 
-      @collection.add note_type: self
+      @collection.add_note_type self
     end
 
     ##
@@ -127,11 +127,16 @@ module AnkiRecord
       allowed_card_template_question_format_field_names + ["FrontSide"]
     end
 
-    def add(note_field: nil, card_template: nil) # :nodoc:
-      raise ArgumentError unless note_field || card_template # TODO: RSpec examples and check argument classes
+    def add_note_field(note_field) # :nodoc: TODO: RSpec example for ArgumentError
+      raise ArgumentError unless note_field.instance_of?(AnkiRecord::NoteField)
 
-      @note_fields << note_field if note_field
-      @card_templates << card_template if card_template
+      @note_fields << note_field
+    end
+
+    def add_card_template(card_template) # :nodoc: TODO: RSpec example for ArgumentError
+      raise ArgumentError unless card_template.instance_of?(AnkiRecord::CardTemplate)
+
+      @card_templates << card_template
     end
 
     private

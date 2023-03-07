@@ -72,7 +72,7 @@ module AnkiRecord
         setup_card_template_instance_variables(name: name)
       end
 
-      @note_type.add card_template: self
+      @note_type.add_card_template self
     end
 
     private

@@ -1,8 +1,8 @@
 # Anki Record
 
-Anki Record is a Ruby gem which provides a programmatic interface to creating and updating Anki flashcard deck `*.apkg` files (Anki SQLite databases). **This gem is in an early stage of development--I do not recommend you use it yet. The API is not stable yet and unknown bugs are so far undiscovered.**
+Anki Record is a library/Ruby gem which provides an interface to Anki flashcard deck `*.apkg` files (Anki SQLite databases). **This gem is in an early stage of development and I do not recommend you use it yet because the API is not stable yet.**
 
-[Anki Record API Documentation](https://kylerego.github.io/anki_record_docs)
+The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
 ## Installation
 
@@ -16,7 +16,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new` and if passed a block, will execute the block and zip the `*.apkg` file:
+The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new` and if passed a block, will execute the block, and then zip the `*.apkg` file:
 
 ```ruby
 require "anki_record"
@@ -29,7 +29,7 @@ AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
 end
 ```
 
-If an exception is raised inside the block, the temporary `collection.anki2` and `collection.anki21` databases are deleted without creating a new `*.apkg` zip file, so this is the recommended way.
+If an exception is raised inside the block, the temporary `collection.anki2` and `collection.anki21` databases and `media` file are deleted without creating a new `*.apkg` zip file, so this is the recommended way.
 
 Alternatively, if `AnkiRecord::Package::new` is not passed a block, the `zip` method must be explicitly called on the Anki package object:
 
@@ -40,7 +40,7 @@ apkg = AnkiRecord::AnkiPackage.new(name: "test")
 apkg.zip
 ```
 
-A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects can be accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods by passing the `name` keyword argument:
+A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument:
 
 ```ruby
 require "anki_record"
