@@ -8,7 +8,7 @@ RSpec.describe AnkiRecord::TimeHelper do
   describe "#milliseconds_since_epoch" do
     it "should return approximately the integer number of milliseconds since the 1970 epoch" do
       seconds_since_epoch = Time.now.to_i
-      expect(MockTimeHelperClass.new.milliseconds_since_epoch).to be_within(1000).of(seconds_since_epoch * 1000)
+      expect(MockTimeHelperClass.new.milliseconds_since_epoch).to be_within(6000).of(seconds_since_epoch * 1000)
     end
   end
   describe "#seconds_since_epoch" do

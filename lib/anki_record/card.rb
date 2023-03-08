@@ -59,6 +59,7 @@ module AnkiRecord
 
     ##
     # Saves the card to the collection.anki21 database
+    # TODO: Refactor to prevent injection
     def save
       @apkg.execute <<~SQL
         insert into cards (id, nid, did, ord,

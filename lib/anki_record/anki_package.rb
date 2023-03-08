@@ -48,13 +48,7 @@ module AnkiRecord
       execute_closure_and_zip(self, &closure) if block_given?
     end
 
-    ##
-    # Executes a raw SQL statement against the *.anki21 database
-    #
-    # Do not use this to execute data definition language SQL statements
-    # (i.e. do not create, alter, or drop tables or indexes)
-    # unless you have a good reason to change the database schema.
-    def execute(raw_sql_string)
+    def execute(raw_sql_string) # :nodoc:
       @anki21_database.execute raw_sql_string
     end
 

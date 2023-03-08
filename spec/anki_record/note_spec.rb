@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::Note do
-  let(:anki_package) { AnkiRecord::AnkiPackage.new(name: "package_to_test_notes") }
+  let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
   let(:basic_note_type) { anki_package.collection.find_note_type_by name: "Basic" }
   let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
 
@@ -61,6 +61,32 @@ RSpec.describe AnkiRecord::Note do
     end
     it "should instantiate a note with a number of card objects equal to the number of card templates of the note type" do
       expect(note.cards.size).to eq note.note_type.card_templates.size
+    end
+  end
+
+  describe "#save" do
+    context "for a note with 2 card templates" do
+      subject(:note_with_two_cards) do
+        crazy_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "crazy note type"
+        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+        crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+        crazy_card_template.question_format = "{{crazy front}}"
+        crazy_card_template.answer_format = "{{crazy back}}"
+        second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+        second_crazy_card_template.question_format = "{{crazy back}}"
+        second_crazy_card_template.answer_format = "{{crazy front}}"
+        crazy_note_type.save
+        AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+      end
+      it "should save a note record to the collection.anki21 database" do
+        note_with_two_cards.save
+        expect(anki_package.execute("select count(*) from notes;").first["count(*)"]).to eq 1
+      end
+      it "should save two card records to the collection.anki21 database" do
+        note_with_two_cards.save
+        expect(anki_package.execute("select count(*) from cards;").first["count(*)"]).to eq 2
+      end
     end
   end
 

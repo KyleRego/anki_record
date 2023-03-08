@@ -78,6 +78,14 @@ module AnkiRecord
       @collection.add_note_type self
     end
 
+    def save
+      collection_models_hash = JSON.parse collection.anki_package.execute("select models from col;").first["models"]
+      collection_models_hash[id] = self
+      new_collection_models_json = JSON.generate collection_models_hash
+      # TODO: Refactor to prevent injection
+      collection.anki_package.execute("update col set models = '#{new_collection_models_json}' where id = '#{collection.id}'")
+    end
+
     ##
     # Returns the note type object's card template with name +name+ or nil if it is not found
     def find_card_template_by(name:)

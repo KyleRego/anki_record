@@ -78,6 +78,27 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
+  describe "#save" do
+    subject(:crazy_note_type) do
+      crazy_note_type = AnkiRecord::NoteType.new collection: collection_argument, name: "crazy note type"
+      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+      crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+      crazy_card_template.question_format = "{{crazy front}}"
+      crazy_card_template.answer_format = "{{crazy back}}"
+      second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+      second_crazy_card_template.question_format = "{{crazy back}}"
+      second_crazy_card_template.answer_format = "{{crazy front}}"
+      crazy_note_type
+    end
+
+    it "should save the note type object's id as a key in the models column's JSON value in the collection.anki21 database" do
+      crazy_note_type.save
+      collection_models_hash = JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"])
+      expect(collection_models_hash.keys.include?(crazy_note_type.id.to_s)).to eq true
+    end
+  end
+
   let(:template_name_argument) { "test template name argument" }
 
   subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: model_hash) }
