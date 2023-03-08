@@ -78,6 +78,7 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
+- Continue work on /spec/anki_record/note_type_spec.rb:108
 - Saving note types, decks, and deck options groups to the collection.anki21 database
 - Work on creating and updating notes and cards to the collection.anki21 database
 - Validation logic of what makes the note valid based on the note type's card templates and fields

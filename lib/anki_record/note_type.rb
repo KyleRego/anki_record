@@ -79,11 +79,24 @@ module AnkiRecord
     end
 
     def save
-      collection_models_hash = JSON.parse collection.anki_package.execute("select models from col;").first["models"]
-      collection_models_hash[id] = self
-      new_collection_models_json = JSON.generate collection_models_hash
+      collection_models_hash = JSON.parse(collection.anki_package.execute("select models from col;").first["models"])
+      collection_models_hash[id] = to_h
+      new_collection_models_json = JSON.generate(collection_models_hash)
       # TODO: Refactor to prevent injection
       collection.anki_package.execute("update col set models = '#{new_collection_models_json}' where id = '#{collection.id}'")
+    end
+
+    def to_h # :nodoc:
+      { id: @id,
+        name: @name,
+        type: @cloze,
+        mod: @last_modified_time,
+        usn: @usn,
+        sort_field:
+        @sort_field,
+        did: @deck_id }
+      # tmpls:
+      # @note_fields.map(&:to_h) # TODO: finish this
     end
 
     ##

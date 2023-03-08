@@ -92,10 +92,25 @@ RSpec.describe AnkiRecord::NoteType do
       crazy_note_type
     end
 
+    let(:col_models_hash) { JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"]) }
+    let(:crazy_note_type_models_hash) do
+      col_models_hash[crazy_note_type.id.to_s]
+    end
+
     it "should save the note type object's id as a key in the models column's JSON value in the collection.anki21 database" do
       crazy_note_type.save
-      collection_models_hash = JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"])
-      expect(collection_models_hash.keys.include?(crazy_note_type.id.to_s)).to eq true
+      expect(col_models_hash.keys.include?(crazy_note_type.id.to_s)).to eq true
+    end
+    it "should save the note type object as a hash, as the value of the note type object's id key, in the models hash" do
+      crazy_note_type.save
+      expect(crazy_note_type_models_hash.instance_of?(Hash)).to eq true
+    end
+    it "should save the note type object as a hash with keys:
+      'id', 'name', 'type', 'mod', 'usn', 'sortf', 'did', 'tmpls', 'flds', 'css', 'latexPre', 'latexPost', 'req', and 'tags'" do
+      crazy_note_type.save
+      %w[id name type mod usn sortf did tmpls flds css latexPre latexPost req tags].each do |key|
+        expect(crazy_note_type_models_hash.keys).to include key
+      end
     end
   end
 

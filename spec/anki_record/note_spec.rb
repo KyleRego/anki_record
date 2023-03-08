@@ -87,6 +87,9 @@ RSpec.describe AnkiRecord::Note do
         note_with_two_cards.save
         expect(anki_package.execute("select count(*) from cards;").first["count(*)"]).to eq 2
       end
+      context "when the note has its fields set" do
+        it "should save the content of the fields into the note record"
+      end
     end
   end
 
