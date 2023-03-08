@@ -75,6 +75,20 @@ module AnkiRecord
       @note_type.add_card_template self
     end
 
+    def to_h # :nodoc:
+      {
+        name: @name,
+        ord: @ordinal_number,
+        qfmt: @question_format,
+        afmt: @answer_format,
+        bqfmt: @bqfmt,
+        bafmt: @bafmt,
+        did: @deck_id,
+        bfont: @browser_font_style,
+        bsize: @browser_font_size
+      }
+    end
+
     private
 
       def setup_card_template_instance_variables_from_existing(args:)

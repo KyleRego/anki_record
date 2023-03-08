@@ -33,6 +33,10 @@ module AnkiRecord
     attr_accessor :cloze
 
     ##
+    # The time that the note type was last modified as the number of seconds since the 1970 epoch
+    attr_reader :last_modified_time
+
+    ##
     # The CSS styling of the note type
     attr_reader :css
 
@@ -56,6 +60,7 @@ module AnkiRecord
     # The array of the note field objects of the note type
     attr_reader :note_fields
 
+    # TODO: This should possibly be a getter for the deck object instead
     ##
     # TODO: wat is this
     attr_reader :deck_id
@@ -89,14 +94,21 @@ module AnkiRecord
     def to_h # :nodoc:
       { id: @id,
         name: @name,
-        type: @cloze,
+        type: @cloze ? 1 : 0,
         mod: @last_modified_time,
         usn: @usn,
-        sort_field:
-        @sort_field,
-        did: @deck_id }
-      # tmpls:
-      # @note_fields.map(&:to_h) # TODO: finish this
+        sortf: @sort_field,
+        did: @deck_id,
+        tmpls: @card_templates.map(&:to_h),
+        flds: @note_fields.map(&:to_h),
+        css: @css,
+        latexPre: @latex_preamble,
+        latexPost: @latex_postamble,
+        latexsvg: @latex_svg,
+        req: @req,
+        tags: @tags,
+        vers: @vers
+      }
     end
 
     ##

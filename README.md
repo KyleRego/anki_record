@@ -1,6 +1,6 @@
 # Anki Record
 
-Anki Record is a library/Ruby gem which provides an interface to Anki flashcard deck `*.apkg` files (Anki SQLite databases). **This gem is in an early stage of development and I do not recommend you use it yet because the API is not stable yet.**
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases). **It is in an early stage of development and the API is not stable, so I do not recommend you use it for anything yet.**
 
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
@@ -78,15 +78,14 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
-- Continue work on /spec/anki_record/note_type_spec.rb:108
+- Continue work on TODO at spec/anki_record/note_type_spec.rb:180
 - Saving note types, decks, and deck options groups to the collection.anki21 database
-- Work on creating and updating notes and cards to the collection.anki21 database
+- Setters for attributes of the note types, decks, and deck options groups
+- Refactor to use only parameterized SQL statements
+- Work on creating, updating, and saving notes and cards to the collection.anki21 database
 - Validation logic of what makes the note valid based on the note type's card templates and fields
 - Work on adding media support
-  - Checksum for notes needs to be updated
-- Work on updating and saving decks
-- Work on updating and saving deck options groups
-- Work on updating and saving note types including the note fields and card templates
+  - The checksum calculation for notes will need to be updated to account for HTML in the content
 
 ### Release checklist
 - Update changelog

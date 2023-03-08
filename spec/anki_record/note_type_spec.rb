@@ -93,23 +93,91 @@ RSpec.describe AnkiRecord::NoteType do
     end
 
     let(:col_models_hash) { JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"]) }
-    let(:crazy_note_type_models_hash) do
+    let(:crazy_note_type_hash) do
       col_models_hash[crazy_note_type.id.to_s]
     end
-
+    before { crazy_note_type.save }
     it "should save the note type object's id as a key in the models column's JSON value in the collection.anki21 database" do
-      crazy_note_type.save
       expect(col_models_hash.keys.include?(crazy_note_type.id.to_s)).to eq true
     end
     it "should save the note type object as a hash, as the value of the note type object's id key, in the models hash" do
-      crazy_note_type.save
-      expect(crazy_note_type_models_hash.instance_of?(Hash)).to eq true
+      expect(crazy_note_type_hash.instance_of?(Hash)).to eq true
     end
     it "should save the note type object as a hash with keys:
-      'id', 'name', 'type', 'mod', 'usn', 'sortf', 'did', 'tmpls', 'flds', 'css', 'latexPre', 'latexPost', 'req', and 'tags'" do
-      crazy_note_type.save
-      %w[id name type mod usn sortf did tmpls flds css latexPre latexPost req tags].each do |key|
-        expect(crazy_note_type_models_hash.keys).to include key
+      'id', 'name', 'type', 'mod', 'usn',
+      'sortf', 'did', 'tmpls', 'flds', 'css',
+      'latexPre', 'latexPost', 'latexsvg', 'req', and 'tags'" do
+      %w[id name type mod usn sortf did tmpls flds css latexPre latexPost latexsvg req tags vers].each do |key|
+        expect(crazy_note_type_hash.keys).to include key
+      end
+    end
+    context "should save the note type object as a hash" do
+      it "with the note type object's id as the value for the id in the note type hash" do
+        expect(crazy_note_type_hash["id"]).to eq crazy_note_type.id
+      end
+      it "with the note type object's name as the value for the name in the note type hash" do
+        expect(crazy_note_type_hash["name"]).to eq crazy_note_type.name
+      end
+      it "with 0 for the value of the type in the note hash because this is a non-cloze note type" do
+        expect(crazy_note_type_hash["type"]).to eq 0
+      end
+      it "with the note type's last_modified_time attribute as the value for the mod in the note type hash" do
+        expect(crazy_note_type_hash["mod"]).to eq crazy_note_type.last_modified_time
+      end
+      it "with -1 for the value of the usn key in the note hash" do
+        expect(crazy_note_type_hash["usn"]).to eq -1
+      end
+      it "with 0 for the value of the sortf key in the note hash" do
+        expect(crazy_note_type_hash["sortf"]).to eq 0
+      end
+      it "with the note type's deck_id for the value of the did key in the note hash" do
+        expect(crazy_note_type_hash["did"]).to eq crazy_note_type.deck_id
+      end
+      it "with an array value for the tmpls key in the note hash" do
+        expect(crazy_note_type_hash["tmpls"].instance_of?(Array)).to eq true
+      end
+      context "with an array value for the tmpls key in the note hash" do
+        let(:tmpls_array) { crazy_note_type_hash["tmpls"] }
+        it "with values which are hashes" do
+          expect(tmpls_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
+        end
+        it "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
+          %w[name ord qfmt afmt bqfmt bafmt did bfont bsize].each do |key|
+            expect(tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to eq true  
+          end
+        end
+        it "with hash values that have values for the name key equal to the card template names of the note type" do
+          expect(tmpls_array.map { |tmpl| tmpl["name"] }).to eq ["crazy card 1", "crazy card 2"]
+        end
+        it "with hash values that have values for the ord keys (ordinal numbers) that together are 0, 1" do
+          expect(tmpls_array.map { |tmpl| tmpl["ord"] }).to eq [0, 1]
+        end
+        it "with hash values that have values for the qfmt keys equal to the card template question format strings" do
+          expect(tmpls_array.map { |tmpl| tmpl["qfmt"] }).to eq ["{{crazy front}}", "{{crazy back}}"]
+        end
+        it "with hash values that have values for the qfmt keys equal to the card template question format strings" do
+          expect(tmpls_array.map { |tmpl| tmpl["afmt"] }).to eq ["{{crazy back}}", "{{crazy front}}"]
+        end
+        it "with hash values that have nil values for the did keys" do
+          expect(tmpls_array.map { |tmpl| tmpl["did"] }).to eq [nil, nil]
+        end
+        it "with hash values that have empty string values for the bfont key" do
+          expect(tmpls_array.map { |tmpl| tmpl["bfont"] }).to eq ["", ""]
+        end
+        it "with hash values that have values of 0 for the bsize key" do
+          expect(tmpls_array.map { |tmpl| tmpl["bsize"] }).to eq [0, 0]
+        end
+      end
+    
+      it "with an array value for the flds key in the note hash" do
+        expect(crazy_note_type_hash["flds"].instance_of?(Array)).to eq true
+      end
+      context "with an array value for the flds key in the note hash" do
+        let(:flds_array) { crazy_note_type_hash["flds"] }
+        it "with values which are hashes" do
+          expect(flds_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
+        end
+        # TODO: RSpec examples for all keys in the note hash
       end
     end
   end

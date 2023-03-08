@@ -61,6 +61,18 @@ module AnkiRecord
       @note_type.add_note_field self
     end
 
+    def to_h # :nodoc:
+      {
+        name: @name,
+        ord: @ordinal_number,
+        sticky: @sticky,
+        rtl: @right_to_left,
+        font: @font_style,
+        size: @font_size,
+        description: @description
+      }
+    end
+
     private
 
       def setup_note_field_instance_variables_from_existing(args:)
