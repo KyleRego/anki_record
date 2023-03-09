@@ -1,8 +1,6 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases). **It is in an early stage of development and the API is not stable, so I do not recommend you use it for anything yet.**
-
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases). **It is in an early stage of development and the API is not stable. I do not recommend you try it yet.**
 
 ## Installation
 
@@ -13,6 +11,25 @@ Install the gem and add to the application's Gemfile by executing:
 If bundler is not being used to manage dependencies, install the gem by executing:
 
     $ gem install anki_record
+
+## Documentation
+
+The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
+
+The RSpec examples are intended to provide executable documentation and reading them may be helpful to understand the API. The best way is to run the test suite with the `rspec` command. The output is formatted as colorful documentation with a nesting pattern that reflects the nesting of the RSpec examples and example groups.
+
+There is a corresponding RSpec file for every file in the library code. The following organizes these in roughly the way the objects collaborate:
+- [anki_package_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/anki_package_spec.rb)
+  - [collection_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/collection_spec.rb)
+    - [note_type_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_type_spec.rb)
+      - [note_field_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_field_spec.rb)
+      - [card_template_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/card_template_spec.rb)
+    - [deck_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/deck_spec.rb)
+    - [deck_options_group_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/deck_options_group_spec.rb)
+  - [note_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_spec.rb)
+    - [card_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/card_spec.rb)
+
+The section below should provide examples of the most common things you might want to do.
 
 ## Usage
 
@@ -69,8 +86,6 @@ apkg.zip
 
 This example creates a `test.apkg` zip file in the current working directory, which when imported into Anki, will add one Basic note and one Cloze note.
 
-The RSpec examples are intended to provide executable documentation, and reading them may be helpful to understand the API (e.g. [anki_package_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/anki_package_spec.rb)).
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -78,7 +93,6 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
-- Continue work on TODO at spec/anki_record/note_type_spec.rb:180
 - Saving note types, decks, and deck options groups to the collection.anki21 database
 - Setters for attributes of the note types, decks, and deck options groups
 - Refactor to use only parameterized SQL statements
@@ -86,6 +100,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Validation logic of what makes the note valid based on the note type's card templates and fields
 - Work on adding media support
   - The checksum calculation for notes will need to be updated to account for HTML in the content
+- Specs need to be refactored to be more DRY and also start using doubles to improve performance
 
 ### Release checklist
 - Update changelog

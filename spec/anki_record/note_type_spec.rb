@@ -91,6 +91,7 @@ RSpec.describe AnkiRecord::NoteType do
       second_crazy_card_template.answer_format = "{{crazy front}}"
       crazy_note_type
     end
+    # TODO: These specs can be written in a much more DRY way
 
     let(:col_models_hash) { JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"]) }
     let(:crazy_note_type_hash) do
@@ -125,7 +126,7 @@ RSpec.describe AnkiRecord::NoteType do
         expect(crazy_note_type_hash["mod"]).to eq crazy_note_type.last_modified_time
       end
       it "with -1 for the value of the usn key in the note hash" do
-        expect(crazy_note_type_hash["usn"]).to eq -1
+        expect(crazy_note_type_hash["usn"]).to eq(-1)
       end
       it "with 0 for the value of the sortf key in the note hash" do
         expect(crazy_note_type_hash["sortf"]).to eq 0
@@ -143,32 +144,34 @@ RSpec.describe AnkiRecord::NoteType do
         end
         it "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
           %w[name ord qfmt afmt bqfmt bafmt did bfont bsize].each do |key|
-            expect(tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to eq true  
+            expect(tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to eq true
           end
         end
-        it "with hash values that have values for the name key equal to the card template names of the note type" do
-          expect(tmpls_array.map { |tmpl| tmpl["name"] }).to eq ["crazy card 1", "crazy card 2"]
-        end
-        it "with hash values that have values for the ord keys (ordinal numbers) that together are 0, 1" do
-          expect(tmpls_array.map { |tmpl| tmpl["ord"] }).to eq [0, 1]
-        end
-        it "with hash values that have values for the qfmt keys equal to the card template question format strings" do
-          expect(tmpls_array.map { |tmpl| tmpl["qfmt"] }).to eq ["{{crazy front}}", "{{crazy back}}"]
-        end
-        it "with hash values that have values for the qfmt keys equal to the card template question format strings" do
-          expect(tmpls_array.map { |tmpl| tmpl["afmt"] }).to eq ["{{crazy back}}", "{{crazy front}}"]
-        end
-        it "with hash values that have nil values for the did keys" do
-          expect(tmpls_array.map { |tmpl| tmpl["did"] }).to eq [nil, nil]
-        end
-        it "with hash values that have empty string values for the bfont key" do
-          expect(tmpls_array.map { |tmpl| tmpl["bfont"] }).to eq ["", ""]
-        end
-        it "with hash values that have values of 0 for the bsize key" do
-          expect(tmpls_array.map { |tmpl| tmpl["bsize"] }).to eq [0, 0]
+        context "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
+          it "and the value for the name key should be equal to the name attribute of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["name"] }).to eq ["crazy card 1", "crazy card 2"]
+          end
+          it "and the value for the ord key should be the ordinal_number attribute of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["ord"] }).to eq [0, 1]
+          end
+          it "and the value for the qfmt key should be the question format string of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["qfmt"] }).to eq ["{{crazy front}}", "{{crazy back}}"]
+          end
+          it "and the value for the qfmt key should be the answer format string of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["afmt"] }).to eq ["{{crazy back}}", "{{crazy front}}"]
+          end
+          it "and the value for the did key should be the deck_id attribute of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["did"] }).to eq [nil, nil]
+          end
+          it "and the value for the bfont key should be equal to the bfont attribute of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["bfont"] }).to eq ["", ""]
+          end
+          it "and the value for the bsize key should be equal to the bsize attribute of the card template" do
+            expect(tmpls_array.map { |tmpl| tmpl["bsize"] }).to eq [0, 0]
+          end
         end
       end
-    
+
       it "with an array value for the flds key in the note hash" do
         expect(crazy_note_type_hash["flds"].instance_of?(Array)).to eq true
       end
@@ -177,7 +180,34 @@ RSpec.describe AnkiRecord::NoteType do
         it "with values which are hashes" do
           expect(flds_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
         end
-        # TODO: RSpec examples for all keys in the note hash
+        it "with hash values with keys that include: 'name', 'ord', 'sticky', 'rtl', 'font', 'size' and 'description'" do
+          %w[name ord sticky rtl font size description].each do |key|
+            expect(flds_array.all? { |fld| fld.keys.include?(key) }).to eq true
+          end
+        end
+        context "with hash values with keys that include: 'name', 'ord', 'sticky', 'rtl', 'font', 'size' and 'description'" do
+          it "and the value for the name key should be the name attribute of the note field" do
+            expect(flds_array.map { |fld| fld["name"] }).to eq ["crazy front", "crazy back"]
+          end
+          it "and the value for the ord key should be the ordinal_number attribute of the note field" do
+            expect(flds_array.map { |fld| fld["ord"] }).to eq [0, 1]
+          end
+          it "and the value for the sticky key should be the sticky attribute of the note field" do
+            expect(flds_array.map { |fld| fld["sticky"] }).to eq [false, false]
+          end
+          it "and the value for the rtl key should be the right_to_left attribute of the note field" do
+            expect(flds_array.map { |fld| fld["rtl"] }).to eq [false, false]
+          end
+          it "and the value for the font key should be equal to the font_style attribute of the note field" do
+            expect(flds_array.map { |fld| fld["font"] }).to eq %w[Arial Arial]
+          end
+          it "and the value for the size key should be equal to the font_size attribute of the note field" do
+            expect(flds_array.map { |fld| fld["size"] }).to eq [20, 20]
+          end
+          it "and the value for the description key should be equal to the description attribute of the note field" do
+            expect(flds_array.map { |fld| fld["description"] }).to eq ["", ""]
+          end
+        end
       end
     end
   end

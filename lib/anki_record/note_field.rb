@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # TODO: raise exceptions on invalid assignment to prevent downstream errors and specs for the writeable attributes
-# TODO: All instance variables should at least be readable
 
 require "pry"
 
@@ -9,11 +8,6 @@ module AnkiRecord
   ##
   # NoteField represents a field of an Anki note type
   class NoteField
-    DEFAULT_FIELD_FONT_STYLE = "Arial"
-    DEFAULT_FIELD_FONT_SIZE = 20
-    DEFAULT_FIELD_DESCRIPTION = ""
-    private_constant :DEFAULT_FIELD_FONT_STYLE, :DEFAULT_FIELD_FONT_SIZE, :DEFAULT_FIELD_DESCRIPTION
-
     ##
     # The note type object that the note field object belongs to
     attr_reader :note_type
@@ -90,9 +84,21 @@ module AnkiRecord
         @ordinal_number = @note_type.note_fields.length
         @sticky = false
         @right_to_left = false
-        @font_style = DEFAULT_FIELD_FONT_STYLE
-        @font_size = DEFAULT_FIELD_FONT_SIZE
-        @description = DEFAULT_FIELD_DESCRIPTION
+        @font_style = default_field_font_style
+        @font_size = default_field_font_size
+        @description = default_field_description
+      end
+
+      def default_field_font_style
+        "Arial"
+      end
+
+      def default_field_font_size
+        20
+      end
+
+      def default_field_description
+        ""
       end
   end
 end

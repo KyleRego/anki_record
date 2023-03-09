@@ -79,8 +79,7 @@ module AnkiRecord
       {
         name: @name,
         ord: @ordinal_number,
-        qfmt: @question_format,
-        afmt: @answer_format,
+        qfmt: @question_format, afmt: @answer_format,
         bqfmt: @bqfmt,
         bafmt: @bafmt,
         did: @deck_id,
