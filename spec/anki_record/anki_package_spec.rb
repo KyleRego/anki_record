@@ -46,7 +46,13 @@ RSpec.describe AnkiRecord::AnkiPackage do
     expect(Dir.exist?(tmp_directory)).to eq false
   end
 
-  after { defined?(directory_argument) ? cleanup_test_files(directory: directory_argument) : cleanup_test_files(directory: ".") }
+  after do
+    if defined?(directory_argument) && File.directory?(directory_argument)
+      cleanup_test_files(directory: directory_argument)
+    else
+      cleanup_test_files(directory: ".")
+    end
+  end
 
   describe "::new with invalid name arguments" do
     context "when the name argument is nil, an empty string, a string with spaces,
@@ -192,6 +198,15 @@ RSpec.describe AnkiRecord::AnkiPackage do
       it "should save one *.apkg zip file in the specified directory" do
         anki_package
         expect_num_apkg_files_in_directory num: 1, directory: directory_argument
+      end
+    end
+
+    context "and a block argument but the directory argument given is not a directory that exists" do
+      let(:closure_argument) { proc {} }
+      let(:directory_argument) { "does_not_exist" }
+
+      it "should throw an error" do
+        expect { anki_package }.to raise_error ArgumentError
       end
     end
   end

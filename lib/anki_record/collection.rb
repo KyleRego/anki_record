@@ -83,6 +83,13 @@ module AnkiRecord
       decks.find { |deck| deck.name == name }
     end
 
+    ##
+    # Return's the collection object's note with id +id+ or nil if it is not found
+    def find_note_by(id: nil)
+      data = anki_package.execute("select * from notes where id = '#{id}'").first
+      p data
+    end
+
     private
 
       def setup_collection_instance_variables(anki_package:)

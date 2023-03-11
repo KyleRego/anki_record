@@ -78,10 +78,34 @@ RSpec.describe AnkiRecord::Collection do
       end
       context "when passed a name argument where the collection has a deck with that name" do
         it "should return a deck object" do
-          expect(collection.find_deck_by(name: "Default").instance_of?(AnkiRecord::Deck)).to eq true
+          expect(collection.find_deck_by(name: "Default")).to be_a AnkiRecord::Deck
         end
         it "should return a deck object with name equal to the name argument" do
           expect(collection.find_deck_by(name: "Default").name).to eq "Default"
+        end
+      end
+    end
+
+    describe "#find_note_by" do
+      context "when passed an id argument where the collection does not have a note with that id" do
+        it "should return nil" do
+          expect(collection.find_note_by(id: "1234")).to eq nil
+        end
+      end
+      context "when passed an id argument where the collection does have a note with that id" do
+        before do
+          apkg = AnkiRecord::AnkiPackage.new(name: "package_with_a_note")
+          @collection = apkg.collection
+          basic_note_type = @collection.find_note_type_by name: "Basic"
+          default_deck = @collection.find_deck_by name: "Default"
+          @note = AnkiRecord::Note.new deck: default_deck, note_type: basic_note_type
+          @note.save
+        end
+        it "should return a note object" do
+          expect(@collection.find_note_by(id: @note.id)).to be_a AnkiRecord::Note
+        end
+        it "should return a note object with id equal to the id argument" do
+          expect(@collection.find_note_by(id: @note.id).id).to eq @note.id
         end
       end
     end

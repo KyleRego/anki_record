@@ -9,6 +9,7 @@ RSpec.describe AnkiRecord do
 
   describe "an unfinished end to end test" do
     it "is an example" do
+      note_id = nil
       AnkiRecord::AnkiPackage.new(name: "crazy") do |apkg|
         collection = apkg.collection
         default_deck = collection.find_deck_by name: "Default"
@@ -26,6 +27,15 @@ RSpec.describe AnkiRecord do
         note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
         note.crazy_front = "Hello"
         note.crazy_back = "World"
+        note.save
+        note_id = note.id
+      end
+
+      AnkiRecord::AnkiPackage.open(path: "./crazy.apkg") do |apkg|
+        collection = apkg.collection
+
+        note = collection.find_note_by id: note_id
+        note.crazy_back = "Ruby"
         note.save
       end
     end

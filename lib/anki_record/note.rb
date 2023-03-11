@@ -72,8 +72,12 @@ module AnkiRecord
     def save
       # TODO: Refactor to prevent injection
       @apkg.execute <<~SQL
-        insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
-                    values ('#{@id}', '#{@guid}', '#{note_type.id}', '#{@last_modified_time}', '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}', '#{checksum(sort_field_value)}', '0', '')
+        insert into notes (id, guid, mid, mod, 
+                          usn, tags, flds, sfld, 
+                          csum, flags, data)
+                    values ('#{@id}', '#{@guid}', '#{note_type.id}', '#{@last_modified_time}',
+                          '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}', 
+                          '#{checksum(sort_field_value)}', '0', '')
       SQL
       cards.each(&:save)
       true

@@ -66,7 +66,7 @@ RSpec.describe AnkiRecord::Note do
 
   describe "#save" do
     context "for a note with 2 card templates" do
-      subject(:note_with_two_cards) do
+      before do
         crazy_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "crazy note type"
         AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
         AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
@@ -77,22 +77,44 @@ RSpec.describe AnkiRecord::Note do
         second_crazy_card_template.question_format = "{{crazy back}}"
         second_crazy_card_template.answer_format = "{{crazy front}}"
         crazy_note_type.save
-        note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
-        note.crazy_front = "Hello"
-        note.crazy_back = "World"
-        note
+        @note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+        @note.crazy_front = "Hello"
+        @note.crazy_back = "World"
+        @note.save
+        @card = note.cards.sort_by { |card| card.id }.first
       end
+      let(:first_card_record) { anki_package.execute("select * from cards order by id;").last }
       it "should save a note record to the collection.anki21 database" do
-        note_with_two_cards.save
         expect(anki_package.execute("select count(*) from notes;").first["count(*)"]).to eq 1
       end
       it "should save two card records to the collection.anki21 database" do
-        note_with_two_cards.save
         expect(anki_package.execute("select count(*) from cards;").first["count(*)"]).to eq 2
+      end
+      context "should save two card records to the collection.anki21 database, and the first card record" do
+        it "should have id equal to the id of the first card object's id" do
+          puts @card
+          p @card.note.note_type.card_templates.count
+          p first_card_record
+          expect(first_card_record["id"]).to eq @card.id
+        end
+        it "should have nid equal to the id of the card's note object" do
+          expect(first_card_record["nid"]).to eq @note.id
+        end
+        it "should have did equal to the id of the deck of the card's note object" do
+          expect(first_card_record["did"]).to eq @note.deck.id
+        end
+        it "should have ord equal to the card object's card template object's ordinal_number attribute" do
+          expect(first_card_record["ord"]).to eq @card.card_template.ordinal_number
+        end
+        it "should have mod equal to the card object's last_modified_time attribute" do
+          expect(first_card_record["mod"]).to eq @card.last_modified_time
+        end
+        it "should have usn equal to -1" do
+          expect(first_card_record["usn"]).to eq -1
+        end
       end
       context "when the note has its fields set" do
         it "should save the content of the fields into the note record" do
-          note_with_two_cards.save
           expect(anki_package.execute("select flds from notes").first["flds"]).to eq "Hello\x1FWorld"
         end
       end

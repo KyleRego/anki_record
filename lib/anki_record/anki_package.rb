@@ -13,37 +13,20 @@ require_relative "collection"
 
 module AnkiRecord
   ##
-  # Represents an Anki SQLite3 package/database
-  #
-  # Use ::new to create a new object or ::open to create an object from an existing one
+  # Represents an Anki package
   class AnkiPackage
-    NAME_ERROR_MESSAGE = "The name argument must be a string without spaces."
-    PATH_ERROR_MESSAGE = "*No .apkg file was found at the given path."
-    STANDARD_ERROR_MESSAGE = <<-MSG
-    An error occurred.
-    The temporary *.anki21 database has been deleted.
-    No *.apkg zip file has been saved.
-    MSG
-
-    private_constant :NAME_ERROR_MESSAGE, :PATH_ERROR_MESSAGE, :STANDARD_ERROR_MESSAGE
-
     ##
     # The collection object of the package
     attr_reader :collection
 
     ##
-    # Creates a new object which represents an Anki SQLite3 database
-    #
-    # This method takes an optional block argument.
-    #
-    # When a block argument is used, execution is yielded to the block.
-    # After the block executes, the temporary files are zipped into the +name+.apkg file
-    # which is saved in +directory+. +directory+ is the current working directory by default.
-    # If the block throws a runtime error, the temporary files are deleted but the zip file is not created.
-    #
-    # When no block argument is used, #zip must be called explicitly at the end of your script.
+    # Creates a new object which represents an Anki package. See README for details.
     def initialize(name:, directory: Dir.pwd, &closure)
-      setup_package_instance_variables(name: name, directory: directory)
+      check_name_argument_is_valid(name:)
+      @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
+      @directory = directory
+      check_directory_argument_is_valid
+      setup_other_package_instance_variables(name: name, directory: directory)
 
       execute_closure_and_zip(self, &closure) if block_given?
     end
@@ -63,9 +46,7 @@ module AnkiRecord
         zip
       end
 
-      def setup_package_instance_variables(name:, directory:)
-        @name = check_name_is_valid(name: name)
-        @directory = directory # TODO: check directory is valid
+      def setup_other_package_instance_variables(name:, directory:)
         @tmpdir = Dir.mktmpdir
         @tmp_files = []
         @anki21_database = setup_anki21_database_object
@@ -74,10 +55,14 @@ module AnkiRecord
         @collection = Collection.new(anki_package: self)
       end
 
-      def check_name_is_valid(name:)
-        raise ArgumentError, NAME_ERROR_MESSAGE unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
+      def check_name_argument_is_valid(name:)
+        unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
+          raise ArgumentError, "The name argument must be a string without spaces."
+        end
+      end
 
-        name.end_with?(".apkg") ? name[0, name.length - 5] : name
+      def check_directory_argument_is_valid
+        raise ArgumentError, "No directory was found at the given path." unless File.directory?(@directory)
       end
 
       def setup_anki21_database_object
@@ -109,18 +94,25 @@ module AnkiRecord
         media_file
       end
 
+      def standard_error_thrown_in_block_message
+        <<-MSG
+        An error occurred.
+        The temporary files (databases and media) have been deleted.
+        No new *.apkg zip file has been saved.
+        MSG
+      end
+
       def puts_error_and_standard_message(error:)
-        puts "#{error}\n#{STANDARD_ERROR_MESSAGE}"
+        puts "#{error}\n#{standard_error_thrown_in_block_message}"
       end
 
     public
 
     ##
-    # Creates a new object which represents the Anki SQLite3 database file at +path+
-    #
-    # Development has focused on ::new so this method is not recommended at this time
+    # Creates a new object which represents a copy of an already existing Anki package. See README for details.
     def self.open(path:, target_directory: nil, &closure)
-      pathname = check_file_at_path_is_valid(path: path)
+      pathname = Pathname.new(path)
+      check_file_is_valid_at pathname: pathname
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
 
       @anki_package = if target_directory
@@ -137,11 +129,8 @@ module AnkiRecord
 
       private
 
-        def check_file_at_path_is_valid(path:)
-          pathname = Pathname.new(path)
-          raise PATH_ERROR_MESSAGE unless pathname.file? && pathname.extname == ".apkg"
-
-          pathname
+        def check_file_is_valid_at(pathname:)
+          raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
         end
     end
 

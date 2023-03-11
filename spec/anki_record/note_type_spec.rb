@@ -214,9 +214,9 @@ RSpec.describe AnkiRecord::NoteType do
 
   let(:template_name_argument) { "test template name argument" }
 
-  subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: model_hash) }
+  subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
   # rubocop:disable Layout/LineContinuationLeadingSpace
-  let(:model_hash) do
+  let(:basic_model_hash) do
     { "id" => 1_676_902_364_661,
       "name" => "Basic",
       "type" => 0,
@@ -260,7 +260,7 @@ RSpec.describe AnkiRecord::NoteType do
   # rubocop:enable Layout/LineContinuationLeadingSpace
 
   describe "::new passed an args hash" do
-    context "when the model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
+    context "when the basic_model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
       it "should instantiate a note type with collection attribute equal to the collection argument" do
         expect(note_type.collection).to eq collection_argument
       end
@@ -268,7 +268,7 @@ RSpec.describe AnkiRecord::NoteType do
         expect(note_type.collection.note_types).to include note_type
       end
       it "should instantiate a note type object with id the same as the data" do
-        expect(note_type_from_existing.id).to eq model_hash["id"]
+        expect(note_type_from_existing.id).to eq basic_model_hash["id"]
       end
       it "should instantiate a note type object with the same name as the data ('Basic')" do
         expect(note_type_from_existing.name).to eq "Basic"
@@ -301,13 +301,13 @@ RSpec.describe AnkiRecord::NoteType do
         expect(note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
       end
       it "should instantiate a note type with the CSS styling from the data" do
-        expect(note_type_from_existing.css).to eq model_hash["css"]
+        expect(note_type_from_existing.css).to eq basic_model_hash["css"]
       end
       it "should instantiate a note type with the data's LaTeX preamble" do
-        expect(note_type_from_existing.latex_preamble).to eq model_hash["latexPre"]
+        expect(note_type_from_existing.latex_preamble).to eq basic_model_hash["latexPre"]
       end
       it "should instantiate a note type with the data's LaTeX postamble" do
-        expect(note_type_from_existing.latex_postamble).to eq model_hash["latexPost"]
+        expect(note_type_from_existing.latex_postamble).to eq basic_model_hash["latexPost"]
       end
       it "should instantiate a note type with latex_svg false" do
         expect(note_type_from_existing.latex_svg).to eq false
