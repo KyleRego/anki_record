@@ -18,11 +18,11 @@ The usage section following this one should have examples showing the most commo
 
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the granular behavior of the objects. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The test suite files should have a 1-to-1 mapping with the source code files.
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The test suite files should have a 1-to-1 mapping with the source code files.
 
 ## Usage
 
-The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip the `*.apkg` file where `*` is the name argument:
+The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip an `*.apkg` file where `*` is the name argument (this argument is not allowed to contain spaces):
 
 ```ruby
 require "anki_record"
@@ -33,7 +33,7 @@ AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
   end
   puts "Countdown complete. Write any Ruby you want in here!"
 end
-# test.apkg now exists in the current working directory
+# test.apkg now exists in the current working directory.
 ```
 
 While execution is happening inside the block, temporary `collection.anki21` and `collection.anki2` SQLite databases and a `media` file exist inside of a temporary directory. These files are the normal zipped contents of an `*.apkg` file. `collection.anki21` is the database that the library is interacting with.
@@ -46,12 +46,10 @@ Alternatively, if `AnkiRecord::Package::new` is not passed a block, the `zip` me
 require "anki_record"
 
 apkg = AnkiRecord::AnkiPackage.new(name: "test")
-apkg.zip
+apkg.zip # This zips the temporary files into test.apkg, and then deletes them.
 ```
 
-The `zip` method zips the temporary files and deletes them.
-
-A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument (this argument is not allowed to contain spaces):
+A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument:
 
 ```ruby
 require "anki_record"
@@ -106,7 +104,7 @@ AnkiRecord::AnkiPackage.new(name: "crazy") do |apkg|
 end
 ```
 
-This creates a new note type called "crazy note type" and one note using it in a `crazy.apkg` zip file.
+This creates `crazy.apkg` with a new custom note type called "crazy note type" and one note using it.
 
 ## Development
 
