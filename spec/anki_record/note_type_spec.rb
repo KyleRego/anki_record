@@ -25,7 +25,7 @@ RSpec.describe AnkiRecord::NoteType do
       expect(note_type.collection.note_types).to include note_type
     end
     it "should instantiate a note type with an integer id" do
-      expect(note_type.id.class).to eq Integer
+      expect(note_type.id).to be_a Integer
     end
     it "should instantiate a note type with name attribute equal to the name argument" do
       expect(note_type.name).to eq name_argument
@@ -214,7 +214,7 @@ RSpec.describe AnkiRecord::NoteType do
 
   let(:template_name_argument) { "test template name argument" }
 
-  subject(:note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
+  subject(:basic_note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
   # rubocop:disable Layout/LineContinuationLeadingSpace
   let(:basic_model_hash) do
     { "id" => 1_676_902_364_661,
@@ -258,9 +258,8 @@ RSpec.describe AnkiRecord::NoteType do
       "req" => [[0, "any", [0]]] }
   end
   # rubocop:enable Layout/LineContinuationLeadingSpace
-
   describe "::new passed an args hash" do
-    context "when the basic_model_hash argument is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
+    context "when the args hash is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
       it "should instantiate a note type with collection attribute equal to the collection argument" do
         expect(note_type.collection).to eq collection_argument
       end
@@ -268,52 +267,113 @@ RSpec.describe AnkiRecord::NoteType do
         expect(note_type.collection.note_types).to include note_type
       end
       it "should instantiate a note type object with id the same as the data" do
-        expect(note_type_from_existing.id).to eq basic_model_hash["id"]
+        expect(basic_note_type_from_existing.id).to eq basic_model_hash["id"]
       end
       it "should instantiate a note type object with the same name as the data ('Basic')" do
-        expect(note_type_from_existing.name).to eq "Basic"
+        expect(basic_note_type_from_existing.name).to eq "Basic"
       end
       it "should instantiate a non-cloze note type" do
-        expect(note_type_from_existing.cloze).to eq false
+        expect(basic_note_type_from_existing.cloze).to eq false
       end
       it "should instantiate a note type with the same id as the data" do
-        expect(note_type_from_existing.id).to eq 1_676_902_364_661
+        expect(basic_note_type_from_existing.id).to eq 1_676_902_364_661
       end
       it "should instantiate a note type with the same deck id as the data (NULL or nil)" do
-        expect(note_type_from_existing.deck_id).to eq nil
+        expect(basic_note_type_from_existing.deck_id).to eq nil
       end
       it "should instantiate a note type with one card template" do
-        expect(note_type_from_existing.card_templates.count).to eq 1
+        expect(basic_note_type_from_existing.card_templates.count).to eq 1
       end
       it "should instantiate a note type with a template with the name Card 1" do
-        expect(note_type_from_existing.card_templates.first.name).to eq "Card 1"
+        expect(basic_note_type_from_existing.card_templates.first.name).to eq "Card 1"
       end
       it "should instantiate a note type with a template that is of type CardTemplate" do
-        expect(note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
+        expect(basic_note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
       end
       it "should instantiate a note type with 2 fields" do
-        expect(note_type_from_existing.note_fields.count).to eq 2
+        expect(basic_note_type_from_existing.note_fields.count).to eq 2
       end
       it "should instantiate a note type with 2 fields that are of class NoteField" do
-        expect(note_type_from_existing.note_fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
+        expect(basic_note_type_from_existing.note_fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
       end
       it "should instantiate a note type with a 'Front' field and a 'Back' field" do
-        expect(note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
+        expect(basic_note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
       end
       it "should instantiate a note type with the CSS styling from the data" do
-        expect(note_type_from_existing.css).to eq basic_model_hash["css"]
+        expect(basic_note_type_from_existing.css).to eq basic_model_hash["css"]
       end
       it "should instantiate a note type with the data's LaTeX preamble" do
-        expect(note_type_from_existing.latex_preamble).to eq basic_model_hash["latexPre"]
+        expect(basic_note_type_from_existing.latex_preamble).to eq basic_model_hash["latexPre"]
       end
       it "should instantiate a note type with the data's LaTeX postamble" do
-        expect(note_type_from_existing.latex_postamble).to eq basic_model_hash["latexPost"]
+        expect(basic_note_type_from_existing.latex_postamble).to eq basic_model_hash["latexPost"]
       end
       it "should instantiate a note type with latex_svg false" do
-        expect(note_type_from_existing.latex_svg).to eq false
+        expect(basic_note_type_from_existing.latex_svg).to eq false
       end
       it "should instantiate a note type with nil tags attribute because it is missing from the data" do
-        expect(note_type_from_existing.tags).to eq nil
+        expect(basic_note_type_from_existing.tags).to eq nil
+      end
+    end
+
+    context "when the args hash is the default JSON object for the basic and reversed card note type" do
+      subject(:basic_and_reversed_card_note_type_from_existing) do
+        AnkiRecord::NoteType.new(collection: collection_argument, args: basic_and_reversed_card_model_hash)
+      end
+      # rubocop:disable Layout/LineContinuationLeadingSpace
+      let(:basic_and_reversed_card_model_hash) do
+        { "id" => 1_676_902_364_662,
+          "name" => "Basic (and reversed card)",
+          "type" => 0,
+          "mod" => 0,
+          "usn" => 0,
+          "sortf" => 0,
+          "did" => nil,
+          "tmpls" =>
+        [{ "name" => "Card 1",
+           "ord" => 0,
+           "qfmt" => "{{Front}}",
+           "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+           "bqfmt" => "",
+           "bafmt" => "",
+           "did" => nil,
+           "bfont" => "",
+           "bsize" => 0 },
+         { "name" => "Card 2",
+           "ord" => 1,
+           "qfmt" => "{{Back}}",
+           "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}",
+           "bqfmt" => "",
+           "bafmt" => "",
+           "did" => nil,
+           "bfont" => "",
+           "bsize" => 0 }],
+          "flds" =>
+        [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
+         { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
+          "css" =>
+        ".card {\n" \
+        "    font-family: arial;\n" \
+        "    font-size: 20px;\n" \
+        "    text-align: center;\n" \
+        "    color: black;\n" \
+        "    background-color: white;\n" \
+        "}\n",
+          "latexPre" =>
+        "\\documentclass[12pt]{article}\n" \
+        "\\special{papersize=3in,5in}\n" \
+        "\\usepackage[utf8]{inputenc}\n" \
+        "\\usepackage{amssymb,amsmath}\n" \
+        "\\pagestyle{empty}\n" \
+        "\\setlength{\\parindent}{0in}\n" \
+        "\\begin{document}\n",
+          "latexPost" => "\\end{document}",
+          "latexsvg" => false,
+          "req" => [[0, "any", [0]], [1, "any", [1]]] }
+      end
+      # rubocop:enable Layout/LineContinuationLeadingSpace
+      it "should instantiate a note type with two card templates" do
+        expect(basic_and_reversed_card_note_type_from_existing.card_templates.count).to eq 2
       end
     end
   end
@@ -321,7 +381,7 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#field_names_in_order" do
     context "for the default Basic note type" do
       it "should return an array ['Front', 'Back'] which are the field names in the correct order" do
-        expect(note_type_from_existing.field_names_in_order).to eq %w[Front Back]
+        expect(basic_note_type_from_existing.field_names_in_order).to eq %w[Front Back]
       end
     end
     context "for a note type with four custom fields" do
@@ -335,7 +395,7 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#snake_case_field_names" do
     context "for the default Basic note type" do
       it "should return an array including the values 'front' and 'back'" do
-        expect(note_type_from_existing.snake_case_field_names).to eq %w[front back]
+        expect(basic_note_type_from_existing.snake_case_field_names).to eq %w[front back]
       end
     end
     context "for a note type with a note field called 'Crazy Note Field Name'" do
@@ -355,7 +415,7 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#sort_field_name" do
     context "for the default Basic note type" do
       it "should return the name of the field used to sort, 'Front'" do
-        expect(note_type_from_existing.sort_field_name).to eq "Front"
+        expect(basic_note_type_from_existing.sort_field_name).to eq "Front"
       end
     end
   end
@@ -363,7 +423,7 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#snake_case_sort_field_name" do
     context "for the default Basic note type" do
       it "should return the name of the field used to sort, 'Front', but in snake_case: front" do
-        expect(note_type_from_existing.snake_case_sort_field_name).to eq "front"
+        expect(basic_note_type_from_existing.snake_case_sort_field_name).to eq "front"
       end
     end
     context "for a note type with a note field called 'Crazy Note Field Name' which is the sort field" do
@@ -377,13 +437,13 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#allowed_card_template_answer_format_field_names" do
     context "for a non-cloze note type" do
       it "should return an array with the string names of the note type's fields' names and 'FrontSide'" do
-        expect(note_type_from_existing.allowed_card_template_answer_format_field_names).to eq %w[Front Back FrontSide]
+        expect(basic_note_type_from_existing.allowed_card_template_answer_format_field_names).to eq %w[Front Back FrontSide]
       end
     end
     context "for a cloze note type" do
       it "should return an array with the string names of the note type's fields' names, 'FrontSide', and the note type's fields' names prepended with 'cloze:'" do
-        note_type_from_existing.cloze = true
-        expect(note_type_from_existing.allowed_card_template_answer_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back", "FrontSide"]
+        basic_note_type_from_existing.cloze = true
+        expect(basic_note_type_from_existing.allowed_card_template_answer_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back", "FrontSide"]
       end
     end
   end
@@ -391,13 +451,13 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#allowed_card_template_question_format_field_names" do
     context "for a non-cloze note type" do
       it "should return an array with the string names of the note type's fields' names" do
-        expect(note_type_from_existing.allowed_card_template_question_format_field_names).to eq %w[Front Back]
+        expect(basic_note_type_from_existing.allowed_card_template_question_format_field_names).to eq %w[Front Back]
       end
     end
     context "for a cloze note type" do
       it "should return an array with the string names of the note type's fields' names and the note type's fields' names prepended with 'cloze:'" do
-        note_type_from_existing.cloze = true
-        expect(note_type_from_existing.allowed_card_template_question_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back"]
+        basic_note_type_from_existing.cloze = true
+        expect(basic_note_type_from_existing.allowed_card_template_question_format_field_names).to eq ["Front", "Back", "cloze:Front", "cloze:Back"]
       end
     end
   end
@@ -405,15 +465,15 @@ RSpec.describe AnkiRecord::NoteType do
   describe "#find_card_template_by" do
     context "when passed a name argument where the note type does not have a card template with that name" do
       it "should return nil" do
-        expect(note_type_from_existing.find_card_template_by(name: "does not exist")).to eq nil
+        expect(basic_note_type_from_existing.find_card_template_by(name: "does not exist")).to eq nil
       end
     end
     context "when passed a name argument where the note type has a card template with that name" do
       it "should return a card template object" do
-        expect(note_type_from_existing.find_card_template_by(name: "Card 1").instance_of?(AnkiRecord::CardTemplate)).to eq true
+        expect(basic_note_type_from_existing.find_card_template_by(name: "Card 1").instance_of?(AnkiRecord::CardTemplate)).to eq true
       end
       it "should return a card template object with name equal to the name argument" do
-        expect(note_type_from_existing.find_card_template_by(name: "Card 1").name).to eq "Card 1"
+        expect(basic_note_type_from_existing.find_card_template_by(name: "Card 1").name).to eq "Card 1"
       end
     end
   end

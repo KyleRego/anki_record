@@ -18,7 +18,17 @@ The section following this one should have examples showing the most common use 
 
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The test suite files should have a 1-to-1 mapping with the source code files.
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The following is an example of output from one spec:
+
+```
+AnkiRecord::Note
+  #save
+    for a note with 2 card templates
+      should save two card records to the collection.anki21 database
+        with nid values equal to the id of the cards' note object's id
+```
+
+The test suite files should have a 1-to-1 mapping with the source code files.
 
 ## Usage
 
@@ -113,13 +123,11 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
-- TODO count: 30
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
   - Updating notes when they already exist in the database
     - Continue working on `Collection#find_note_by`
       - Continue fleshing out `note_spec.rb` (expect that notes and cards are saved correctly)
-        - Investigate currently failing specs (having difficulty with asserting the id is correct and the card templates count of the note type seems wrong)
-          - Add specs for instantiating a note type from data with more than one card template (rule that out as the issue)
+        - spec/anki_record/note_spec.rb:89
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content
@@ -131,6 +139,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Use only parameterized SQL statements
   - Specs need to be refactored to be more DRY and also start using doubles to improve performance
   - Use more specific RSpec matchers than `eq` everywhere
+  - Reduce TODO comments
 
 ### Release checklist
 - Remove `require "pry"`

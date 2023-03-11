@@ -13,19 +13,19 @@ module AnkiRecord
     include SharedConstantsHelper
 
     ##
-    # The note that the card belongs to
+    # The note object that the card belongs to
     attr_reader :note
 
     ##
-    # The card template that the card uses
+    # The card template object that the card uses as its template
     attr_reader :card_template
 
     ##
-    # The id of the card, which is time it was created as the number of milliseconds since the 1970 epoch
+    # The id of the card. This is approximately the number of milliseconds since the 1970 epoch when the card was created.
     attr_reader :id
 
     ##
-    # The time that the card was last modified as the number of seconds since the 1970 epoch
+    # The number of seconds since the 1970 epoch when the card was most recently modified.
     attr_reader :last_modified_time
 
     # rubocop:disable Metrics/MethodLength
@@ -34,7 +34,7 @@ module AnkiRecord
       raise ArgumentError unless note && card_template && note.note_type == card_template.note_type
 
       @note = note
-      @apkg = @note.deck.collection.anki_package
+      @anki_package = @note.deck.collection.anki_package
 
       @card_template = card_template
 
@@ -59,9 +59,8 @@ module AnkiRecord
 
     ##
     # Saves the card to the collection.anki21 database
-    # TODO: Refactor to prevent injection
     def save
-      @apkg.execute <<~SQL
+      @anki_package.execute <<~SQL
         insert into cards (id, nid, did, ord,
                           mod, usn, type, queue,
                           due, ivl, factor, reps,

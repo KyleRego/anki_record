@@ -7,6 +7,7 @@ require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 require_relative "note_field"
 
+# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
   # NoteType represents an Anki note type (also called a model)
@@ -240,3 +241,4 @@ module AnkiRecord
       end
   end
 end
+# rubocop:enable Metrics/ClassLength

@@ -26,7 +26,7 @@ module AnkiRecord
       @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
       @directory = directory
       check_directory_argument_is_valid
-      setup_other_package_instance_variables(name: name, directory: directory)
+      setup_other_package_instance_variables
 
       execute_closure_and_zip(self, &closure) if block_given?
     end
@@ -46,7 +46,7 @@ module AnkiRecord
         zip
       end
 
-      def setup_other_package_instance_variables(name:, directory:)
+      def setup_other_package_instance_variables
         @tmpdir = Dir.mktmpdir
         @tmp_files = []
         @anki21_database = setup_anki21_database_object
@@ -56,9 +56,9 @@ module AnkiRecord
       end
 
       def check_name_argument_is_valid(name:)
-        unless name.instance_of?(String) && !name.empty? && !name.include?(" ")
-          raise ArgumentError, "The name argument must be a string without spaces."
-        end
+        return if name.instance_of?(String) && !name.empty? && !name.include?(" ")
+
+        raise ArgumentError, "The name argument must be a string without spaces."
       end
 
       def check_directory_argument_is_valid
@@ -135,7 +135,7 @@ module AnkiRecord
     end
 
     ##
-    # Zips the temporary files into the *.apkg package and deletes the temporary files.
+    # Zips the temporary files into the *.apkg package file, and then deletes the temporary files.
     def zip
       create_zip_file && destroy_temporary_directory
     end
@@ -162,15 +162,11 @@ module AnkiRecord
 
     public
 
-    ##
-    # Returns true if the database is open
-    def open?
+    def open? # :nodoc:
       !closed?
     end
 
-    ##
-    # Returns true if the database is closed
-    def closed?
+    def closed? # :nodoc:
       @anki21_database.closed?
     end
   end
