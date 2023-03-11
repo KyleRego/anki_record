@@ -77,7 +77,10 @@ RSpec.describe AnkiRecord::Note do
         second_crazy_card_template.question_format = "{{crazy back}}"
         second_crazy_card_template.answer_format = "{{crazy front}}"
         crazy_note_type.save
-        AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+        note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+        note.crazy_front = "Hello"
+        note.crazy_back = "World"
+        note
       end
       it "should save a note record to the collection.anki21 database" do
         note_with_two_cards.save
@@ -88,7 +91,10 @@ RSpec.describe AnkiRecord::Note do
         expect(anki_package.execute("select count(*) from cards;").first["count(*)"]).to eq 2
       end
       context "when the note has its fields set" do
-        it "should save the content of the fields into the note record"
+        it "should save the content of the fields into the note record" do
+          note_with_two_cards.save
+          expect(anki_package.execute("select flds from notes").first["flds"]).to eq "Hello\x1FWorld"
+        end
       end
     end
   end

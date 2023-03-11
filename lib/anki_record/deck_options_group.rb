@@ -43,6 +43,10 @@ module AnkiRecord
       @collection.add_deck_options_group self
     end
 
+    def save # :nodoc:
+      false # TODO
+    end
+
     private
 
       # rubocop:disable Metrics/MethodLength

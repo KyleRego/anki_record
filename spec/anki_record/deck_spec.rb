@@ -88,4 +88,78 @@ RSpec.describe AnkiRecord::Deck do
       end
     end
   end
+
+  describe "#save" do
+    let(:crazy_deck_name) { "crazy deck" }
+    subject(:crazy_deck) do
+      AnkiRecord::Deck.new name: crazy_deck_name, collection: collection_argument
+    end
+
+    # TODO: Another place where a collection method to get the col_decks_hash would be useful
+    let(:col_decks_hash) { JSON.parse(collection_argument.anki_package.execute("select decks from col;").first["decks"]) }
+    let(:crazy_deck_hash) { col_decks_hash[crazy_deck.id.to_s] }
+
+    before { crazy_deck.save }
+    it "should save the deck object's id as a key in the decks column's JSON object in the collection.anki21 database" do
+      expect(col_decks_hash.keys).to include crazy_deck.id.to_s
+    end
+    it "should save the deck object as a hash, as the value of the deck object's id key, in the decks hash" do
+      expect(crazy_deck_hash).to be_a Hash
+    end
+    it "should save the deck object as a hash with the following keys:
+      'id', 'mod', 'name', 'usn', 'lrnToday', 'revToday',
+      'newToday', 'timeToday', 'collapsed', 'browserCollapsed',
+      'desc', 'dyn', 'conf', 'extendNew', 'extendRev'" do
+      %w[id mod name usn lrnToday revToday newToday timeToday collapsed browserCollapsed desc dyn conf extendNew extendRev].each do |key|
+        expect(crazy_deck_hash.keys).to include key
+      end
+    end
+    context "should save the deck object as a hash" do
+      it "with the deck object's id attribute as the value for the id key in the deck hash" do
+        expect(crazy_deck_hash["id"]).to eq crazy_deck.id
+      end
+      it "with the deck object's last_modified_time attribute as the value for the mod key in the deck hash" do
+        expect(crazy_deck_hash["mod"]).to eq crazy_deck.last_modified_time
+      end
+      it "with the deck object's name attribute as the value for the name key in the deck hash" do
+        expect(crazy_deck_hash["name"]).to eq crazy_deck.name
+      end
+      it "with -1 for the value of the usn key in the deck hash" do
+        expect(crazy_deck_hash["usn"]).to eq(-1)
+      end
+      it "with [0, 0] for the value of the lrnToday key in the deck hash" do
+        expect(crazy_deck_hash["lrnToday"]).to eq [0, 0]
+      end
+      it "with [0, 0] for the value of the revToday key in the deck hash" do
+        expect(crazy_deck_hash["revToday"]).to eq [0, 0]
+      end
+      it "with [0, 0] for the value of the newToday key in the deck hash" do
+        expect(crazy_deck_hash["newToday"]).to eq [0, 0]
+      end
+      it "with [0, 0] for the value of the timeToday key in the deck hash" do
+        expect(crazy_deck_hash["timeToday"]).to eq [0, 0]
+      end
+      it "with false for the value of the collapsed key in the deck hash" do
+        expect(crazy_deck_hash["collapsed"]).to eq false
+      end
+      it "with false for the value of the browserCollapsed key in the deck hash" do
+        expect(crazy_deck_hash["browserCollapsed"]).to eq false
+      end
+      it "with the deck object's description attribute as the value for the desc key in the deck hash" do
+        expect(crazy_deck_hash["desc"]).to eq crazy_deck.description
+      end
+      it "with 0 for the value of the dyn key in the deck hash" do
+        expect(crazy_deck_hash["dyn"]).to eq 0
+      end
+      it "with the deck object's deck_options_group_id attribute as the value for the conf key in the deck hash" do
+        expect(crazy_deck_hash["conf"]).to eq crazy_deck.deck_options_group_id
+      end
+      it "with 0 for the value of the extendNew key in the deck hash" do
+        expect(crazy_deck_hash["extendNew"]).to eq 0
+      end
+      it "with 0 for the value of the extendRev key in the deck hash" do
+        expect(crazy_deck_hash["extendRev"]).to eq 0
+      end
+    end
+  end
 end

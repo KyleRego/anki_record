@@ -9,24 +9,24 @@ RSpec.describe AnkiRecord do
 
   describe "an unfinished end to end test" do
     it "is an example" do
-      AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
+      AnkiRecord::AnkiPackage.new(name: "crazy") do |apkg|
         collection = apkg.collection
-
+        default_deck = collection.find_deck_by name: "Default"
         crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
-
         AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
         AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-
         crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
         crazy_card_template.question_format = "{{crazy front}}"
         crazy_card_template.answer_format = "{{crazy back}}"
+        second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+        second_crazy_card_template.question_format = "{{crazy back}}"
+        second_crazy_card_template.answer_format = "{{crazy front}}"
+        crazy_note_type.save
 
-        # crazy_note_type.save # TODO
-
-        crazy_deck = AnkiRecord::Deck.new collection: collection, name: "crazy deck"
-        expect(crazy_deck.name).to eq "crazy deck"
-
-        # crazy_deck.save # TODO
+        note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+        note.crazy_front = "Hello"
+        note.crazy_back = "World"
+        note.save
       end
     end
   end

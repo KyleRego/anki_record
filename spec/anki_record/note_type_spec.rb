@@ -98,13 +98,13 @@ RSpec.describe AnkiRecord::NoteType do
       col_models_hash[crazy_note_type.id.to_s]
     end
     before { crazy_note_type.save }
-    it "should save the note type object's id as a key in the models column's JSON value in the collection.anki21 database" do
-      expect(col_models_hash.keys.include?(crazy_note_type.id.to_s)).to eq true
+    it "should save the note type object's id as a key in the models column's JSON object in the collection.anki21 database" do
+      expect(col_models_hash.keys).to include crazy_note_type.id.to_s
     end
-    it "should save the note type object as a hash, as the value of the note type object's id key, in the models hash" do
-      expect(crazy_note_type_hash.instance_of?(Hash)).to eq true
+    it "should save the note type object as a hash, as the value of the note type object's id key, in the models JSON object" do
+      expect(crazy_note_type_hash).to be_a Hash
     end
-    it "should save the note type object as a hash with keys:
+    it "should save the note type object as a hash with the following keys:
       'id', 'name', 'type', 'mod', 'usn',
       'sortf', 'did', 'tmpls', 'flds', 'css',
       'latexPre', 'latexPost', 'latexsvg', 'req', and 'tags'" do
@@ -113,10 +113,10 @@ RSpec.describe AnkiRecord::NoteType do
       end
     end
     context "should save the note type object as a hash" do
-      it "with the note type object's id as the value for the id in the note type hash" do
+      it "with the note type object's id attribute as the value for the id in the note type hash" do
         expect(crazy_note_type_hash["id"]).to eq crazy_note_type.id
       end
-      it "with the note type object's name as the value for the name in the note type hash" do
+      it "with the note type object's name attribute as the value for the name key in the note type hash" do
         expect(crazy_note_type_hash["name"]).to eq crazy_note_type.name
       end
       it "with 0 for the value of the type in the note hash because this is a non-cloze note type" do

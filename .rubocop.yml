@@ -17,6 +17,7 @@ Layout/LineLength:
 
 Metrics/BlockLength:
   Exclude:
+    - "spec/*"
     - "spec/anki_record/*"
 
 Layout/IndentationConsistency:

@@ -12,11 +12,6 @@ module AnkiRecord
     include SharedConstantsHelper
     include TimeHelper
 
-    DEFAULT_DECK_TODAY_ARRAY = [0, 0].freeze
-    DEFAULT_COLLAPSED = false
-
-    private_constant :DEFAULT_DECK_TODAY_ARRAY, :DEFAULT_COLLAPSED
-
     ##
     # The collection object that the deck belongs to
     attr_reader :collection
@@ -39,6 +34,7 @@ module AnkiRecord
     # TODO: is this really supposed to be seconds? Should it be milliseconds?
     attr_reader :last_modified_time
 
+    # TODO: Probably this should be an accessor for the deck options group object instead of the id?
     ##
     # The id of the eck options/settings group that is applied to the deck
     attr_reader :deck_options_group_id
@@ -56,6 +52,28 @@ module AnkiRecord
       end
 
       @collection.add_deck self
+    end
+
+    ##
+    # Saves the deck to the collection.anki21 database
+    def save
+      # TODO: should accessing the decks data be a method of collection? and other similar methods, e.g. col_decks_hash
+      collection_decks_hash = JSON.parse(collection.anki_package.execute("select decks from col;").first["decks"])
+      collection_decks_hash[@id] = to_h
+      collection.anki_package.execute <<~SQL
+        update col set decks = '#{JSON.generate(collection_decks_hash)}' where id = '#{collection.id}'
+      SQL
+    end
+
+    def to_h # :nodoc:
+      {
+        id: @id, mod: @last_modified_time, name: @name, usn: @usn,
+        lrnToday: @learn_today, revToday: @review_today, newToday: @new_today, timeToday: @time_today,
+        collapsed: @collapsed_in_main_window, browserCollapsed: @collapsed_in_browser,
+        desc: @description, dyn: @dyn,
+        conf: @deck_options_group_id,
+        extendNew: @extend_new, extendRev: @extend_review
+      }
     end
 
     private
@@ -88,9 +106,9 @@ module AnkiRecord
         @last_modified_time = seconds_since_epoch
         @name = name
         @usn = NEW_OBJECT_USN
-        @learn_today = @review_today = @new_today = @time_today = DEFAULT_DECK_TODAY_ARRAY
-        @collapsed_in_main_window = DEFAULT_COLLAPSED
-        @collapsed_in_browser = DEFAULT_COLLAPSED
+        @learn_today = @review_today = @new_today = @time_today = default_deck_today_array
+        @collapsed_in_main_window = default_collapsed
+        @collapsed_in_browser = default_collapsed
         @description = ""
         @dyn = NON_FILTERED_DECK_DYN
         @deck_options_group_id = nil # TODO: Set id to the default deck options group?
@@ -98,6 +116,14 @@ module AnkiRecord
         @extend_new = 0
         @extend_review = 0
       end
-    # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/MethodLength
+
+      def default_deck_today_array
+        [0, 0].freeze
+      end
+
+      def default_collapsed
+        false
+      end
   end
 end

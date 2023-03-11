@@ -14,26 +14,15 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Documentation
 
+The usage section following this one should have examples showing the most common use cases, but the gem also has some additional documentation.
+
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
-The RSpec examples are intended to provide executable documentation and reading them may be helpful to understand the API. The best way is to run the test suite with the `rspec` command. The output is formatted as colorful documentation with a nesting pattern that reflects the nesting of the RSpec examples and example groups.
-
-There is a corresponding RSpec file for every file in the library code. The following organizes these in roughly the way the objects collaborate:
-- [anki_package_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/anki_package_spec.rb)
-  - [collection_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/collection_spec.rb)
-    - [note_type_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_type_spec.rb)
-      - [note_field_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_field_spec.rb)
-      - [card_template_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/card_template_spec.rb)
-    - [deck_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/deck_spec.rb)
-    - [deck_options_group_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/deck_options_group_spec.rb)
-  - [note_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/note_spec.rb)
-    - [card_spec.rb](https://github.com/KyleRego/anki_record/blob/main/spec/anki_record/card_spec.rb)
-
-The section below should provide examples of the most common things you might want to do.
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the granular behavior of the objects. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The test suite files should have a 1-to-1 mapping with the source code files.
 
 ## Usage
 
-The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new` and if passed a block, will execute the block, and then zip the `*.apkg` file:
+The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip the `*.apkg` file where `*` is the name argument:
 
 ```ruby
 require "anki_record"
@@ -44,9 +33,12 @@ AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
   end
   puts "Countdown complete. Write any Ruby you want in here!"
 end
+# test.apkg now exists in the current working directory
 ```
 
-If an exception is raised inside the block, the temporary `collection.anki2` and `collection.anki21` databases and `media` file are deleted without creating a new `*.apkg` zip file, so this is the recommended way.
+While execution is happening inside the block, temporary `collection.anki21` and `collection.anki2` SQLite databases and a `media` file exist inside of a temporary directory. These files are the normal zipped contents of an `*.apkg` file. `collection.anki21` is the database that the library is interacting with.
+
+If an exception is raised inside the block, the files are deleted without creating a new `*.apkg` zip file, so this is the recommended way.
 
 Alternatively, if `AnkiRecord::Package::new` is not passed a block, the `zip` method must be explicitly called on the Anki package object:
 
@@ -57,7 +49,9 @@ apkg = AnkiRecord::AnkiPackage.new(name: "test")
 apkg.zip
 ```
 
-A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument:
+The `zip` method zips the temporary files and deletes them.
+
+A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument (this argument is not allowed to contain spaces):
 
 ```ruby
 require "anki_record"
@@ -86,6 +80,34 @@ apkg.zip
 
 This example creates a `test.apkg` zip file in the current working directory, which when imported into Anki, will add one Basic note and one Cloze note.
 
+The following example is from the next version of the library which is unreleased.
+
+```ruby
+require "anki_record"
+
+AnkiRecord::AnkiPackage.new(name: "crazy") do |apkg|
+  collection = apkg.collection
+  default_deck = collection.find_deck_by name: "Default"
+  crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
+  AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+  AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+  crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+  crazy_card_template.question_format = "{{crazy front}}"
+  crazy_card_template.answer_format = "{{crazy back}}"
+  second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+  second_crazy_card_template.question_format = "{{crazy back}}"
+  second_crazy_card_template.answer_format = "{{crazy front}}"
+  crazy_note_type.save
+
+  note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+  note.crazy_front = "Hello"
+  note.crazy_back = "World"
+  note.save
+end
+```
+
+This creates a new note type called "crazy note type" and one note using it in a `crazy.apkg` zip file.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -93,7 +115,11 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
+- CSS of crazy note type example and other setters
+- Saving notes of a custom type
+- Updating notes when they already exist in the database
 - Saving note types, decks, and deck options groups to the collection.anki21 database
+  - And updating them when they already exist
 - Setters for attributes of the note types, decks, and deck options groups
 - Refactor to use only parameterized SQL statements
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database

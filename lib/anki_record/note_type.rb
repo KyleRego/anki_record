@@ -83,24 +83,22 @@ module AnkiRecord
       @collection.add_note_type self
     end
 
+    ##
+    # Saves the note type to the collection.anki21 database
     def save
       collection_models_hash = JSON.parse(collection.anki_package.execute("select models from col;").first["models"])
-      collection_models_hash[id] = to_h
-      new_collection_models_json = JSON.generate(collection_models_hash)
-      # TODO: Refactor to prevent injection
+      collection_models_hash[@id] = to_h
       collection.anki_package.execute <<~SQL
-        update col set models = '#{new_collection_models_json}' where id = '#{collection.id}'
+        update col set models = '#{JSON.generate(collection_models_hash)}' where id = '#{collection.id}'
       SQL
     end
 
     def to_h # :nodoc:
-      { id: @id, name: @name,
-        type: @cloze ? 1 : 0,
+      { id: @id, name: @name, type: @cloze ? 1 : 0,
         mod: @last_modified_time,
         usn: @usn, sortf: @sort_field, did: @deck_id,
         tmpls: @card_templates.map(&:to_h),
-        flds: @note_fields.map(&:to_h),
-        css: @css,
+        flds: @note_fields.map(&:to_h), css: @css,
         latexPre: @latex_preamble, latexPost: @latex_postamble, latexsvg: @latex_svg,
         req: @req, tags: @tags, vers: @vers }
     end
