@@ -17,6 +17,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
   before do
     # :nocov:
+    # The test temporary directory might exist if RSpec was force quit/interrupted
     cleanup_test_files(directory: TEST_TMP_DIRECTORY) && Dir.rmdir(TEST_TMP_DIRECTORY) if Dir.exist?(TEST_TMP_DIRECTORY)
     # :nocov:
     Dir.mkdir(TEST_TMP_DIRECTORY)

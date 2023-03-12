@@ -126,8 +126,13 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
   - Updating notes when they already exist in the database
     - Continue working on `Collection#find_note_by`
-      - Continue fleshing out `note_spec.rb` (expect that notes and cards are saved correctly)
-        - spec/anki_record/note_spec.rb:89
+      - Need to be able to instantiate notes/cards from existing data
+        - Rather than overload the constructors, I'm thinking it should be managed by methods of Collection
+          - take note record
+          - find existing note type, create one if it doesn't exist
+          - find deck from note's card records
+          - create note object and card objects in usual way
+          - set their attributes from existing data
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content

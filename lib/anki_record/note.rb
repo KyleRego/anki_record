@@ -41,15 +41,10 @@ module AnkiRecord
     attr_reader :note_type
 
     ##
-    # The card objects of the note
+    # An array of the card objects of the note
     attr_reader :cards
 
-    ##
-    # Instantiate a new note for a deck and note type
-    # or TODO: instantiate a new object from an already existing record
-    # rubocop:disable Metrics/MethodLength
-    # rubocop:disable Metrics/AbcSize
-    def initialize(deck:, note_type:)
+    def initialize(note_type:, deck:)
       raise ArgumentError unless deck && note_type && deck.collection == note_type.collection
 
       @apkg = deck.collection.anki_package
@@ -63,21 +58,21 @@ module AnkiRecord
       @note_type = note_type
       @field_contents = setup_field_contents
       @cards = @note_type.card_templates.map { |card_template| Card.new(note: self, card_template: card_template) }
+      @flags = 0
+      @data = ""
     end
-    # rubocop:enable Metrics/MethodLength
-    # rubocop:enable Metrics/AbcSize
 
     ##
     # Save the note to the collection.anki21 database
     def save
       # TODO: Refactor to prevent injection
       @apkg.execute <<~SQL
-        insert into notes (id, guid, mid, mod,#{" "}
-                          usn, tags, flds, sfld,#{" "}
+        insert into notes (id, guid, mid, mod,
+                          usn, tags, flds, sfld,
                           csum, flags, data)
                     values ('#{@id}', '#{@guid}', '#{note_type.id}', '#{@last_modified_time}',
-                          '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}',#{" "}
-                          '#{checksum(sort_field_value)}', '0', '')
+                          '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}',
+                          '#{checksum(sort_field_value)}', '#{@flags}', '#{@data}')
       SQL
       cards.each(&:save)
       true

@@ -21,7 +21,8 @@ module AnkiRecord
     attr_reader :card_template
 
     ##
-    # The id of the card. This is approximately the number of milliseconds since the 1970 epoch when the card was created.
+    # The id of the card.
+    # This is approximately the number of milliseconds since the 1970 epoch when the card was created.
     attr_reader :id
 
     ##
