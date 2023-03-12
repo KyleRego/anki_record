@@ -46,12 +46,18 @@ RSpec.describe AnkiRecord::Card do
         end
       end
     end
-    context "with valid arguments" do
+    context "with valid note and card_template arguments" do
       it "should instantiate a card object" do
         expect(new_card.instance_of?(AnkiRecord::Card)).to eq true
       end
       it "should instantiate a card object with note attribute equal to the note object argument" do
         expect(new_card.note).to eq note_argument
+      end
+      it "should instantiate a card object with deck attribute equal to the deck of the note" do
+        expect(new_card.deck).to eq note_argument.deck
+      end
+      it "should instantiate a card object with collection attribute equal to the collection of the card's note's deck's collection" do
+        expect(new_card.collection).to eq note_argument.deck.collection
       end
       it "should instantiate a card object with card_template attribute equal to the card template argument" do
         expect(new_card.card_template).to eq card_template_argument
@@ -61,6 +67,37 @@ RSpec.describe AnkiRecord::Card do
       end
       it "should instantiate a card object with an integer last_modified_time attribute" do
         expect(new_card.last_modified_time.instance_of?(Integer)).to eq true
+      end
+      it "should instantiate a card object with an usn attribute equal to -1" do
+        expect(new_card.usn).to eq(-1)
+      end
+      it "should instantiate a card object with `type`, `queue`, `due`, `ivl`, `factor`,
+          `reps`, `lapses`, `left`, `odue`, `odid`, and `flags` attributes equal to 0" do
+        %w[type queue due ivl factor reps lapses left odue odid flags].each do |attribute|
+          expect(new_card.send(attribute.to_s)).to eq 0
+        end
+      end
+    end
+    context "with valid note and card_templates arguments and the card_data argument with an already existing card data hash" do
+      let(:card_data_hash) do
+        { "id" => 1_678_650_585_538,
+          "nid" => 1_678_650_580_123,
+          "did" => 1,
+          "ord" => 0,
+          "mod" => 1_678_650_583,
+          "usn" => -1,
+          "type" => 0,
+          "queue" => 0,
+          "due" => 0,
+          "ivl" => 0,
+          "factor" => 0,
+          "reps" => 0,
+          "lapses" => 0,
+          "left" => 0,
+          "odue" => 0,
+          "odid" => 0,
+          "flags" => 0,
+          "data" => "{}" }
       end
     end
   end

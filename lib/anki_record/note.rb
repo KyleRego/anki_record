@@ -45,6 +45,7 @@ module AnkiRecord
     attr_reader :cards
 
     def initialize(note_type:, deck:, data: nil)
+      p data
       raise ArgumentError unless deck && note_type && deck.collection == note_type.collection
 
       @apkg = deck.collection.anki_package
@@ -57,19 +58,22 @@ module AnkiRecord
       @deck = deck
       @note_type = note_type
       @field_contents = setup_field_contents
-      @cards = @note_type.card_templates.map { |card_template| Card.new(note: self, card_template: card_template) }
+      @cards = @note_type.card_templates.map.with_index do |card_template, index|
+        if data
+          Card.new(note: self, card_template: card_template, card_data: data[:cards_data][index])
+        else
+          Card.new(note: self, card_template: card_template)
+        end
+      end
       @flags = 0
       @data = ""
 
-      # Probably only pass this the data[:note_data] and pass
-      # the card constructor above the cards_data array
-      update_instance_variables_from_existing_data(data: data) if data
+      update_instance_variables_from_existing_data(note_data: data[:note_data]) if data
     end
 
     private
 
-      def update_instance_variables_from_existing_data(data:)
-        note_data = data[:note_data]
+      def update_instance_variables_from_existing_data(note_data:)
         @id = note_data["id"]
         @guid = note_data["guid"]
         @last_modified_time = note_data["mod"]

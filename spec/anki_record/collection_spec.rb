@@ -141,7 +141,7 @@ RSpec.describe AnkiRecord::Collection do
         end
       end
       context "when passed an id argument where the collection does have a note with that id" do
-        context "and the note's note type has 3 fields, 3 card templates, and all 3 fields set" do
+        context "and there is a Basic note type note with that id" do
           before do
             apkg = AnkiRecord::AnkiPackage.new(name: "package_with_a_note")
             @collection = apkg.collection
@@ -153,21 +153,11 @@ RSpec.describe AnkiRecord::Collection do
           it "should return a note object" do
             expect(@collection.find_note_by(id: @note.id)).to be_a AnkiRecord::Note
           end
-          context "should return a note object with cards attribute" do
-            it "with a length of 3"
-            it "with Card objects"
-            it "with data equal to what was in the card records data"
-          end
+          it "should return a note object with one card"
           it "should return a note object with id equal to the id argument" do
             expect(@collection.find_note_by(id: @note.id).id).to eq @note.id
           end
-          it "should return a note object with the guid attribute equal to the "
-          it "should return a note object with the last_modified_time attribute equal to the "
-          it "should return a note object with the usn attribute equal to "
-          it "should return a note object with the tags"
-          it "should return a note object with the field_contents attribute"
-          it "should return a note object with the flags"
-          it "should return a note object with the data"
+          it "should return a note object with one card equal to the id of the note's corresponding card record"
         end
       end
     end

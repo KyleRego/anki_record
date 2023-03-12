@@ -17,6 +17,14 @@ module AnkiRecord
     attr_reader :note
 
     ##
+    # The deck object that the card belongs to
+    attr_reader :deck
+
+    ##
+    # The collectio object that the card belongs to
+    attr_reader :collection
+
+    ##
     # The card template object that the card uses as its template
     attr_reader :card_template
 
@@ -29,13 +37,23 @@ module AnkiRecord
     # The number of seconds since the 1970 epoch when the card was most recently modified.
     attr_reader :last_modified_time
 
+    ##
+    # The usn (update sequence number) of the card
+    attr_reader :usn
+
+    ##
+    # TODO: Investigate all these
+    attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags
+
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
-    def initialize(note:, card_template:)
+    def initialize(note:, card_template:, card_data: nil)
       raise ArgumentError unless note && card_template && note.note_type == card_template.note_type
 
       @note = note
-      @anki_package = @note.deck.collection.anki_package
+      @deck = @note.deck
+      @collection = @deck.collection
+      @anki_package = @collection.anki_package
 
       @card_template = card_template
 
@@ -53,10 +71,35 @@ module AnkiRecord
       @odue = 0
       @odid = 0
       @flags = 0
-      @data = {}
+      @data = "{}"
+
+      update_instance_variables_from_existing_data(card_data: card_data) if card_data
     end
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
+
+    private
+
+      def update_instance_variables_from_existing_data(card_data:)
+        @id = card_data["id"]
+        @deck = @collection.find_deck_by id: card_data["did"]
+        @last_modified_time = card_data["mod"]
+        @usn = card_data["usn"]
+        @type = card_data["type"]
+        @queue = card_data["queue"]
+        @due = card_data["due"]
+        @ivl = card_data["ivl"]
+        @factor = card_data["factor"]
+        @reps = card_data["reps"]
+        @lapses = card_data["lapses"]
+        @left = card_data["left"]
+        @odue = card_data["odue"]
+        @odid = card_data["odid"]
+        @flags = card_data["flags"]
+        @data = card_data["data"]
+      end
+
+    public
 
     ##
     # Saves the card to the collection.anki21 database
@@ -66,7 +109,7 @@ module AnkiRecord
                           mod, usn, type, queue,
                           due, ivl, factor, reps,
                           lapses, left, odue, odid, flags, data)
-                    values ('#{@id}', '#{@note.id}', '#{@note.deck.id}', '#{@card_template.ordinal_number}',
+                    values ('#{@id}', '#{@note.id}', '#{@deck.id}', '#{@card_template.ordinal_number}',
                            '#{@last_modified_time}', '#{@usn}', '#{@type}', '#{@queue}',
                            '#{@due}', '#{@ivl}', '#{@factor}', '#{@reps}',
                            '#{@lapses}', '#{@left}', '#{@odue}', '#{@odid}', '#{@flags}', '#{@data}')

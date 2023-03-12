@@ -32,7 +32,7 @@ RSpec.describe AnkiRecord::Note do
         end
       end
     end
-    context "when passed valid note_type and deck arguments" do
+    context "with valid note_type and deck arguments" do
       it "should instantiate a note" do
         expect(note).to be_a AnkiRecord::Note
       end
@@ -62,6 +62,21 @@ RSpec.describe AnkiRecord::Note do
       end
       it "should instantiate a note with a number of card objects equal to the number of card templates of the note type" do
         expect(note.cards.size).to eq note.note_type.card_templates.size
+      end
+    end
+    context "with valid note_type and deck arguments and the note_data argument with an already existing note data hash" do
+      let(:note_data_hash) do
+        { "id" => 1_678_650_580_123,
+          "guid" => "a58-a5b9-4",
+          "mid" => 1_676_902_364_661,
+          "mod" => 1_678_650_583,
+          "usn" => -1,
+          "tags" => "",
+          "flds" => "\u001F",
+          "sfld" => "",
+          "csum" => 3_661_210_606,
+          "flags" => 0,
+          "data" => "" }
       end
     end
   end
