@@ -55,6 +55,16 @@ RSpec.describe AnkiRecord::Collection do
     end
 
     describe "#find_note_type_by" do
+      context "when passed both name and id arguments" do
+        it "should throw an ArgumentError" do
+          expect { collection.find_note_type_by(name: "name", id: "id") }.to raise_error ArgumentError
+        end
+      end
+      context "when passed neither a name nor an id argument" do
+        it "should throw an ArgumentError" do
+          expect { collection.find_note_type_by }.to raise_error ArgumentError
+        end
+      end
       context "when passed a name argument where the collection does not have a note type with that name" do
         it "should return nil" do
           expect(collection.find_note_type_by(name: "no-note-type-with-this-name")).to eq nil
@@ -68,9 +78,33 @@ RSpec.describe AnkiRecord::Collection do
           expect(collection.find_note_type_by(name: "Basic").name).to eq "Basic"
         end
       end
+      context "when passed an id argument where the collection does not have a note type with that id" do
+        it "should return nil" do
+          expect(collection.find_note_type_by(id: "1234")).to eq nil
+        end
+      end
+      context "when passed an id argument where the collection has a note type with that id" do
+        let(:basic_note_type_id) { collection.find_note_type_by(name: "Basic").id }
+        it "should return a note type object" do
+          expect(collection.find_note_type_by(id: basic_note_type_id).instance_of?(AnkiRecord::NoteType)).to eq true
+        end
+        it "should return a note type object with name equal to the name argument" do
+          expect(collection.find_note_type_by(id: basic_note_type_id).id).to eq basic_note_type_id
+        end
+      end
     end
 
     describe "#find_deck_by" do
+      context "when passed both name and id arguments" do
+        it "should throw an ArgumentError" do
+          expect { collection.find_deck_by(name: "name", id: "id") }.to raise_error ArgumentError
+        end
+      end
+      context "when passed neither a name nor an id argument" do
+        it "should throw an ArgumentError" do
+          expect { collection.find_deck_by }.to raise_error ArgumentError
+        end
+      end
       context "when passed a name argument where the collection does not have a deck with that name" do
         it "should return nil" do
           expect(collection.find_deck_by(name: "no-deck-with-this-name")).to eq nil
@@ -84,6 +118,20 @@ RSpec.describe AnkiRecord::Collection do
           expect(collection.find_deck_by(name: "Default").name).to eq "Default"
         end
       end
+      context "when passed an id argument where the collection does not have a note type with that id" do
+        it "should return nil" do
+          expect(collection.find_deck_by(id: "1234")).to eq nil
+        end
+      end
+      context "when passed an id argument where the collection has a deck with that id" do
+        let(:default_deck_id) { collection.find_deck_by(name: "Default").id }
+        it "should return a note type object" do
+          expect(collection.find_deck_by(id: default_deck_id).instance_of?(AnkiRecord::Deck)).to eq true
+        end
+        it "should return a note type object with name equal to the name argument" do
+          expect(collection.find_deck_by(id: default_deck_id).id).to eq default_deck_id
+        end
+      end
     end
 
     describe "#find_note_by" do
@@ -93,18 +141,34 @@ RSpec.describe AnkiRecord::Collection do
         end
       end
       context "when passed an id argument where the collection does have a note with that id" do
-        before do
-          apkg = AnkiRecord::AnkiPackage.new(name: "package_with_a_note")
-          @collection = apkg.collection
-          basic_note_type = @collection.find_note_type_by name: "Basic"
-          default_deck = @collection.find_deck_by name: "Default"
-          @note = AnkiRecord::Note.new deck: default_deck, note_type: basic_note_type
-          @note.save
+        context "and the note's note type has 3 fields, 3 card templates, and all 3 fields set" do
+          before do
+            apkg = AnkiRecord::AnkiPackage.new(name: "package_with_a_note")
+            @collection = apkg.collection
+            basic_note_type = @collection.find_note_type_by name: "Basic"
+            default_deck = @collection.find_deck_by name: "Default"
+            @note = AnkiRecord::Note.new deck: default_deck, note_type: basic_note_type
+            @note.save
+          end
+          it "should return a note object" do
+            expect(@collection.find_note_by(id: @note.id)).to be_a AnkiRecord::Note
+          end
+          context "should return a note object with cards attribute" do
+            it "with a length of 3"
+            it "with Card objects"
+            it "with data equal to what was in the card records data"
+          end
+          it "should return a note object with id equal to the id argument" do
+            expect(@collection.find_note_by(id: @note.id).id).to eq @note.id
+          end
+          it "should return a note object with the guid attribute equal to the "
+          it "should return a note object with the last_modified_time attribute equal to the "
+          it "should return a note object with the usn attribute equal to "
+          it "should return a note object with the tags"
+          it "should return a note object with the field_contents attribute"
+          it "should return a note object with the flags"
+          it "should return a note object with the data"
         end
-        it "should return a note object"
-        # expect(@collection.find_note_by(id: @note.id)).to be_a AnkiRecord::Note
-        it "should return a note object with id equal to the id argument"
-        # expect(@collection.find_note_by(id: @note.id).id).to eq @note.id
       end
     end
   end

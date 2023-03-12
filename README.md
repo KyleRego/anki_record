@@ -18,7 +18,7 @@ The section following this one should have examples showing the most common use 
 
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output this in a way that reflects the nesting of the RSpec examples and example groups. The following is an example of output from one spec:
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. The following is an example of output from one example in `spec/anki_record/note_spec.rb`:
 
 ```
 AnkiRecord::Note
@@ -28,7 +28,7 @@ AnkiRecord::Note
         with nid values equal to the id of the cards' note object's id
 ```
 
-The test suite files should have a 1-to-1 mapping with the source code files.
+The RSpec test suite files in `spec` should have a 1-to-1 mapping with the source code files in `lib`.
 
 ## Usage
 
@@ -133,6 +133,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
           - find deck from note's card records
           - create note object and card objects in usual way
           - set their attributes from existing data
+            - See pending examples and lib/anki_record/note.rb:64 comments
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content

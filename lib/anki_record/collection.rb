@@ -72,22 +72,41 @@ module AnkiRecord
     end
 
     ##
-    # Returns the collection object's note type with name +name+ or nil if it is not found
-    def find_note_type_by(name: nil)
-      note_types.find { |note_type| note_type.name == name }
+    # Returns the collection object's note type found by either name or id, and nil if it is not found.
+    def find_note_type_by(name: nil, id: nil)
+      raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
+
+      if name
+        note_types.find { |note_type| note_type.name == name }
+      elsif id
+        note_types.find { |note_type| note_type.id == id }
+      end
     end
 
     ##
-    # Returns the collection object's deck with name +name+ or nil if it is not found
-    def find_deck_by(name: nil)
-      decks.find { |deck| deck.name == name }
+    # Returns the collection object's deck found by either name or id, and nil if it is not found.
+    def find_deck_by(name: nil, id: nil)
+      raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
+
+      if name
+        decks.find { |deck| deck.name == name }
+      elsif id
+        decks.find { |deck| deck.id == id }
+      end
     end
 
     ##
-    # Return's the collection object's note with id +id+ or nil if it is not found
+    # Returns the collection object's note with id +id+, or nil if it is not found.
     def find_note_by(id: nil)
-      data = anki_package.execute("select * from notes where id = '#{id}'").first
-      p data
+      note_data = anki_package.execute("select * from notes where id = '#{id}'").first
+      return nil unless note_data
+
+      note_type = find_note_type_by id: note_data["mid"]
+      cards_data = anki_package.execute("select * from cards where nid = '#{id}'")
+      deck = find_deck_by id: cards_data.first["did"]
+      AnkiRecord::Note.new note_type: note_type,
+                           deck: deck,
+                           data: { note_data: note_data, cards_data: cards_data }
     end
 
     private

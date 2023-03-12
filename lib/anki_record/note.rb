@@ -44,7 +44,7 @@ module AnkiRecord
     # An array of the card objects of the note
     attr_reader :cards
 
-    def initialize(note_type:, deck:)
+    def initialize(note_type:, deck:, data: nil)
       raise ArgumentError unless deck && note_type && deck.collection == note_type.collection
 
       @apkg = deck.collection.anki_package
@@ -60,12 +60,34 @@ module AnkiRecord
       @cards = @note_type.card_templates.map { |card_template| Card.new(note: self, card_template: card_template) }
       @flags = 0
       @data = ""
+
+      # Probably only pass this the data[:note_data] and pass
+      # the card constructor above the cards_data array
+      update_instance_variables_from_existing_data(data: data) if data
     end
+
+    private
+
+      def update_instance_variables_from_existing_data(data:)
+        note_data = data[:note_data]
+        @id = note_data["id"]
+        @guid = note_data["guid"]
+        @last_modified_time = note_data["mod"]
+        @usn = note_data["usn"]
+        @tags = note_data["tags"].split
+        snake_case_field_names_in_order = note_type.snake_case_field_names
+        note_data["flds"].split("\x1F").each_with_index do |fld, ordinal|
+          @fields[snake_case_field_names_in_order[ordinal]] = fld
+        end
+        @flags = note_data["flags"]
+        @data = note_data[""]
+      end
+
+    public
 
     ##
     # Save the note to the collection.anki21 database
     def save
-      # TODO: Refactor to prevent injection
       @apkg.execute <<~SQL
         insert into notes (id, guid, mid, mod,
                           usn, tags, flds, sfld,
