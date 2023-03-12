@@ -78,27 +78,5 @@ RSpec.describe AnkiRecord::Card do
         end
       end
     end
-    context "with valid note and card_templates arguments and the card_data argument with an already existing card data hash" do
-      let(:card_data_hash) do
-        { "id" => 1_678_650_585_538,
-          "nid" => 1_678_650_580_123,
-          "did" => 1,
-          "ord" => 0,
-          "mod" => 1_678_650_583,
-          "usn" => -1,
-          "type" => 0,
-          "queue" => 0,
-          "due" => 0,
-          "ivl" => 0,
-          "factor" => 0,
-          "reps" => 0,
-          "lapses" => 0,
-          "left" => 0,
-          "odue" => 0,
-          "odid" => 0,
-          "flags" => 0,
-          "data" => "{}" }
-      end
-    end
   end
 end

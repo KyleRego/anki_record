@@ -21,7 +21,7 @@ module AnkiRecord
     attr_reader :deck
 
     ##
-    # The collectio object that the card belongs to
+    # The collection object that the card belongs to
     attr_reader :collection
 
     ##
@@ -47,9 +47,17 @@ module AnkiRecord
 
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
-    def initialize(note:, card_template:, card_data: nil)
-      raise ArgumentError unless note && card_template && note.note_type == card_template.note_type
+    def initialize(note:, card_template: nil, card_data: nil)
+      if note && card_template && (note.note_type == card_template.note_type)
+        setup_instance_variables(note: note, card_template: card_template)
+      elsif note && card_data
+        setup_instance_variables_from_existing(note: note, card_data: card_data)
+      else
+        raise ArgumentError
+      end
+    end
 
+    def setup_instance_variables(note:, card_template:)
       @note = note
       @deck = @note.deck
       @collection = @deck.collection
@@ -72,17 +80,17 @@ module AnkiRecord
       @odid = 0
       @flags = 0
       @data = "{}"
-
-      update_instance_variables_from_existing_data(card_data: card_data) if card_data
     end
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
 
     private
 
-      def update_instance_variables_from_existing_data(card_data:)
+      def setup_instance_variables_from_existing(note:, card_data:)
+        @note = note
+        @collection = note.note_type.collection
+        @deck = collection.find_deck_by id: card_data["did"]
         @id = card_data["id"]
-        @deck = @collection.find_deck_by id: card_data["did"]
         @last_modified_time = card_data["mod"]
         @usn = card_data["usn"]
         @type = card_data["type"]

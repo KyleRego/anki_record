@@ -3,6 +3,9 @@
 RSpec.describe AnkiRecord::Note do
   let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
   let(:basic_note_type) { anki_package.collection.find_note_type_by name: "Basic" }
+  let(:basic_and_reversed_card_note_type) do
+    anki_package.collection.find_note_type_by name: "Basic (and reversed card)"
+  end
   let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
 
   subject(:note) { AnkiRecord::Note.new deck: default_deck, note_type: basic_note_type }
@@ -64,19 +67,29 @@ RSpec.describe AnkiRecord::Note do
         expect(note.cards.size).to eq note.note_type.card_templates.size
       end
     end
-    context "with valid note_type and deck arguments and the note_data argument with an already existing note data hash" do
-      let(:note_data_hash) do
-        { "id" => 1_678_650_580_123,
-          "guid" => "a58-a5b9-4",
-          "mid" => 1_676_902_364_661,
-          "mod" => 1_678_650_583,
-          "usn" => -1,
-          "tags" => "",
-          "flds" => "\u001F",
-          "sfld" => "",
-          "csum" => 3_661_210_606,
-          "flags" => 0,
-          "data" => "" }
+    context "with valid note_type, deck, and data arguments" do
+      context "and the data is from a 'Basic (optional reverse card)' note" do
+        before do
+          note = AnkiRecord::Note.new note_type: basic_and_reversed_card_note_type, deck: default_deck
+          note.front = "What is the ABC metric?"
+          note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
+          note.save
+          @note_id = note.id
+        end
+        let(:note_cards_data) { anki_package.collection.note_cards_data_for_note_id id: @note_id }
+        subject(:note_from_existing_record) do
+          AnkiRecord::Note.new collection: anki_package.collection, data: note_cards_data
+        end
+        it "should instantiate a note object" do
+          expect(note_from_existing_record).to be_a AnkiRecord::Note
+        end
+        it "should instantiate a note object with id attribute equal to the id of the note in the data" do
+          expect(note_from_existing_record.id).to eq note_cards_data[:note_data]["id"]
+        end
+        it "should instantiate a note object with cards attribute having a length of 2" do
+          expect(note_from_existing_record.cards.length).to eq 2
+        end
+        it "additional tests for all attributes of the note and 2 cards being set correctly"
       end
     end
   end

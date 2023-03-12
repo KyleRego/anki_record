@@ -97,16 +97,22 @@ module AnkiRecord
 
     ##
     # Returns the collection object's note with id +id+, or nil if it is not found.
-    def find_note_by(id: nil)
+    def find_note_by(id:)
+      note_cards_data = note_cards_data_for_note_id id: id
+      return nil unless note_cards_data
+
+      note_type = find_note_type_by id: note_cards_data[:note_data]["mid"]
+      deck = find_deck_by id: note_cards_data[:cards_data].first["did"]
+
+      AnkiRecord::Note.new data: note_cards_data
+    end
+
+    def note_cards_data_for_note_id(id:) # :nodoc:
       note_data = anki_package.execute("select * from notes where id = '#{id}'").first
       return nil unless note_data
 
-      note_type = find_note_type_by id: note_data["mid"]
       cards_data = anki_package.execute("select * from cards where nid = '#{id}'")
-      deck = find_deck_by id: cards_data.first["did"]
-      AnkiRecord::Note.new note_type: note_type,
-                           deck: deck,
-                           data: { note_data: note_data, cards_data: cards_data }
+      { note_data: note_data, cards_data: cards_data }
     end
 
     private

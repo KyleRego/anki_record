@@ -133,8 +133,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
           - find deck from note's card records
           - create note object and card objects in usual way
           - set their attributes from existing data
-            - Continue at spec/anki_record/note_spec.rb:67 and spec/anki_record/card_spec.rb:82
-              - Look at some real data to see what some different values could be for all the columns
+            - Continue at spec/anki_record/note_spec.rb:92
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content

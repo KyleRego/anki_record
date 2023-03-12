@@ -44,44 +44,50 @@ module AnkiRecord
     # An array of the card objects of the note
     attr_reader :cards
 
-    def initialize(note_type:, deck:, data: nil)
-      p data
-      raise ArgumentError unless deck && note_type && deck.collection == note_type.collection
-
-      @apkg = deck.collection.anki_package
-
-      @id = milliseconds_since_epoch
-      @guid = globally_unique_id
-      @last_modified_time = seconds_since_epoch
-      @usn = NEW_OBJECT_USN
-      @tags = []
-      @deck = deck
-      @note_type = note_type
-      @field_contents = setup_field_contents
-      @cards = @note_type.card_templates.map.with_index do |card_template, index|
-        if data
-          Card.new(note: self, card_template: card_template, card_data: data[:cards_data][index])
-        else
-          Card.new(note: self, card_template: card_template)
-        end
+    def initialize(note_type: nil, deck: nil, collection: nil, data: nil)
+      if note_type && deck && collection.nil? && data.nil? && (note_type.collection == deck.collection)
+        setup_instance_variables(note_type: note_type, deck: deck)
+      elsif collection && data
+        setup_instance_variables_from_existing(collection: collection,
+                                               note_data: data[:note_data], cards_data: data[:cards_data])
+      else
+        raise ArgumentError
       end
-      @flags = 0
-      @data = ""
-
-      update_instance_variables_from_existing_data(note_data: data[:note_data]) if data
     end
 
     private
 
-      def update_instance_variables_from_existing_data(note_data:)
+      def setup_instance_variables(note_type:, deck:)
+        @note_type = note_type
+        @deck = deck
+        @collection = deck.collection
+        @id = milliseconds_since_epoch
+        @guid = globally_unique_id
+        @last_modified_time = seconds_since_epoch
+        @usn = NEW_OBJECT_USN
+        @tags = []
+        @field_contents = setup_field_contents
+        @cards = @note_type.card_templates.map do |card_template|
+          Card.new(note: self, card_template: card_template)
+        end
+        @flags = 0
+        @data = ""
+      end
+
+      def setup_instance_variables_from_existing(collection:, note_data:, cards_data:)
+        @note_type = collection.find_note_type_by id: note_data["mid"]
         @id = note_data["id"]
         @guid = note_data["guid"]
         @last_modified_time = note_data["mod"]
         @usn = note_data["usn"]
         @tags = note_data["tags"].split
         snake_case_field_names_in_order = note_type.snake_case_field_names
+        @field_contents = setup_field_contents
         note_data["flds"].split("\x1F").each_with_index do |fld, ordinal|
-          @fields[snake_case_field_names_in_order[ordinal]] = fld
+          @field_contents[snake_case_field_names_in_order[ordinal]] = fld
+        end
+        @cards = @note_type.card_templates.map.with_index do |_card_template, index|
+          Card.new(note: self, card_data: cards_data[index])
         end
         @flags = note_data["flags"]
         @data = note_data[""]
@@ -92,7 +98,7 @@ module AnkiRecord
     ##
     # Save the note to the collection.anki21 database
     def save
-      @apkg.execute <<~SQL
+      @collection.anki_package.execute <<~SQL
         insert into notes (id, guid, mid, mod,
                           usn, tags, flds, sfld,
                           csum, flags, data)
