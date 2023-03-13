@@ -96,15 +96,12 @@ module AnkiRecord
     end
 
     ##
-    # Returns the collection object's note with id +id+, or nil if it is not found.
+    # Returns the collection object's note with id +id+ as a note object, or nil if it is not found.
     def find_note_by(id:)
       note_cards_data = note_cards_data_for_note_id id: id
       return nil unless note_cards_data
 
-      note_type = find_note_type_by id: note_cards_data[:note_data]["mid"]
-      deck = find_deck_by id: note_cards_data[:cards_data].first["did"]
-
-      AnkiRecord::Note.new data: note_cards_data
+      AnkiRecord::Note.new collection: self, data: note_cards_data
     end
 
     def note_cards_data_for_note_id(id:) # :nodoc:

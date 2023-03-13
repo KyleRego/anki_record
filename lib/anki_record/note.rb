@@ -27,10 +27,16 @@ module AnkiRecord
     attr_reader :last_modified_time
 
     ##
-    # The tags applied to the note
-    #
-    # TODO: a setter method for the tags of the note
+    # The note's update sequence number
+    attr_reader :usn
+
+    ##
+    # The note's tags as an array
     attr_reader :tags
+
+    ##
+    # The note's field contents as a hash
+    attr_reader :field_contents
 
     ##
     # The deck that the note's cards will be put into when saved
@@ -44,6 +50,16 @@ module AnkiRecord
     # An array of the card objects of the note
     attr_reader :cards
 
+    ##
+    # flags corresponds to the flags column in the collection.anki21 notes table
+    attr_reader :flags
+
+    ##
+    # data corresponds to the data column in the collection.anki21 notes table
+    attr_reader :data
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
     def initialize(note_type: nil, deck: nil, collection: nil, data: nil)
       if note_type && deck && collection.nil? && data.nil? && (note_type.collection == deck.collection)
         setup_instance_variables(note_type: note_type, deck: deck)
@@ -54,9 +70,12 @@ module AnkiRecord
         raise ArgumentError
       end
     end
+    # rubocop:enable Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     private
 
+      # rubocop:disable Metrics/MethodLength
       def setup_instance_variables(note_type:, deck:)
         @note_type = note_type
         @deck = deck
@@ -74,6 +93,7 @@ module AnkiRecord
         @data = ""
       end
 
+      # rubocop:disable Metrics/AbcSize
       def setup_instance_variables_from_existing(collection:, note_data:, cards_data:)
         @note_type = collection.find_note_type_by id: note_data["mid"]
         @id = note_data["id"]
@@ -90,8 +110,10 @@ module AnkiRecord
           Card.new(note: self, card_data: cards_data[index])
         end
         @flags = note_data["flags"]
-        @data = note_data[""]
+        @data = note_data["data"]
       end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
 
     public
 
@@ -114,9 +136,6 @@ module AnkiRecord
     # This overrides BasicObject#method_missing and has the effect of creating "ghost methods"
     #
     # Specifically, creates setter and getter ghost methods for the fields of the note's note type
-    #
-    # TODO: This should raise a NoMethodError if
-    # the missing method does not end with '=' and is not a field of the note type
     def method_missing(method_name, field_content = nil)
       method_name = method_name.to_s
       return @field_contents[method_name] unless method_name.end_with?("=")

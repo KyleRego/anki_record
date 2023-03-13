@@ -77,6 +77,7 @@ RSpec.describe AnkiRecord::Note do
           @note_id = note.id
         end
         let(:note_cards_data) { anki_package.collection.note_cards_data_for_note_id id: @note_id }
+        let(:note_data) { note_cards_data[:note_data] }
         subject(:note_from_existing_record) do
           AnkiRecord::Note.new collection: anki_package.collection, data: note_cards_data
         end
@@ -84,12 +85,47 @@ RSpec.describe AnkiRecord::Note do
           expect(note_from_existing_record).to be_a AnkiRecord::Note
         end
         it "should instantiate a note object with id attribute equal to the id of the note in the data" do
-          expect(note_from_existing_record.id).to eq note_cards_data[:note_data]["id"]
+          expect(note_from_existing_record.id).to eq note_data["id"]
+        end
+        it "should instantiate a note object with guid attribute equal to the guid of the note in the data" do
+          expect(note_from_existing_record.guid).to eq note_data["guid"]
+        end
+        it "should instantiate a note object with last_modified_time attribute equal to the mod of the note in the data" do
+          expect(note_from_existing_record.last_modified_time).to eq note_data["mod"]
+        end
+        it "should instantiate a note object with tags attribute equal to an empty array (because the note has no tags)" do
+          expect(note_from_existing_record.tags).to eq []
+        end
+        it "should instantiate a note object with usn attribute equal to the usn of the note in the data" do
+          expect(note_from_existing_record.usn).to eq note_data["usn"]
+        end
+        it "should instantiate a note object with field_contents attribute equal to a hash with the names of the fields as keys and contents as values" do
+          split_fields = note_data["flds"].split("\x1F")
+          expect(note_from_existing_record.field_contents).to eq ({ "back" => split_fields[1], "front" => split_fields[0] })
+        end
+        it "should instantiate a note object with flags attribute equal to the flags of the note in the data" do
+          expect(note_from_existing_record.flags).to eq note_data["flags"]
+        end
+        it "should instantiate a note object with data attribute equal to the data column value of the note in the data" do
+          expect(note_from_existing_record.data).to eq note_data["data"]
         end
         it "should instantiate a note object with cards attribute having a length of 2" do
           expect(note_from_existing_record.cards.length).to eq 2
         end
-        it "additional tests for all attributes of the note and 2 cards being set correctly"
+        it "should instantiate a note object with two card objects" do
+          note_from_existing_record.cards.each { |card| expect(card).to be_a AnkiRecord::Card }
+        end
+        context "should instantiate a note object with two card objects that" do
+          let(:cards_data) { note_cards_data[:cards_data] }
+          it "should have the note object as their note attribute" do
+            note_from_existing_record.cards.each { |card| expect(card.note).to eq note_from_existing_record }
+          end
+          it "should have id attributes equal to the ids of the card records in the data" do
+            expect(note_from_existing_record.cards.map(&:id)).to eq cards_data.map { |cd| cd["id"] }
+          end
+          it "should have guid attributes equal "
+          # STARTHERE
+        end
       end
     end
   end

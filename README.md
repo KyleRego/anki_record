@@ -133,7 +133,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
           - find deck from note's card records
           - create note object and card objects in usual way
           - set their attributes from existing data
-            - Continue at spec/anki_record/note_spec.rb:92
+            - Go to STARTHERE
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content
@@ -147,6 +147,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Use more specific RSpec matchers than `eq` everywhere
   - Reduce TODO comments
   - Investigate if note guid is determined in Anki in a non-random way
+  - Note method missing should throw an error if the missing method is not one it responds to
 
 ### Release checklist
 - Remove `require "pry"`
