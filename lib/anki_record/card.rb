@@ -43,7 +43,7 @@ module AnkiRecord
 
     ##
     # TODO: Investigate all these
-    attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags
+    attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags, :data
 
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
@@ -86,6 +86,8 @@ module AnkiRecord
 
     private
 
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
       def setup_instance_variables_from_existing(note:, card_data:)
         @note = note
         @collection = note.note_type.collection
@@ -106,6 +108,8 @@ module AnkiRecord
         @flags = card_data["flags"]
         @data = card_data["data"]
       end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
 
     public
 

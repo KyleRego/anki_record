@@ -43,7 +43,7 @@ module AnkiRecord
     # These represent groups of settings that can be applied to decks.
     attr_reader :deck_options_groups
 
-    def initialize(anki_package:)
+    def initialize(anki_package:) # :nodoc:
       setup_collection_instance_variables(anki_package: anki_package)
     end
 
@@ -73,6 +73,8 @@ module AnkiRecord
 
     ##
     # Returns the collection object's note type found by either name or id, and nil if it is not found.
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
     def find_note_type_by(name: nil, id: nil)
       raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
 
@@ -94,6 +96,8 @@ module AnkiRecord
         decks.find { |deck| deck.id == id }
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     ##
     # Returns the collection object's note with id +id+ as a note object, or nil if it is not found.

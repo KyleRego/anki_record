@@ -101,7 +101,7 @@ RSpec.describe AnkiRecord::Note do
         end
         it "should instantiate a note object with field_contents attribute equal to a hash with the names of the fields as keys and contents as values" do
           split_fields = note_data["flds"].split("\x1F")
-          expect(note_from_existing_record.field_contents).to eq ({ "back" => split_fields[1], "front" => split_fields[0] })
+          expect(note_from_existing_record.field_contents).to eq({ "back" => split_fields[1], "front" => split_fields[0] })
         end
         it "should instantiate a note object with flags attribute equal to the flags of the note in the data" do
           expect(note_from_existing_record.flags).to eq note_data["flags"]
@@ -117,14 +117,26 @@ RSpec.describe AnkiRecord::Note do
         end
         context "should instantiate a note object with two card objects that" do
           let(:cards_data) { note_cards_data[:cards_data] }
-          it "should have the note object as their note attribute" do
+          it "should have note attribute equal to the note object that is instantiated" do
             note_from_existing_record.cards.each { |card| expect(card.note).to eq note_from_existing_record }
           end
           it "should have id attributes equal to the ids of the card records in the data" do
-            expect(note_from_existing_record.cards.map(&:id)).to eq cards_data.map { |cd| cd["id"] }
+            expect(note_from_existing_record.cards.map(&:id)).to eq(cards_data.map { |cd| cd["id"] })
           end
-          it "should have guid attributes equal "
-          # STARTHERE
+          it "should have last_modified_time attributes equal to the mod values of the card records in the data" do
+            expect(note_from_existing_record.cards.map(&:last_modified_time)).to eq(cards_data.map { |cd| cd["mod"] })
+          end
+          it "should have deck attribute equal to the deck object with id equal to the did of the card records in the data" do
+            expect(note_from_existing_record.cards.map(&:deck)).to eq(cards_data.map do |cd|
+              note_from_existing_record.collection.find_deck_by id: cd["did"]
+            end)
+          end
+          it "should have usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, and data attributes
+              that are equal to these fields with the same name in the cards data" do
+                %w[usn type queue due ivl factor reps lapses left odue odid flags data].each do |field|
+                  expect(note_from_existing_record.cards.map { |card| card.send(field.to_sym) }).to eq(cards_data.map { |cd| cd[field] })
+                end
+              end
         end
       end
     end

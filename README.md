@@ -1,6 +1,8 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases). **It is in an early stage of development and the API is not stable. I do not recommend you try it yet.**
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases).
+
+**It is in an early stage of development and the API is not stable.**
 
 ## Installation
 
@@ -127,13 +129,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Updating notes when they already exist in the database
     - Continue working on `Collection#find_note_by`
       - Need to be able to instantiate notes/cards from existing data
-        - Rather than overload the constructors, I'm thinking it should be managed by methods of Collection
-          - take note record
-          - find existing note type, create one if it doesn't exist
-          - find deck from note's card records
-          - create note object and card objects in usual way
-          - set their attributes from existing data
-            - Go to STARTHERE
+      - Need to be able to update note/cards that are already saved to the database
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content

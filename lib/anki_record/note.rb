@@ -47,6 +47,10 @@ module AnkiRecord
     attr_reader :note_type
 
     ##
+    # The collection object
+    attr_reader :collection # TODO: tests
+
+    ##
     # An array of the card objects of the note
     attr_reader :cards
 
@@ -95,6 +99,7 @@ module AnkiRecord
 
       # rubocop:disable Metrics/AbcSize
       def setup_instance_variables_from_existing(collection:, note_data:, cards_data:)
+        @collection = collection
         @note_type = collection.find_note_type_by id: note_data["mid"]
         @id = note_data["id"]
         @guid = note_data["guid"]
