@@ -11,6 +11,7 @@ require_relative "db/clean_collection2_record"
 require_relative "db/clean_collection21_record"
 require_relative "collection"
 
+# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
   # Represents an Anki package
@@ -33,6 +34,10 @@ module AnkiRecord
 
     def execute(raw_sql_string) # :nodoc:
       @anki21_database.execute raw_sql_string
+    end
+
+    def prepare(sql) # :nodoc:
+      @anki21_database.prepare sql
     end
 
     private
@@ -156,7 +161,6 @@ module AnkiRecord
       end
 
       def destroy_temporary_directory
-        @anki21_database.close
         FileUtils.rm_rf(@tmpdir)
       end
 
@@ -171,3 +175,4 @@ module AnkiRecord
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

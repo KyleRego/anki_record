@@ -115,17 +115,20 @@ module AnkiRecord
 
     ##
     # Saves the card to the collection.anki21 database
+    # rubocop:disable Metrics/MethodLength
     def save
-      @anki_package.execute <<~SQL
+      statement = @anki_package.prepare  <<~SQL
         insert into cards (id, nid, did, ord,
                           mod, usn, type, queue,
                           due, ivl, factor, reps,
                           lapses, left, odue, odid, flags, data)
-                    values ('#{@id}', '#{@note.id}', '#{@deck.id}', '#{@card_template.ordinal_number}',
-                           '#{@last_modified_time}', '#{@usn}', '#{@type}', '#{@queue}',
-                           '#{@due}', '#{@ivl}', '#{@factor}', '#{@reps}',
-                           '#{@lapses}', '#{@left}', '#{@odue}', '#{@odid}', '#{@flags}', '#{@data}')
+                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       SQL
+      statement.execute [@id, @note.id, @deck.id, @card_template.ordinal_number,
+                         @last_modified_time, @usn, @type, @queue,
+                         @due, @ivl, @factor, @reps,
+                         @lapses, @left, @odue, @odid, @flags, @data]
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end

@@ -67,7 +67,7 @@ RSpec.describe AnkiRecord::Note do
         expect(note.cards.size).to eq note.note_type.card_templates.size
       end
     end
-    context "with valid note_type, deck, and data arguments" do
+    context "with valid collection and data arguments" do
       context "and the data is from a 'Basic (optional reverse card)' note" do
         before do
           note = AnkiRecord::Note.new note_type: basic_and_reversed_card_note_type, deck: default_deck
@@ -143,7 +143,7 @@ RSpec.describe AnkiRecord::Note do
   end
 
   describe "#save" do
-    context "for a note with 2 card templates" do
+    context "for a note with 2 card templates, that does not exist yet in the collection.anki21 database" do
       subject(:note_with_two_cards) do
         crazy_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "crazy note type"
         AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
@@ -233,6 +233,7 @@ RSpec.describe AnkiRecord::Note do
         end
       end
     end
+    context "for a note with 2 card templates, that does already exist yet the collection.anki21 database"
   end
 
   describe "#method_missing" do
@@ -248,6 +249,11 @@ RSpec.describe AnkiRecord::Note do
           expect(note.front).to eq "Content of the note Front field"
         end
       end
+    end
+    context "when the missing method does not end with '=" do
+      context "but the method does not correspond to one of the snake_case note type field names"
+
+      context "and the method corresponds to one of the snake_card note type field names"
     end
   end
 
