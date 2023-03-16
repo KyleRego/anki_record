@@ -93,7 +93,7 @@ RSpec.describe AnkiRecord::NoteType do
     end
     # TODO: These specs can be written in a much more DRY way
 
-    let(:col_models_hash) { JSON.parse(collection_argument.anki_package.execute("select models from col;").first["models"]) }
+    let(:col_models_hash) { collection_argument.models_json }
     let(:crazy_note_type_hash) do
       col_models_hash[crazy_note_type.id.to_s]
     end

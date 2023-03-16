@@ -162,10 +162,10 @@ RSpec.describe AnkiRecord::Note do
       end
       before { note_with_two_cards.save }
       it "should save a note record to the collection.anki21 database" do
-        expect(anki_package.execute("select count(*) from notes;").first["count(*)"]).to eq 1
+        expect(anki_package.prepare("select count(*) from notes;").execute.first["count(*)"]).to eq 1
       end
       context "should save a note record to the collection.anki21 database" do
-        let(:note_record_data) { anki_package.execute("select * from notes;").first }
+        let(:note_record_data) { anki_package.prepare("select * from notes;").execute.first }
         it "with an id value equal to the id of the note object" do
           expect(note_record_data["id"]).to eq note_with_two_cards.id
         end
@@ -201,10 +201,10 @@ RSpec.describe AnkiRecord::Note do
         end
       end
       it "should save two card records to the collection.anki21 database" do
-        expect(anki_package.execute("select count(*) from cards;").first["count(*)"]).to eq 2
+        expect(anki_package.prepare("select count(*) from cards").execute.first["count(*)"]).to eq 2
       end
       context "should save two card records to the collection.anki21 database" do
-        let(:cards_records_data) { anki_package.execute("select * from cards;") }
+        let(:cards_records_data) { anki_package.prepare("select * from cards").execute.to_a }
         it "with id values equal to the ids of the card objects" do
           expect(cards_records_data.map { |hash| hash["id"] }.sort).to eq note_with_two_cards.cards.map(&:id).sort
         end

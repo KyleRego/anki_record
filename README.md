@@ -138,7 +138,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Setter for the CSS of note types
   - Other setters for attributes of the note types, decks, and deck options groups
 - Refactoring
-  - Use only prepared SQL statements
   - Specs need to be refactored to be more DRY and also start using doubles to improve performance
   - Use more specific RSpec matchers than `eq` everywhere
   - Reduce TODO comments

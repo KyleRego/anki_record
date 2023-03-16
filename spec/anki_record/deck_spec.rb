@@ -94,9 +94,7 @@ RSpec.describe AnkiRecord::Deck do
     subject(:crazy_deck) do
       AnkiRecord::Deck.new name: crazy_deck_name, collection: collection_argument
     end
-
-    # TODO: Another place where a collection method to get the col_decks_hash would be useful
-    let(:col_decks_hash) { JSON.parse(collection_argument.anki_package.execute("select decks from col;").first["decks"]) }
+    let(:col_decks_hash) { collection_argument.decks_json }
     let(:crazy_deck_hash) { col_decks_hash[crazy_deck.id.to_s] }
 
     before { crazy_deck.save }

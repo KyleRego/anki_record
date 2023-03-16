@@ -8,18 +8,19 @@ require_relative "helpers/time_helper"
 
 module AnkiRecord
   ##
-  # Represents an Anki note
+  # Represents an Anki note. The note object corresponds to a record in the `notes`
+  # table in the collection.anki21 database.
   class Note
     include ChecksumHelper
     include TimeHelper
     include SharedConstantsHelper
 
     ##
-    # The id of the note
+    # The note's id
     attr_reader :id
 
     ##
-    # The globally unique id of the note
+    # The note's globally unique id
     attr_reader :guid
 
     ##
@@ -55,11 +56,11 @@ module AnkiRecord
     attr_reader :cards
 
     ##
-    # flags corresponds to the flags column in the collection.anki21 notes table
+    # Corresponds to the flags column in the collection.anki21 notes table
     attr_reader :flags
 
     ##
-    # data corresponds to the data column in the collection.anki21 notes table
+    # Corresponds to the data column in the collection.anki21 notes table
     attr_reader :data
 
     # rubocop:disable Metrics/CyclomaticComplexity
@@ -123,24 +124,23 @@ module AnkiRecord
     public
 
     ##
-    # Save the note to the collection.anki21 database
+    # Saves the note to the collection.anki21 database.
     def save
-      @collection.anki_package.execute <<~SQL
-        insert into notes (id, guid, mid, mod,
-                          usn, tags, flds, sfld,
-                          csum, flags, data)
-                    values ('#{@id}', '#{@guid}', '#{note_type.id}', '#{@last_modified_time}',
-                          '#{@usn}', '#{@tags.join(" ")}', '#{field_values_separated_by_us}', '#{sort_field_value}',
-                          '#{checksum(sort_field_value)}', '#{@flags}', '#{@data}')
+      statement = @collection.anki_package.prepare <<~SQL
+        insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
+                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       SQL
+      statement.execute([@id, @guid, note_type.id, @last_modified_time,
+                         @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
+                         checksum(sort_field_value), @flags, @data])
       cards.each(&:save)
       true
     end
 
     ##
-    # This overrides BasicObject#method_missing and has the effect of creating "ghost methods"
+    # Overrides BasicObject#method_missing and creates "ghost methods."
     #
-    # Specifically, creates setter and getter ghost methods for the fields of the note's note type
+    # The ghost methods are the setters and getters for the note field values.
     def method_missing(method_name, field_content = nil)
       method_name = method_name.to_s
       return @field_contents[method_name] unless method_name.end_with?("=")

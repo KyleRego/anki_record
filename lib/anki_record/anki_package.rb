@@ -11,17 +11,16 @@ require_relative "db/clean_collection2_record"
 require_relative "db/clean_collection21_record"
 require_relative "collection"
 
-# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
-  # Represents an Anki package
+  # Represents an Anki package.
   class AnkiPackage
     ##
-    # The collection object of the package
+    # The package's collection object.
     attr_reader :collection
 
     ##
-    # Creates a new object which represents an Anki package. See README for details.
+    # Instantiates a new Anki package object. See the README for usage details.
     def initialize(name:, directory: Dir.pwd, &closure)
       check_name_argument_is_valid(name:)
       @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
@@ -32,10 +31,8 @@ module AnkiRecord
       execute_closure_and_zip(self, &closure) if block_given?
     end
 
-    def execute(raw_sql_string) # :nodoc:
-      @anki21_database.execute raw_sql_string
-    end
-
+    # Returns an SQLite3::Statement object representing the given SQL.
+    # The Statement is executed using Statement#execute (refer to the sqlite3 gem documentation).
     def prepare(sql) # :nodoc:
       @anki21_database.prepare sql
     end
@@ -114,10 +111,11 @@ module AnkiRecord
     public
 
     ##
-    # Creates a new object which represents a copy of an already existing Anki package. See README for details.
+    # Instantiates a new object which is a copy of an already existing Anki package. See README for details.
     def self.open(path:, target_directory: nil, &closure)
       pathname = Pathname.new(path)
-      check_file_is_valid_at pathname: pathname
+      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
+
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
 
       @anki_package = if target_directory
@@ -131,16 +129,11 @@ module AnkiRecord
 
     class << self
       include TimeHelper
-
-      private
-
-        def check_file_is_valid_at(pathname:)
-          raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
-        end
     end
 
     ##
-    # Zips the temporary files into the *.apkg package file, and then deletes the temporary files.
+    # Zips the temporary files (collection.anki21, collection.anki2, and media) into the *.apkg package file.
+    # The temporary files, and the temporary directory they were in, are deleted after zipping.
     def zip
       create_zip_file && destroy_temporary_directory
     end
@@ -175,4 +168,3 @@ module AnkiRecord
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

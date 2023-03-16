@@ -57,12 +57,10 @@ module AnkiRecord
     ##
     # Saves the deck to the collection.anki21 database
     def save
-      # TODO: should accessing the decks data be a method of collection? and other similar methods, e.g. col_decks_hash
-      collection_decks_hash = JSON.parse(collection.anki_package.execute("select decks from col;").first["decks"])
+      collection_decks_hash = collection.decks_json
       collection_decks_hash[@id] = to_h
-      collection.anki_package.execute <<~SQL
-        update col set decks = '#{JSON.generate(collection_decks_hash)}' where id = '#{collection.id}'
-      SQL
+      sql = "update col set decks = ? where id = ?"
+      collection.anki_package.prepare(sql).execute([JSON.generate(collection_decks_hash), collection.id])
     end
 
     def to_h # :nodoc:

@@ -109,11 +109,19 @@ module AnkiRecord
     end
 
     def note_cards_data_for_note_id(id:) # :nodoc:
-      note_data = anki_package.execute("select * from notes where id = '#{id}'").first
+      note_data = anki_package.prepare("select * from notes where id = ?").execute([id]).first
       return nil unless note_data
 
-      cards_data = anki_package.execute("select * from cards where nid = '#{id}'")
+      cards_data = anki_package.prepare("select * from cards where nid = ?").execute([id]).to_a
       { note_data: note_data, cards_data: cards_data }
+    end
+
+    def decks_json # :nodoc:
+      JSON.parse(anki_package.prepare("select decks from col;").execute.first["decks"])
+    end
+
+    def models_json # :nodoc:
+      JSON.parse(anki_package.prepare("select models from col;").execute.first["models"])
     end
 
     private
@@ -126,7 +134,7 @@ module AnkiRecord
       end
 
       def col_record
-        @col_record ||= @anki_package.execute("select * from col;").first
+        @col_record ||= @anki_package.prepare("select * from col").execute.first
       end
 
       # rubocop:disable Metrics/AbcSize

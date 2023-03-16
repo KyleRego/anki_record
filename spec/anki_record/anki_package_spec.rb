@@ -107,7 +107,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
     end
     it "should save the temporary collection.anki21 database with with the following 5 tables: cards, col, graves, notes, revlog" do
       expected_tables = %w[cards col graves notes revlog]
-      result = anki_package.instance_variable_get(:@anki21_database).execute("select name from sqlite_master where type = 'table'").map do |hash|
+      result = anki_package.instance_variable_get(:@anki21_database).prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
         hash["name"]
       end.sort
       expect(result).to eq expected_tables
@@ -115,13 +115,13 @@ RSpec.describe AnkiRecord::AnkiPackage do
     it "should save the temporary collection.anki21 database with with 7 indexes:
       ix_cards_nid, ix_cards_sched, ix_cards_usn, ix_notes_csum, ix_notes_usn, ix_revlog_cid, ix_revlog_usn" do
       expected_indexes = %w[ix_cards_nid ix_cards_sched ix_cards_usn ix_notes_csum ix_notes_usn ix_revlog_cid ix_revlog_usn].sort
-      result = anki_package.instance_variable_get(:@anki21_database).execute("select name from sqlite_master where type = 'index'").map do |hash|
+      result = anki_package.instance_variable_get(:@anki21_database).prepare("select name from sqlite_master where type = 'index'").execute.map do |hash|
         hash["name"]
       end.sort
       expect(result).to eq expected_indexes
     end
     it "should save the temporary collection.anki21 database with 1 record in the col table" do
-      result = anki_package.instance_variable_get(:@anki21_database).execute("select count(*) from col").first["count(*)"]
+      result = anki_package.instance_variable_get(:@anki21_database).prepare("select count(*) from col").execute.first["count(*)"]
 
       expect(result).to eq 1
     end

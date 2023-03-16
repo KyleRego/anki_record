@@ -87,11 +87,10 @@ module AnkiRecord
     ##
     # Saves the note type to the collection.anki21 database
     def save
-      collection_models_hash = JSON.parse(collection.anki_package.execute("select models from col;").first["models"])
+      collection_models_hash = collection.models_json
       collection_models_hash[@id] = to_h
-      collection.anki_package.execute <<~SQL
-        update col set models = '#{JSON.generate(collection_models_hash)}' where id = '#{collection.id}'
-      SQL
+      sql = "update col set models = ? where id = ?"
+      collection.anki_package.prepare(sql).execute([JSON.generate(collection_models_hash), collection.id])
     end
 
     def to_h # :nodoc:
