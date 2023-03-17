@@ -33,8 +33,8 @@ RSpec.describe AnkiRecord do
 
       AnkiRecord::AnkiPackage.open(path: "./crazy.apkg") do |apkg|
         collection = apkg.collection
-
         note = collection.find_note_by id: note_id
+        puts "DID NOT FIND NOTE" unless note
         note.crazy_back = "Ruby"
         note.save
       end

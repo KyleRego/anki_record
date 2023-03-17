@@ -33,7 +33,7 @@ module AnkiRecord
 
     # Returns an SQLite3::Statement object representing the given SQL.
     # The Statement is executed using Statement#execute (refer to the sqlite3 gem documentation).
-    def prepare(sql) # :nodoc:
+    def prepare(sql)
       @anki21_database.prepare sql
     end
 
@@ -123,8 +123,19 @@ module AnkiRecord
                       else
                         new(name: new_apkg_name)
                       end
+      @anki_package.copy_over_existing_data(pathname: pathname)
       @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
       @anki_package
+    end
+
+    # CONTINUE HERE
+    def copy_over_existing_data(pathname:)
+      Zip::File.open(pathname) do |zip_file|
+        zip_file.each do |entry|
+          next unless entry.name == "collection.anki21"
+          p entry
+        end
+      end
     end
 
     class << self

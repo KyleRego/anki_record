@@ -113,21 +113,31 @@ module AnkiRecord
 
     public
 
-    ##
-    # Saves the card to the collection.anki21 database
     # rubocop:disable Metrics/MethodLength
-    def save
-      statement = @anki_package.prepare  <<~SQL
-        insert into cards (id, nid, did, ord,
-                          mod, usn, type, queue,
-                          due, ivl, factor, reps,
-                          lapses, left, odue, odid, flags, data)
-                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      SQL
-      statement.execute [@id, @note.id, @deck.id, @card_template.ordinal_number,
-                         @last_modified_time, @usn, @type, @queue,
-                         @due, @ivl, @factor, @reps,
-                         @lapses, @left, @odue, @odid, @flags, @data]
+    def save(note_exists_already: false) # :nodoc:
+      if note_exists_already
+        statement = @anki_package.prepare <<~SQL
+          update cards set nid = ?, did = ?, ord = ?, mod = ?, usn = ?, type = ?,
+                            queue = ?, due = ?, ivl = ?, factor = ?, reps = ?, lapses = ?,
+                            left = ?, odue = ?, odid = ?, flags = ?, data = ? where id = ?
+        SQL
+        statement.execute [@note.id, @deck.id, @card_template.ordinal_number,
+                           @last_modified_time, @usn, @type, @queue,
+                           @due, @ivl, @factor, @reps,
+                           @lapses, @left, @odue, @odid, @flags, @data, @id]
+      else
+        statement = @anki_package.prepare  <<~SQL
+          insert into cards (id, nid, did, ord,
+                            mod, usn, type, queue,
+                            due, ivl, factor, reps,
+                            lapses, left, odue, odid, flags, data)
+                      values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        SQL
+        statement.execute [@id, @note.id, @deck.id, @card_template.ordinal_number,
+                           @last_modified_time, @usn, @type, @queue,
+                           @due, @ivl, @factor, @reps,
+                           @lapses, @left, @odue, @odid, @flags, @data]
+      end
     end
     # rubocop:enable Metrics/MethodLength
   end

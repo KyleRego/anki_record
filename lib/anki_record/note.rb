@@ -10,6 +10,7 @@ module AnkiRecord
   ##
   # Represents an Anki note. The note object corresponds to a record in the `notes`
   # table in the collection.anki21 database.
+  # rubocop:disable Metrics/ClassLength
   class Note
     include ChecksumHelper
     include TimeHelper
@@ -125,17 +126,33 @@ module AnkiRecord
 
     ##
     # Saves the note to the collection.anki21 database.
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def save
-      statement = @collection.anki_package.prepare <<~SQL
-        insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
-                    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      SQL
-      statement.execute([@id, @guid, note_type.id, @last_modified_time,
-                         @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
-                         checksum(sort_field_value), @flags, @data])
-      cards.each(&:save)
+      if collection.find_note_by id: @id
+        statement = @collection.anki_package.prepare <<~SQL
+          update notes set guid = ?, mid = ?, mod = ?, usn = ?, tags = ?,
+                                     flds = ?, sfld = ?, csum = ?, flags = ?, data = ?
+                           where id = ?
+        SQL
+        statement.execute([@guid, note_type.id, @last_modified_time,
+                           @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
+                           checksum(sort_field_value), @flags, @data, @id])
+        cards.each { |card| card.save(note_exists_already: true) }
+      else
+        statement = @collection.anki_package.prepare <<~SQL
+          insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
+                      values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        SQL
+        statement.execute([@id, @guid, note_type.id, @last_modified_time,
+                           @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
+                           checksum(sort_field_value), @flags, @data])
+        cards.each(&:save)
+      end
       true
     end
+    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
 
     ##
     # Overrides BasicObject#method_missing and creates "ghost methods."
@@ -189,4 +206,5 @@ module AnkiRecord
         @field_contents[note_type.snake_case_sort_field_name]
       end
   end
+  # rubocop:enable Metrics/ClassLength
 end

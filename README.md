@@ -125,11 +125,11 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
+- Need to be able to copy the contents of an existing package into the new package when it is opened
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
   - Updating notes when they already exist in the database
-    - Continue working on `Collection#find_note_by`
-      - Need to be able to instantiate notes/cards from existing data
-      - Need to be able to update note/cards that are already saved to the database
+    - Need to be able to instantiate notes/cards from existing data
+    - Need to be able to update note/cards that are already saved to the database
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content

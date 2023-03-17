@@ -143,29 +143,34 @@ RSpec.describe AnkiRecord::Note do
   end
 
   describe "#save" do
+    subject(:note_with_two_cards) do
+      crazy_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "crazy note type"
+      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+      crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+      crazy_card_template.question_format = "{{crazy front}}"
+      crazy_card_template.answer_format = "{{crazy back}}"
+      second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+      second_crazy_card_template.question_format = "{{crazy back}}"
+      second_crazy_card_template.answer_format = "{{crazy front}}"
+      crazy_note_type.save
+      note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+      note.crazy_front = "Hello"
+      note.crazy_back = "World"
+      note
+    end
+    let(:note_record_data) { anki_package.prepare("select * from notes where id = #{note_with_two_cards.id}").execute.first }
+    let(:cards_records_data) { anki_package.prepare("select * from cards where nid = #{note_with_two_cards.id}").execute.to_a }
+    let(:note_count) { anki_package.prepare("select count(*) from notes;").execute.first["count(*)"] }
+    let(:cards_count) { anki_package.prepare("select count(*) from cards").execute.first["count(*)"] }
+    let(:expected_number_of_notes) { 1 }
+    let(:expected_number_of_cards) { 2 }
     context "for a note with 2 card templates, that does not exist yet in the collection.anki21 database" do
-      subject(:note_with_two_cards) do
-        crazy_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "crazy note type"
-        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
-        AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-        crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
-        crazy_card_template.question_format = "{{crazy front}}"
-        crazy_card_template.answer_format = "{{crazy back}}"
-        second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
-        second_crazy_card_template.question_format = "{{crazy back}}"
-        second_crazy_card_template.answer_format = "{{crazy front}}"
-        crazy_note_type.save
-        note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
-        note.crazy_front = "Hello"
-        note.crazy_back = "World"
-        note
-      end
       before { note_with_two_cards.save }
       it "should save a note record to the collection.anki21 database" do
-        expect(anki_package.prepare("select count(*) from notes;").execute.first["count(*)"]).to eq 1
+        expect(note_count).to eq expected_number_of_notes
       end
       context "should save a note record to the collection.anki21 database" do
-        let(:note_record_data) { anki_package.prepare("select * from notes;").execute.first }
         it "with an id value equal to the id of the note object" do
           expect(note_record_data["id"]).to eq note_with_two_cards.id
         end
@@ -201,10 +206,9 @@ RSpec.describe AnkiRecord::Note do
         end
       end
       it "should save two card records to the collection.anki21 database" do
-        expect(anki_package.prepare("select count(*) from cards").execute.first["count(*)"]).to eq 2
+        expect(cards_count).to eq expected_number_of_cards
       end
       context "should save two card records to the collection.anki21 database" do
-        let(:cards_records_data) { anki_package.prepare("select * from cards").execute.to_a }
         it "with id values equal to the ids of the card objects" do
           expect(cards_records_data.map { |hash| hash["id"] }.sort).to eq note_with_two_cards.cards.map(&:id).sort
         end
@@ -233,7 +237,32 @@ RSpec.describe AnkiRecord::Note do
         end
       end
     end
-    context "for a note with 2 card templates, that does already exist yet the collection.anki21 database"
+    context "for a note with 2 card templates, that does already exist yet the collection.anki21 database, but with unsaved field changes" do
+      let(:new_crazy_front) { "What does the cow say?" }
+      let(:new_crazy_back) { "moo"}
+      subject(:already_saved_note_with_two_cards) do
+        already_saved_note_with_two_cards = note_with_two_cards
+        already_saved_note_with_two_cards.save
+        already_saved_note_with_two_cards.crazy_front = new_crazy_front
+        already_saved_note_with_two_cards.crazy_back = new_crazy_back
+        already_saved_note_with_two_cards
+      end
+      before { already_saved_note_with_two_cards.save }
+      it "should not change the number of notes in the database" do
+        expect(note_count).to eq expected_number_of_notes
+      end
+      context "should update the already existing note" do
+        it "such that the flds value is equal to a string with the two new field values separated by a unit separator" do
+          expect(note_record_data["flds"]).to eq "#{new_crazy_front}\x1F#{new_crazy_back}"
+        end
+        it "such that the sfld value is equal to the sort field, in this case the default, which is the first field" do
+          expect(note_record_data["sfld"]).to eq new_crazy_front
+        end
+      end
+      it "should not change the number of cards in the database" do
+        expect(cards_count).to eq expected_number_of_cards
+      end
+    end
   end
 
   describe "#method_missing" do

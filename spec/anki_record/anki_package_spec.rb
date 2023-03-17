@@ -156,8 +156,8 @@ RSpec.describe AnkiRecord::AnkiPackage do
   context "::new with a block argument that throws an error" do
     let(:closure_argument) { proc { raise "runtime error" } }
 
-    # silence output from the rescue clause which puts the error
-    before { expect($stdout).to receive(:write) }
+    # Silence output from the rescue clause which puts the error
+    before { expect($stdout).to receive(:write).at_least(:once) }
 
     it "should delete the temporary directory" do
       expect_the_temporary_directory_to_not_exist
@@ -311,8 +311,8 @@ RSpec.describe AnkiRecord::AnkiPackage do
     context "with a block argument that throws an error" do
       let(:closure_argument) { proc { raise "runtime error" } }
 
-      # silence output from the rescue clause which puts the error
-      before { expect($stdout).to receive(:write) }
+      # Silence output from the rescue clause which puts the error
+      before { expect($stdout).to receive(:write).at_least(:once) }
 
       it "should delete the temporary directory" do
         expect_the_temporary_directory_to_not_exist
@@ -321,6 +321,40 @@ RSpec.describe AnkiRecord::AnkiPackage do
       it "should not create a new *.apkg-number where number is the number of seconds since the epoch" do
         anki_package_from_existing
         expect(Dir.entries(".").select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
+      end
+    end
+
+    context "with a path argument to an anki package that has a custom note type note with 2 cards already" do
+      let(:path_argument) { "./crazy.apkg" }
+      before do
+        AnkiRecord::AnkiPackage.new(name: path_argument) do |apkg|
+          collection = apkg.collection
+          default_deck = collection.find_deck_by name: "Default"
+          crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
+          AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+          AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+          crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+          crazy_card_template.question_format = "{{crazy front}}"
+          crazy_card_template.answer_format = "{{crazy back}}"
+          second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+          second_crazy_card_template.question_format = "{{crazy back}}"
+          second_crazy_card_template.answer_format = "{{crazy front}}"
+          crazy_note_type.save
+
+          note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+          note.crazy_front = "Hello"
+          note.crazy_back = "World"
+          note.save
+          @note_id = note.id
+        end
+      end
+      context "should copy the note and card records from the existing collection.anki21 database" do
+        it "such that the note record is present in the new collection.anki21 database" do
+          AnkiRecord::AnkiPackage.open(path: path_argument) do |apkg|
+            collection = apkg.collection
+            expect(collection.find_note_by id: @note_id).to be_a AnkiRecord::Note
+          end
+        end
       end
     end
   end
