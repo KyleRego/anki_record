@@ -15,18 +15,22 @@ module AnkiRecord
   ##
   # Represents an Anki package.
   class AnkiPackage
+    include AnkiRecord::DataQueryHelper
+
     ##
     # The package's collection object.
     attr_reader :collection
 
     ##
     # Instantiates a new Anki package object. See the README for usage details.
-    def initialize(name:, directory: Dir.pwd, &closure)
+    def initialize(name:, target_directory: Dir.pwd, data: nil, open_path: nil, &closure)
       check_name_argument_is_valid(name:)
       @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
-      @directory = directory
+      @target_directory = target_directory
+      @open_path = open_path
       check_directory_argument_is_valid
       setup_other_package_instance_variables
+      insert_existing_data(data: data) if data
 
       execute_closure_and_zip(self, &closure) if block_given?
     end
@@ -64,7 +68,7 @@ module AnkiRecord
       end
 
       def check_directory_argument_is_valid
-        raise ArgumentError, "No directory was found at the given path." unless File.directory?(@directory)
+        raise ArgumentError, "No directory was found at the given path." unless File.directory?(@target_directory)
       end
 
       def setup_anki21_database_object
@@ -96,6 +100,29 @@ module AnkiRecord
         media_file
       end
 
+      def insert_existing_data(data:)
+        @collection.copy_over_existing(col_record: data[:col_record])
+        copy_over_notes_and_cards(note_ids: data[:note_ids])
+      end
+
+      def copy_over_notes_and_cards(note_ids:)
+        Zip::File.open(@open_path) do |zip_file|
+          zip_file.each do |entry|
+            next unless entry.name == "collection.anki21"
+
+            entry.extract
+            existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
+            existing_collection_anki21.results_as_hash = true
+            
+            note_ids.each do |note_id|
+              note_cards_data = note_cards_data_for_note_id(sql_able: existing_collection_anki21, id: note_id)
+              AnkiRecord::Note.new(collection: @collection, data: note_cards_data).save
+            end
+          end
+        end
+        File.delete("collection.anki21")
+      end
+
       def standard_error_thrown_in_block_message
         <<-MSG
         An error occurred.
@@ -117,29 +144,37 @@ module AnkiRecord
       raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
 
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
+      data = col_record_and_note_ids_to_copy_over(pathname: pathname)
 
       @anki_package = if target_directory
-                        new(name: new_apkg_name, directory: target_directory)
+                        new(name: new_apkg_name, target_directory: target_directory, data: data, open_path: pathname)
                       else
-                        new(name: new_apkg_name)
+                        new(name: new_apkg_name, data: data, open_path: pathname)
                       end
-      @anki_package.copy_over_existing_data(pathname: pathname)
       @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
       @anki_package
     end
 
-    # CONTINUE HERE
-    def copy_over_existing_data(pathname:)
-      Zip::File.open(pathname) do |zip_file|
-        zip_file.each do |entry|
-          next unless entry.name == "collection.anki21"
-          p entry
-        end
-      end
-    end
-
     class << self
       include TimeHelper
+
+      def col_record_and_note_ids_to_copy_over(pathname:) # :nodoc:
+        data = {}
+        Zip::File.open(pathname) do |zip_file|
+          zip_file.each do |entry|
+            next unless entry.name == "collection.anki21"
+
+            entry.extract
+            existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
+            existing_collection_anki21.results_as_hash = true
+            col_record = existing_collection_anki21.prepare("select * from col").execute.first
+            note_ids = existing_collection_anki21.prepare("select id from notes").execute.map { |note| note["id"] }
+            data = { col_record: col_record, note_ids: note_ids }
+          end
+        end
+        File.delete("collection.anki21")
+        data
+      end
     end
 
     ##
@@ -161,7 +196,7 @@ module AnkiRecord
       end
 
       def target_zip_file
-        "#{@directory}/#{@name}.apkg"
+        "#{@target_directory}/#{@name}.apkg"
       end
 
       def destroy_temporary_directory

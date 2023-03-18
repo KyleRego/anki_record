@@ -5,6 +5,7 @@ require "json"
 
 require_relative "deck"
 require_relative "deck_options_group"
+require_relative "helpers/data_query_helper"
 require_relative "helpers/time_helper"
 require_relative "note_type"
 
@@ -12,6 +13,7 @@ module AnkiRecord
   ##
   # Collection represents the single record in the Anki database `col` table
   class Collection
+    include AnkiRecord::DataQueryHelper
     include AnkiRecord::TimeHelper
 
     ##
@@ -79,11 +81,23 @@ module AnkiRecord
       raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
 
       if name
-        note_types.find { |note_type| note_type.name == name }
+        note_type = note_types.find { |note_type| note_type.name == name }
       elsif id
-        note_types.find { |note_type| note_type.id == id }
+        note_type = note_types.find { |note_type| note_type.id == id }
       end
+      return note_type if note_type
+
+      return add_note_type_from_existing(id: id)
     end
+
+    private
+
+    def add_note_type_from_existing(id:)
+      
+
+    end
+
+    public
 
     ##
     # Returns the collection object's deck found by either name or id, and nil if it is not found.
@@ -102,18 +116,10 @@ module AnkiRecord
     ##
     # Returns the collection object's note with id +id+ as a note object, or nil if it is not found.
     def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id id: id
+      note_cards_data = note_cards_data_for_note_id sql_able: anki_package, id: id
       return nil unless note_cards_data
 
       AnkiRecord::Note.new collection: self, data: note_cards_data
-    end
-
-    def note_cards_data_for_note_id(id:) # :nodoc:
-      note_data = anki_package.prepare("select * from notes where id = ?").execute([id]).first
-      return nil unless note_data
-
-      cards_data = anki_package.prepare("select * from cards where nid = ?").execute([id]).to_a
-      { note_data: note_data, cards_data: cards_data }
     end
 
     def decks_json # :nodoc:
@@ -122,6 +128,13 @@ module AnkiRecord
 
     def models_json # :nodoc:
       JSON.parse(anki_package.prepare("select models from col;").execute.first["models"])
+    end
+
+    def copy_over_existing(col_record: ) # :nodoc:
+      @col_record = col_record
+      setup_simple_collaborator_objects
+      setup_custom_collaborator_objects
+      remove_instance_variable(:@col_record)
     end
 
     private

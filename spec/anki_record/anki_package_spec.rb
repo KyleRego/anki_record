@@ -2,12 +2,12 @@
 
 RSpec.describe AnkiRecord::AnkiPackage do
   subject(:anki_package) do
-    if defined?(closure_argument) && defined?(directory_argument)
-      AnkiRecord::AnkiPackage.new(name: database_name, directory: directory_argument, &closure_argument)
+    if defined?(closure_argument) && defined?(target_directory_argument)
+      AnkiRecord::AnkiPackage.new(name: database_name, target_directory: target_directory_argument, &closure_argument)
     elsif defined?(closure_argument)
       AnkiRecord::AnkiPackage.new(name: database_name, &closure_argument)
-    elsif defined?(directory_argument)
-      AnkiRecord::AnkiPackage.new(name: database_name, directory: directory_argument)
+    elsif defined?(target_directory_argument)
+      AnkiRecord::AnkiPackage.new(name: database_name, target_directory: target_directory_argument)
     else
       AnkiRecord::AnkiPackage.new(name: database_name)
     end
@@ -48,8 +48,8 @@ RSpec.describe AnkiRecord::AnkiPackage do
   end
 
   after do
-    if defined?(directory_argument) && File.directory?(directory_argument)
-      cleanup_test_files(directory: directory_argument)
+    if defined?(target_directory_argument) && File.directory?(target_directory_argument)
+      cleanup_test_files(directory: target_directory_argument)
     else
       cleanup_test_files(directory: ".")
     end
@@ -87,7 +87,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
   context "::new with no block argument" do
     it "should instantiate an Anki package object with a collection attribute which is an instance of Collection" do
-      expect(anki_package.collection.instance_of?(AnkiRecord::Collection)).to eq true
+      expect(anki_package.collection).to be_a AnkiRecord::Collection
     end
     it "should save one collection.anki21 file to a temporary directory" do
       anki_package
@@ -140,7 +140,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
     it "should yield an instance of AnkiPackage to the block argument" do
       AnkiRecord::AnkiPackage.new(name: "test") do |yielded_object|
-        expect(yielded_object.instance_of?(AnkiRecord::AnkiPackage)).to eq true
+        expect(yielded_object).to be_a AnkiRecord::AnkiPackage
       end
     end
 
@@ -169,7 +169,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
   end
 
   context "::new with a directory argument" do
-    let(:directory_argument) { TEST_TMP_DIRECTORY }
+    let(:target_directory_argument) { TEST_TMP_DIRECTORY }
 
     context "and no block argument" do
       it "should save one collection.anki21 file to a temporary directory" do
@@ -182,7 +182,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
       end
       it "should not save an *.apkg zip file" do
         anki_package
-        expect_num_apkg_files_in_directory num: 0, directory: directory_argument
+        expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
       end
       it "should not close the temporary collection.anki21 database" do
         expect(anki_package.open?).to eq true
@@ -198,13 +198,13 @@ RSpec.describe AnkiRecord::AnkiPackage do
       end
       it "should save one *.apkg zip file in the specified directory" do
         anki_package
-        expect_num_apkg_files_in_directory num: 1, directory: directory_argument
+        expect_num_apkg_files_in_directory num: 1, directory: target_directory_argument
       end
     end
 
     context "and a block argument but the directory argument given is not a directory that exists" do
       let(:closure_argument) { proc {} }
-      let(:directory_argument) { "does_not_exist" }
+      let(:target_directory_argument) { "does_not_exist" }
 
       it "should throw an error" do
         expect { anki_package }.to raise_error ArgumentError
@@ -226,12 +226,12 @@ RSpec.describe AnkiRecord::AnkiPackage do
   end
 
   subject(:anki_package_from_existing) do
-    if defined?(closure_argument) && defined?(target_directory_argument)
-      AnkiRecord::AnkiPackage.open(path: path_argument, target_directory: target_directory_argument, &closure_argument)
+    if defined?(closure_argument) && defined?(target_target_directory_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument, target_directory: target_target_directory_argument, &closure_argument)
     elsif defined?(closure_argument)
       AnkiRecord::AnkiPackage.open(path: path_argument, &closure_argument)
-    elsif defined?(target_directory_argument)
-      AnkiRecord::AnkiPackage.open(path: path_argument, target_directory: target_directory_argument)
+    elsif defined?(target_target_directory_argument)
+      AnkiRecord::AnkiPackage.open(path: path_argument, target_directory: target_target_directory_argument)
     else
       AnkiRecord::AnkiPackage.open(path: path_argument)
     end
@@ -276,10 +276,10 @@ RSpec.describe AnkiRecord::AnkiPackage do
         end
       end
       context "and a target_directory argument" do
-        let(:target_directory_argument) { TEST_TMP_DIRECTORY }
+        let(:target_target_directory_argument) { TEST_TMP_DIRECTORY }
         it "should not create a new *.apkg-number file in the specified directory" do
           anki_package_from_existing
-          expect(Dir.entries(target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
+          expect(Dir.entries(target_target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
         end
       end
     end
@@ -299,11 +299,11 @@ RSpec.describe AnkiRecord::AnkiPackage do
       end
 
       context "and a target directory argument" do
-        let(:target_directory_argument) { TEST_TMP_DIRECTORY }
+        let(:target_target_directory_argument) { TEST_TMP_DIRECTORY }
         it "should create a new *.apkg-number file in the specified directory" do
           anki_package_from_existing
 
-          expect(Dir.entries(target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 1
+          expect(Dir.entries(target_target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 1
         end
       end
     end
@@ -326,11 +326,12 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
     context "with a path argument to an anki package that has a custom note type note with 2 cards already" do
       let(:path_argument) { "./crazy.apkg" }
+      let(:note_type_name) { "crazy note type" }
       before do
         AnkiRecord::AnkiPackage.new(name: path_argument) do |apkg|
           collection = apkg.collection
           default_deck = collection.find_deck_by name: "Default"
-          crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
+          crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
           AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
           AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
           crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
@@ -345,15 +346,24 @@ RSpec.describe AnkiRecord::AnkiPackage do
           note.crazy_front = "Hello"
           note.crazy_back = "World"
           note.save
+          @note_type_id = crazy_note_type.id
           @note_id = note.id
         end
       end
-      context "should copy the note and card records from the existing collection.anki21 database" do
-        it "such that the note record is present in the new collection.anki21 database" do
-          AnkiRecord::AnkiPackage.open(path: path_argument) do |apkg|
-            collection = apkg.collection
-            expect(collection.find_note_by id: @note_id).to be_a AnkiRecord::Note
+      let(:copied_over_collection) { AnkiRecord::AnkiPackage.open(path: path_argument).collection }
+      let(:copied_over_note_type) { copied_over_collection.find_note_type_by name: note_type_name }
+      let(:copied_over_note) { copied_over_collection.find_note_by id: @note_id }
+      context "should copy the data from the opened package, such that in the new collection.anki21 database" do
+        it "the custom note type is present" do
+          expect(copied_over_note_type).to be_a AnkiRecord::NoteType       
+        end
+        context "the custom note type is present" do
+          it "and it has the same id as the original note type object" do
+            expect(copied_over_note_type.id).to eq @note_type_id
           end
+        end
+        it "the note is present" do
+          expect(copied_over_note).to be_a AnkiRecord::Note
         end
       end
     end

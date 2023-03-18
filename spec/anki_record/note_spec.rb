@@ -76,7 +76,7 @@ RSpec.describe AnkiRecord::Note do
           note.save
           @note_id = note.id
         end
-        let(:note_cards_data) { anki_package.collection.note_cards_data_for_note_id id: @note_id }
+        let(:note_cards_data) { anki_package.collection.note_cards_data_for_note_id sql_able: anki_package, id: @note_id }
         let(:note_data) { note_cards_data[:note_data] }
         subject(:note_from_existing_record) do
           AnkiRecord::Note.new collection: anki_package.collection, data: note_cards_data

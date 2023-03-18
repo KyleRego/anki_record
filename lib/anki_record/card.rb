@@ -61,7 +61,6 @@ module AnkiRecord
       @note = note
       @deck = @note.deck
       @collection = @deck.collection
-      @anki_package = @collection.anki_package
 
       @card_template = card_template
 
@@ -116,7 +115,7 @@ module AnkiRecord
     # rubocop:disable Metrics/MethodLength
     def save(note_exists_already: false) # :nodoc:
       if note_exists_already
-        statement = @anki_package.prepare <<~SQL
+        statement = @collection.anki_package.prepare <<~SQL
           update cards set nid = ?, did = ?, ord = ?, mod = ?, usn = ?, type = ?,
                             queue = ?, due = ?, ivl = ?, factor = ?, reps = ?, lapses = ?,
                             left = ?, odue = ?, odid = ?, flags = ?, data = ? where id = ?
@@ -126,7 +125,7 @@ module AnkiRecord
                            @due, @ivl, @factor, @reps,
                            @lapses, @left, @odue, @odid, @flags, @data, @id]
       else
-        statement = @anki_package.prepare  <<~SQL
+        statement = @collection.anki_package.prepare  <<~SQL
           insert into cards (id, nid, did, ord,
                             mod, usn, type, queue,
                             due, ivl, factor, reps,

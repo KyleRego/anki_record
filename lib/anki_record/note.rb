@@ -72,6 +72,7 @@ module AnkiRecord
       elsif collection && data
         setup_instance_variables_from_existing(collection: collection,
                                                note_data: data[:note_data], cards_data: data[:cards_data])
+        add_note_type unless note_type
       else
         raise ArgumentError
       end
