@@ -81,23 +81,11 @@ module AnkiRecord
       raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
 
       if name
-        note_type = note_types.find { |note_type| note_type.name == name }
+        note_types.find { |note_type| note_type.name == name }
       elsif id
-        note_type = note_types.find { |note_type| note_type.id == id }
+        note_types.find { |note_type| note_type.id == id }
       end
-      return note_type if note_type
-
-      return add_note_type_from_existing(id: id)
     end
-
-    private
-
-    def add_note_type_from_existing(id:)
-      
-
-    end
-
-    public
 
     ##
     # Returns the collection object's deck found by either name or id, and nil if it is not found.

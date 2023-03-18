@@ -125,7 +125,8 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
-- Need to be able to copy the contents of an existing package into the new package when it is opened
+- Copying the contents of an existing package into the new package when it is opened
+  - spec/anki_record/anki_package_spec.rb:356
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
   - Updating notes when they already exist in the database
     - Need to be able to instantiate notes/cards from existing data
@@ -135,8 +136,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
     - The checksum calculation for notes will need to be updated to account for HTML in the content
 - Saving note types, decks, and deck options groups to the collection.anki21 database
   - Updating them when they already exist
-  - Setter for the CSS of note types
-  - Other setters for attributes of the note types, decks, and deck options groups
+  - Setters for any relevant attributes with validation
 - Refactoring
   - Specs need to be refactored to be more DRY and also start using doubles to improve performance
   - Use more specific RSpec matchers than `eq` everywhere

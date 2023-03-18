@@ -98,13 +98,20 @@ RSpec.describe AnkiRecord::NoteType do
       col_models_hash[crazy_note_type.id.to_s]
     end
     before { crazy_note_type.save }
+
     it "should save the note type object's id as a key in the models column's JSON object in the collection.anki21 database" do
       expect(col_models_hash.keys).to include crazy_note_type.id.to_s
     end
-    it "should save the note type object as a hash, as the value of the note type object's id key, in the models JSON object" do
+    it "should save the note type object as a JSON object value, as the value of the note type object's id key, in the models JSON object" do
       expect(crazy_note_type_hash).to be_a Hash
     end
-    it "should save the note type object as a hash with the following keys:
+    it "should save the note type object's two card templates as JSON object values in the models JSON object tmpls array value" do
+      expect(crazy_note_type_hash["tmpls"].count).to eq 2
+    end
+    it "should save the note type object's two fields as JSON object values in the models JSON object flds array value" do
+      expect(crazy_note_type_hash["flds"].count).to eq 2
+    end
+    it "should save the note type object as a JSON object value with the following keys:
       'id', 'name', 'type', 'mod', 'usn',
       'sortf', 'did', 'tmpls', 'flds', 'css',
       'latexPre', 'latexPost', 'latexsvg', 'req', and 'tags'" do
@@ -112,7 +119,8 @@ RSpec.describe AnkiRecord::NoteType do
         expect(crazy_note_type_hash.keys).to include key
       end
     end
-    context "should save the note type object as a hash" do
+
+    context "should save the note type object as a JSON object value" do
       it "with the note type object's id attribute as the value for the id in the note type hash" do
         expect(crazy_note_type_hash["id"]).to eq crazy_note_type.id
       end

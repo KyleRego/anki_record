@@ -61,7 +61,6 @@ module AnkiRecord
       @note = note
       @deck = @note.deck
       @collection = @deck.collection
-
       @card_template = card_template
 
       @id = milliseconds_since_epoch
@@ -92,6 +91,7 @@ module AnkiRecord
         @collection = note.note_type.collection
         @deck = collection.find_deck_by id: card_data["did"]
         @id = card_data["id"]
+        @ordinal_number = card_data["ord"]
         @last_modified_time = card_data["mod"]
         @usn = card_data["usn"]
         @type = card_data["type"]
@@ -120,24 +120,30 @@ module AnkiRecord
                             queue = ?, due = ?, ivl = ?, factor = ?, reps = ?, lapses = ?,
                             left = ?, odue = ?, odid = ?, flags = ?, data = ? where id = ?
         SQL
-        statement.execute [@note.id, @deck.id, @card_template.ordinal_number,
+        statement.execute [@note.id, @deck.id, ordinal_number,
                            @last_modified_time, @usn, @type, @queue,
                            @due, @ivl, @factor, @reps,
                            @lapses, @left, @odue, @odid, @flags, @data, @id]
       else
-        statement = @collection.anki_package.prepare  <<~SQL
+        statement = @collection.anki_package.prepare <<~SQL
           insert into cards (id, nid, did, ord,
                             mod, usn, type, queue,
                             due, ivl, factor, reps,
                             lapses, left, odue, odid, flags, data)
                       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL
-        statement.execute [@id, @note.id, @deck.id, @card_template.ordinal_number,
+        statement.execute [@id, @note.id, @deck.id, ordinal_number,
                            @last_modified_time, @usn, @type, @queue,
                            @due, @ivl, @factor, @reps,
                            @lapses, @left, @odue, @odid, @flags, @data]
       end
     end
     # rubocop:enable Metrics/MethodLength
+
+    private
+
+    def ordinal_number
+      @card_template&.ordinal_number || @ordinal_number
+    end
   end
 end

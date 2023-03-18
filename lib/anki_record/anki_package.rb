@@ -124,14 +124,11 @@ module AnkiRecord
       end
 
       def standard_error_thrown_in_block_message
-        <<-MSG
-        An error occurred.
-        The temporary files (databases and media) have been deleted.
-        No new *.apkg zip file has been saved.
-        MSG
+        "Any temporary files created have been deleted.\nNo new *.apkg zip file was saved."
       end
 
       def puts_error_and_standard_message(error:)
+        puts error.backtrace
         puts "#{error}\n#{standard_error_thrown_in_block_message}"
       end
 
@@ -153,6 +150,33 @@ module AnkiRecord
                       end
       @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
       @anki_package
+    end
+
+    ##
+    # Returns true if the Anki package object was instantiated using ::open.
+    def was_instantiated_from_existing_apkg?
+      !@open_path.nil?
+    end
+
+    ##
+    # If the Anki package was instantiated using ::open, this method
+    # will unzip the opened *.apkg file and yield its collection.anki21 database
+    # as a SQLite3::Database object to the block argument.
+    def temporarily_unzip_source_apkg
+      raise ArgumentError unless @open_path && block_given?
+
+      Zip::File.open(@open_path) do |zip_file|
+        zip_file.each do |entry|
+          next unless entry.name == "collection.anki21"
+
+          entry.extract
+          existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
+          existing_collection_anki21.results_as_hash = true
+          
+          yield existing_collection_anki21
+        end
+      end
+      File.delete("collection.anki21")
     end
 
     class << self

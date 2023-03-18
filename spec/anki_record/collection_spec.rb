@@ -92,6 +92,44 @@ RSpec.describe AnkiRecord::Collection do
           expect(collection.find_note_type_by(id: basic_note_type_id).id).to eq basic_note_type_id
         end
       end
+      context "when the note type exists in the opened Anki package but not the current collection.anki21 database" do
+        let(:opened_apkg_name) { "crazy" }
+        let(:path_argument) { "./#{opened_apkg_name}.apkg" }
+        let(:note_type_name) { "crazy note type" }
+        before do
+          AnkiRecord::AnkiPackage.new(name: opened_apkg_name) do |apkg|
+            collection = apkg.collection
+            default_deck = collection.find_deck_by name: "Default"
+            crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
+            AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+            AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+            crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+            crazy_card_template.question_format = "{{crazy front}}"
+            crazy_card_template.answer_format = "{{crazy back}}"
+            second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+            second_crazy_card_template.question_format = "{{crazy back}}"
+            second_crazy_card_template.answer_format = "{{crazy front}}"
+            crazy_note_type.save
+
+            note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
+            note.crazy_front = "Hello"
+            note.crazy_back = "World"
+            note.save
+            @note_type_id = crazy_note_type.id
+            @note_id = note.id
+          end
+        end
+        let(:copied_over_collection) do
+          apkg = AnkiRecord::AnkiPackage.open(path: path_argument)
+          apkg.collection
+        end
+        it "should return a note type" do
+          expect(copied_over_collection.find_note_type_by name: note_type_name)
+        end
+        it "should return a note type with the same id as the existing note type from the opened package" do
+          expect(copied_over_collection.find_note_type_by(name: note_type_name).id).to eq @note_type_id
+        end
+      end
     end
 
     describe "#find_deck_by" do

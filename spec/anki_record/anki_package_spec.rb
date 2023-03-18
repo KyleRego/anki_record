@@ -353,6 +353,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
       let(:copied_over_collection) { AnkiRecord::AnkiPackage.open(path: path_argument).collection }
       let(:copied_over_note_type) { copied_over_collection.find_note_type_by name: note_type_name }
       let(:copied_over_note) { copied_over_collection.find_note_by id: @note_id }
+      # Continue work here
       context "should copy the data from the opened package, such that in the new collection.anki21 database" do
         it "the custom note type is present" do
           expect(copied_over_note_type).to be_a AnkiRecord::NoteType       
