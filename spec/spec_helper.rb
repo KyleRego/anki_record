@@ -16,7 +16,7 @@ TEST_TMP_DIRECTORY = "tests_tmp"
 
 def cleanup_test_files(directory:)
   files_created_by_tests = Dir.entries(directory).select do |file|
-    file.match(ANKI_PACKAGE_REGEX) || file.match(UPDATED_ANKI_PACKAGE_REGEX)
+    file.match(ANKI_PACKAGE_REGEX) || file.match(UPDATED_ANKI_PACKAGE_REGEX) || file.match(ANKI_COLLECTION_21_REGEX)
   end
   files_created_by_tests.each { |file| File.delete("#{directory}/#{file}") }
 end

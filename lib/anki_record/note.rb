@@ -10,7 +10,6 @@ module AnkiRecord
   ##
   # Represents an Anki note. The note object corresponds to a record in the `notes`
   # table in the collection.anki21 database.
-  # rubocop:disable Metrics/ClassLength
   class Note
     include ChecksumHelper
     include TimeHelper
@@ -72,7 +71,6 @@ module AnkiRecord
       elsif collection && data
         setup_instance_variables_from_existing(collection: collection,
                                                note_data: data[:note_data], cards_data: data[:cards_data])
-        add_note_type unless note_type
       else
         raise ArgumentError
       end
@@ -160,16 +158,12 @@ module AnkiRecord
     #
     # The ghost methods are the setters and getters for the note field values.
     def method_missing(method_name, field_content = nil)
+      raise NoMethodError unless respond_to_missing? method_name
+
       method_name = method_name.to_s
       return @field_contents[method_name] unless method_name.end_with?("=")
 
       method_name = method_name.chomp("=")
-      valid_fields_snake_names = @field_contents.keys
-      unless valid_fields_snake_names.include?(method_name)
-        raise ArgumentError,
-              "Valid fields for the #{note_type.name} note type are one of #{valid_fields_snake_names.join(", ")}"
-      end
-
       @field_contents[method_name] = field_content
     end
 
@@ -207,5 +201,4 @@ module AnkiRecord
         @field_contents[note_type.snake_case_sort_field_name]
       end
   end
-  # rubocop:enable Metrics/ClassLength
 end

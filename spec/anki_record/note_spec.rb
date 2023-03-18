@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::Note do
+  after { cleanup_test_files(directory: ".") }
   let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
   let(:basic_note_type) { anki_package.collection.find_note_type_by name: "Basic" }
   let(:basic_and_reversed_card_note_type) do
@@ -239,7 +240,7 @@ RSpec.describe AnkiRecord::Note do
     end
     context "for a note with 2 card templates, that does already exist yet the collection.anki21 database, but with unsaved field changes" do
       let(:new_crazy_front) { "What does the cow say?" }
-      let(:new_crazy_back) { "moo"}
+      let(:new_crazy_back) { "moo" }
       subject(:already_saved_note_with_two_cards) do
         already_saved_note_with_two_cards = note_with_two_cards
         already_saved_note_with_two_cards.save
@@ -269,7 +270,7 @@ RSpec.describe AnkiRecord::Note do
     context "when the missing method ends with '='" do
       context "but the method does not correspond to one of the snake_case note type field names" do
         it "should throw an error" do
-          expect { note.made_up_field = "Made up" }.to raise_error ArgumentError
+          expect { note.made_up_field = "Made up" }.to raise_error NoMethodError
         end
       end
       context "and the method corresponds to one of the snake_case note type field names" do
@@ -281,7 +282,9 @@ RSpec.describe AnkiRecord::Note do
     end
     context "when the missing method does not end with '=" do
       context "but the method does not correspond to one of the snake_case note type field names"
-
+      it "should throw an error" do
+        expect { note.what_this_method }.to raise_error NoMethodError
+      end
       context "and the method corresponds to one of the snake_card note type field names"
     end
   end

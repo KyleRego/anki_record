@@ -52,6 +52,7 @@ module AnkiRecord
       end
 
       @collection.add_deck self
+      save
     end
 
     ##
@@ -109,12 +110,15 @@ module AnkiRecord
         @collapsed_in_browser = default_collapsed
         @description = ""
         @dyn = NON_FILTERED_DECK_DYN
-        @deck_options_group_id = nil # TODO: Set id to the default deck options group?
-        # TODO: alternatively, if this is nil when the deck is saved, it can be set to the default options group id
+        @deck_options_group_id = default_deck_options_group_id
         @extend_new = 0
         @extend_review = 0
       end
       # rubocop:enable Metrics/MethodLength
+
+      def default_deck_options_group_id
+        collection.deck_options_groups.min_by(&:id).id
+      end
 
       def default_deck_today_array
         [0, 0].freeze

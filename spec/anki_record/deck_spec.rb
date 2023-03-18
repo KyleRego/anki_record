@@ -31,8 +31,8 @@ RSpec.describe AnkiRecord::Deck do
       it "should instantiate a deck with an integer last_modified_time attribute" do
         expect(deck.id.instance_of?(Integer)).to eq true
       end
-      it "should instantiate a deck with a deck_options_group_id being nil" do
-        expect(deck.deck_options_group_id).to eq nil
+      it "should instantiate a deck with a deck_options_group_id being 1" do
+        expect(deck.deck_options_group_id).to eq 1
       end
     end
     context "when passed a collection argument, and name and args arguments" do

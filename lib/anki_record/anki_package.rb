@@ -14,6 +14,7 @@ require_relative "collection"
 module AnkiRecord
   ##
   # Represents an Anki package.
+  # rubocop:disable Metrics/ClassLength
   class AnkiPackage
     include AnkiRecord::DataQueryHelper
 
@@ -106,21 +107,12 @@ module AnkiRecord
       end
 
       def copy_over_notes_and_cards(note_ids:)
-        Zip::File.open(@open_path) do |zip_file|
-          zip_file.each do |entry|
-            next unless entry.name == "collection.anki21"
-
-            entry.extract
-            existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
-            existing_collection_anki21.results_as_hash = true
-            
-            note_ids.each do |note_id|
-              note_cards_data = note_cards_data_for_note_id(sql_able: existing_collection_anki21, id: note_id)
-              AnkiRecord::Note.new(collection: @collection, data: note_cards_data).save
-            end
+        temporarily_unzip_source_apkg do |source_collection_anki21|
+          note_ids.each do |note_id|
+            note_cards_data = note_cards_data_for_note_id(sql_able: source_collection_anki21, id: note_id)
+            AnkiRecord::Note.new(collection: @collection, data: note_cards_data).save
           end
         end
-        File.delete("collection.anki21")
       end
 
       def standard_error_thrown_in_block_message
@@ -136,6 +128,7 @@ module AnkiRecord
 
     ##
     # Instantiates a new object which is a copy of an already existing Anki package. See README for details.
+    # rubocop:disable Metrics/MethodLength
     def self.open(path:, target_directory: nil, &closure)
       pathname = Pathname.new(path)
       raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
@@ -151,6 +144,7 @@ module AnkiRecord
       @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
       @anki_package
     end
+    # rubocop:enable Metrics/MethodLength
 
     ##
     # Returns true if the Anki package object was instantiated using ::open.
@@ -162,6 +156,7 @@ module AnkiRecord
     # If the Anki package was instantiated using ::open, this method
     # will unzip the opened *.apkg file and yield its collection.anki21 database
     # as a SQLite3::Database object to the block argument.
+    # rubocop:disable Metrics/MethodLength
     def temporarily_unzip_source_apkg
       raise ArgumentError unless @open_path && block_given?
 
@@ -170,18 +165,21 @@ module AnkiRecord
           next unless entry.name == "collection.anki21"
 
           entry.extract
-          existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
-          existing_collection_anki21.results_as_hash = true
-          
-          yield existing_collection_anki21
+          source_collection_anki21 = SQLite3::Database.open "collection.anki21"
+          source_collection_anki21.results_as_hash = true
+
+          yield source_collection_anki21
         end
       end
       File.delete("collection.anki21")
     end
+    # rubocop:enable Metrics/MethodLength
 
     class << self
       include TimeHelper
 
+      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize
       def col_record_and_note_ids_to_copy_over(pathname:) # :nodoc:
         data = {}
         Zip::File.open(pathname) do |zip_file|
@@ -189,16 +187,18 @@ module AnkiRecord
             next unless entry.name == "collection.anki21"
 
             entry.extract
-            existing_collection_anki21 = SQLite3::Database.open "collection.anki21"
-            existing_collection_anki21.results_as_hash = true
-            col_record = existing_collection_anki21.prepare("select * from col").execute.first
-            note_ids = existing_collection_anki21.prepare("select id from notes").execute.map { |note| note["id"] }
+            source_collection_anki21 = SQLite3::Database.open "collection.anki21"
+            source_collection_anki21.results_as_hash = true
+            col_record = source_collection_anki21.prepare("select * from col").execute.first
+            note_ids = source_collection_anki21.prepare("select id from notes").execute.map { |note| note["id"] }
             data = { col_record: col_record, note_ids: note_ids }
           end
         end
         File.delete("collection.anki21")
         data
       end
+      # rubocop:enable Metrics/AbcSize
+      # rubocop:enable Metrics/MethodLength
     end
 
     ##
@@ -237,4 +237,5 @@ module AnkiRecord
       @anki21_database.closed?
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

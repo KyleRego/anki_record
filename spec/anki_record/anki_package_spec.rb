@@ -324,47 +324,92 @@ RSpec.describe AnkiRecord::AnkiPackage do
       end
     end
 
-    context "with a path argument to an anki package that has a custom note type note with 2 cards already" do
-      let(:path_argument) { "./crazy.apkg" }
-      let(:note_type_name) { "crazy note type" }
-      before do
-        AnkiRecord::AnkiPackage.new(name: path_argument) do |apkg|
-          collection = apkg.collection
-          default_deck = collection.find_deck_by name: "Default"
-          crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
-          AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
-          AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-          crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
-          crazy_card_template.question_format = "{{crazy front}}"
-          crazy_card_template.answer_format = "{{crazy back}}"
-          second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
-          second_crazy_card_template.question_format = "{{crazy back}}"
-          second_crazy_card_template.answer_format = "{{crazy front}}"
-          crazy_note_type.save
+    context "with a path argument to an anki package" do
+      context "that has a custom note type (2 card templates, 2 note fields) and one note using it already, in a custom deck" do
+        let(:path_argument) { "./crazy.apkg" }
+        let(:note_type_name) { "crazy note type" }
+        before do
+          AnkiRecord::AnkiPackage.new(name: path_argument) do |apkg|
+            collection = apkg.collection
+            crazy_deck = AnkiRecord::Deck.new collection: collection, name: "Test::Deck"
+            crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
+            AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
+            AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
+            crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+            crazy_card_template.question_format = "{{crazy front}}"
+            crazy_card_template.answer_format = "{{crazy back}}"
+            second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+            second_crazy_card_template.question_format = "{{crazy back}}"
+            second_crazy_card_template.answer_format = "{{crazy front}}"
+            crazy_note_type.save
 
-          note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
-          note.crazy_front = "Hello"
-          note.crazy_back = "World"
-          note.save
-          @note_type_id = crazy_note_type.id
-          @note_id = note.id
-        end
-      end
-      let(:copied_over_collection) { AnkiRecord::AnkiPackage.open(path: path_argument).collection }
-      let(:copied_over_note_type) { copied_over_collection.find_note_type_by name: note_type_name }
-      let(:copied_over_note) { copied_over_collection.find_note_by id: @note_id }
-      # Continue work here
-      context "should copy the data from the opened package, such that in the new collection.anki21 database" do
-        it "the custom note type is present" do
-          expect(copied_over_note_type).to be_a AnkiRecord::NoteType       
-        end
-        context "the custom note type is present" do
-          it "and it has the same id as the original note type object" do
-            expect(copied_over_note_type.id).to eq @note_type_id
+            note = AnkiRecord::Note.new note_type: crazy_note_type, deck: crazy_deck
+            note.crazy_front = "Hello"
+            note.crazy_back = "World"
+            note.save
+            @original_deck = crazy_deck
+            @original_note = note
+            @original_cards = note.cards
+            @original_note_type = crazy_note_type
+            @original_card_templates = @original_note_type.card_templates
+            @original_note_fields = @original_note_type.note_fields
           end
         end
-        it "the note is present" do
-          expect(copied_over_note).to be_a AnkiRecord::Note
+        let(:copied_over_collection) { AnkiRecord::AnkiPackage.open(path: path_argument).collection }
+        let(:copied_over_note_type) { copied_over_collection.find_note_type_by name: note_type_name }
+        let!(:copied_over_note) { copied_over_collection.find_note_by id: @original_note.id }
+
+        context "should copy the data from the opened package, such that in the collection object" do
+          it "the custom note type is present" do
+            expect(copied_over_note_type).to be_a AnkiRecord::NoteType
+          end
+          context "the custom note type is present" do
+            it "and it has the same id as the original note type object" do
+              expect(copied_over_note_type.id).to eq @original_note_type.id
+            end
+            it "and it has two card templates" do
+              expect(copied_over_note_type.card_templates.count).to eq @original_card_templates.count
+            end
+            context "and it has two card templates" do
+              it "that have the same names as the original card templates" do
+                expect(copied_over_note_type.card_templates.map(&:name).sort).to eq @original_card_templates.map(&:name).sort
+              end
+            end
+            it "and it has two note fields" do
+              expect(copied_over_note_type.note_fields.count).to eq @original_note_fields.count
+            end
+            context "and it has two note fields" do
+              it "that have the same names as the original note fields" do
+                expect(copied_over_note_type.note_fields.map(&:name).sort).to eq @original_note_fields.map(&:name).sort
+              end
+            end
+          end
+          it "the note is present" do
+            expect(copied_over_note).to be_a AnkiRecord::Note
+          end
+          context "the note is present" do
+            it "and it has the same id, guid, last_modified_time, usn, tags, field_contents, flags, and data attributes as the original note" do
+              %w[id guid last_modified_time usn tags field_contents flags data].each do |note_attribute|
+                expect(copied_over_note.send(note_attribute)).to eq @original_note.send(note_attribute)
+              end
+            end
+            it "and it has two cards" do
+              expect(copied_over_note.cards.count).to eq @original_cards.count
+            end
+            context "and it has two cards" do
+              it "that have the same ids as the original card records" do
+                expect(copied_over_note.cards.map(&:id).sort).to eq @original_cards.map(&:id).sort
+              end
+            end
+          end
+        end
+        context "should copy the data over from the opened package, such that in the new collection.anki21 database" do
+          it "there is an id key in the models JSON object of the col record equal to the custom model id" do
+            expect(copied_over_collection.models_json.keys).to include @original_note_type.id.to_s
+          end
+          it "there is an id key in the decks JSON object of the col record equal to the custom deck id" do
+            expect(copied_over_collection.decks_json.keys).to include @original_deck.id.to_s
+          end
         end
       end
     end

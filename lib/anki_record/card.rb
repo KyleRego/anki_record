@@ -142,8 +142,8 @@ module AnkiRecord
 
     private
 
-    def ordinal_number
-      @card_template&.ordinal_number || @ordinal_number
-    end
+      def ordinal_number
+        @card_template&.ordinal_number || @ordinal_number
+      end
   end
 end

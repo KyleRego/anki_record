@@ -25,7 +25,7 @@ The RSpec examples are intended to provide executable documentation and may also
 ```
 AnkiRecord::Note
   #save
-    for a note with 2 card templates
+    for a note with 2 card templates, that does not exist yet in the collection.anki21 database
       should save two card records to the collection.anki21 database
         with nid values equal to the id of the cards' note object's id
 ```
@@ -126,15 +126,15 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ### Development road map:
 - Copying the contents of an existing package into the new package when it is opened
-  - spec/anki_record/anki_package_spec.rb:356
+  - Add more unit tests
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
   - Updating notes when they already exist in the database
-    - Need to be able to instantiate notes/cards from existing data
-    - Need to be able to update note/cards that are already saved to the database
+      - Add more unit tests
   - Validation logic of what makes the note valid based on the note type's card templates and fields
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content
 - Saving note types, decks, and deck options groups to the collection.anki21 database
+  - Add being able to handle subdecks
   - Updating them when they already exist
   - Setters for any relevant attributes with validation
 - Refactoring

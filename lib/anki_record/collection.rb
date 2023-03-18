@@ -118,7 +118,7 @@ module AnkiRecord
       JSON.parse(anki_package.prepare("select models from col;").execute.first["models"])
     end
 
-    def copy_over_existing(col_record: ) # :nodoc:
+    def copy_over_existing(col_record:) # :nodoc:
       @col_record = col_record
       setup_simple_collaborator_objects
       setup_custom_collaborator_objects

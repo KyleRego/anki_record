@@ -82,6 +82,7 @@ module AnkiRecord
       end
 
       @collection.add_note_type self
+      save
     end
 
     ##

@@ -124,7 +124,7 @@ RSpec.describe AnkiRecord::Collection do
           apkg.collection
         end
         it "should return a note type" do
-          expect(copied_over_collection.find_note_type_by name: note_type_name)
+          expect(copied_over_collection.find_note_type_by(name: note_type_name))
         end
         it "should return a note type with the same id as the existing note type from the opened package" do
           expect(copied_over_collection.find_note_type_by(name: note_type_name).id).to eq @note_type_id
