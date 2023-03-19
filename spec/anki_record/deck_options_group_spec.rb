@@ -20,7 +20,7 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
     end
     context "with collection and name arguments" do
       it "should instantiate a new deck options group" do
-        expect(deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)).to eq true
+        expect(deck_options_group).to be_a AnkiRecord::DeckOptionsGroup
       end
       it "should instantiate a new deck options group with a collection attribute being the collection argument it was instantiated with" do
         expect(deck_options_group.collection).to eq collection_argument
@@ -29,10 +29,10 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
         expect(deck_options_group.collection.deck_options_groups).to include deck_options_group
       end
       it "should instantiate a new deck options group with an integer id" do
-        expect(deck_options_group.id.instance_of?(Integer)).to eq true
+        expect(deck_options_group.id).to be_a Integer
       end
       it "should instantiate a new deck options group with an integer last_modified_time" do
-        expect(deck_options_group.last_modified_time.instance_of?(Integer)).to eq true
+        expect(deck_options_group.last_modified_time).to be_a Integer
       end
     end
 

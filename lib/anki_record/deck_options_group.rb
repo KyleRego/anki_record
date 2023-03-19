@@ -13,7 +13,7 @@ module AnkiRecord
     include TimeHelper
 
     ##
-    # The collection object that the deck options group belongs to
+    # The deck options group's collection object.
     attr_reader :collection
 
     ##

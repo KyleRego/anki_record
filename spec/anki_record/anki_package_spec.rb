@@ -138,9 +138,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
   context "::new with a block argument" do
     let(:closure_argument) { proc {} }
 
-    it "should yield an instance of AnkiPackage to the block argument" do
+    it "should yield an instance of Collection to the block argument" do
       AnkiRecord::AnkiPackage.new(name: "test") do |yielded_object|
-        expect(yielded_object).to be_a AnkiRecord::AnkiPackage
+        expect(yielded_object).to be_a AnkiRecord::Collection
       end
     end
 
@@ -329,8 +329,7 @@ RSpec.describe AnkiRecord::AnkiPackage do
         let(:path_argument) { "./crazy.apkg" }
         let(:note_type_name) { "crazy note type" }
         before do
-          AnkiRecord::AnkiPackage.new(name: path_argument) do |apkg|
-            collection = apkg.collection
+          AnkiRecord::AnkiPackage.new(name: path_argument) do |collection|
             crazy_deck = AnkiRecord::Deck.new collection: collection, name: "Test::Deck"
             crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
             AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"

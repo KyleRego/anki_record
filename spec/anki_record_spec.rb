@@ -6,9 +6,7 @@ RSpec.describe AnkiRecord do
   it "should create two Anki packages that import into Anki correctly (sets up a manual feature test)" do
     note_id = nil
 
-    AnkiRecord::AnkiPackage.new(name: "end-to-end-test-package") do |apkg|
-      collection = apkg.collection
-
+    AnkiRecord::AnkiPackage.new(name: "end-to-end-test-package") do |collection|
       crazy_deck = AnkiRecord::Deck.new collection: collection, name: "end-to-end-test-deck"
 
       crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
@@ -30,9 +28,7 @@ RSpec.describe AnkiRecord do
       note_id = note.id
     end
 
-    AnkiRecord::AnkiPackage.open(path: "./end-to-end-test-package.apkg") do |apkg|
-      collection = apkg.collection
-
+    AnkiRecord::AnkiPackage.open(path: "./end-to-end-test-package.apkg") do |collection|
       note = collection.find_note_by id: note_id
       note.crazy_back = "Ruby"
       note.save

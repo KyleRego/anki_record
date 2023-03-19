@@ -11,17 +11,18 @@ require_relative "note_type"
 
 module AnkiRecord
   ##
-  # Collection represents the single record in the Anki database `col` table
+  # Collection represents the single record in the Anki collection.anki21 database's `col` table.
+  # The note types, decks, and deck options groups data are contained within this record.
   class Collection
     include AnkiRecord::DataQueryHelper
     include AnkiRecord::TimeHelper
 
     ##
-    # The Anki package object that the collection object belongs to
+    # The collection's Anki package object.
     attr_reader :anki_package
 
     ##
-    # The id of the collection record that the collection object corresponds to (this is usually 1)
+    # The collection's id, and the id of the corresponding col record (usually 1).
     attr_reader :id
 
     ##
@@ -33,16 +34,15 @@ module AnkiRecord
     attr_reader :last_modified_time
 
     ##
-    # The array of the collection object's note type objects
+    # The collection's note type objects as an array.
     attr_reader :note_types
 
     ##
-    # The array of the collection object's deck objects
+    # The collection's deck objects as an array
     attr_reader :decks
 
     ##
-    # The array of the collection's deck options group objects.
-    # These represent groups of settings that can be applied to decks.
+    # The collection's deck option group objects as an array.
     attr_reader :deck_options_groups
 
     def initialize(anki_package:) # :nodoc:
@@ -52,15 +52,11 @@ module AnkiRecord
     def add_note_type(note_type) # :nodoc:
       raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
 
-      # TODO: RSpec example for ArgumentError
-
       @note_types << note_type
     end
 
     def add_deck(deck) # :nodoc:
       raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
-
-      # TODO: RSpec example for ArgumentError
 
       @decks << deck
     end
@@ -68,41 +64,37 @@ module AnkiRecord
     def add_deck_options_group(deck_options_group) # :nodoc:
       raise ArgumentError unless deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)
 
-      # TODO: RSpec example for ArgumentError
-
       @deck_options_groups << deck_options_group
     end
 
     ##
-    # Returns the collection object's note type found by either name or id, and nil if it is not found.
-    # rubocop:disable Metrics/CyclomaticComplexity
-    # rubocop:disable Metrics/PerceivedComplexity
+    # Returns the collection's note type object found by either +name+ or +id+, and nil if it is not found.
     def find_note_type_by(name: nil, id: nil)
-      raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
+      return note_types.find { |note_type| note_type.name == name } if name && id.nil?
 
-      if name
-        note_types.find { |note_type| note_type.name == name }
-      elsif id
-        note_types.find { |note_type| note_type.id == id }
-      end
+      return note_types.find { |note_type| note_type.id == id } if id && name.nil?
+
+      raise ArgumentError
     end
 
     ##
-    # Returns the collection object's deck found by either name or id, and nil if it is not found.
+    # Returns the collection's deck object found by either +name+ or +id+, and nil if it is not found.
     def find_deck_by(name: nil, id: nil)
-      raise ArgumentError unless (name && id.nil?) || (id && name.nil?)
+      return decks.find { |deck| deck.name == name } if name && id.nil?
 
-      if name
-        decks.find { |deck| deck.name == name }
-      elsif id
-        decks.find { |deck| deck.id == id }
-      end
+      return decks.find { |deck| deck.id == id } if id && name.nil?
+
+      raise ArgumentError
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
-    # rubocop:enable Metrics/PerceivedComplexity
 
     ##
-    # Returns the collection object's note with id +id+ as a note object, or nil if it is not found.
+    # Returns the collection's deck options group object found by +id+, and nil if it is not found.
+    def find_deck_options_group_by(id:)
+      deck_options_groups.find { |deck_options_group| deck_options_group.id == id }
+    end
+
+    ##
+    # Returns the collection's note object found by +id+, or nil if it is not found.
     def find_note_by(id:)
       note_cards_data = note_cards_data_for_note_id sql_able: anki_package, id: id
       return nil unless note_cards_data
@@ -155,8 +147,8 @@ module AnkiRecord
 
       def setup_custom_collaborator_objects
         setup_note_type_collaborators
-        setup_deck_collaborators
         setup_deck_options_groups_collaborators
+        setup_deck_collaborators
       end
 
       def setup_note_type_collaborators

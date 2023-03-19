@@ -7,40 +7,39 @@ require_relative "helpers/time_helper"
 
 module AnkiRecord
   ##
-  # Deck represents an Anki deck
+  # Deck represents an Anki deck.
+  # In the collection.anki21 database, the deck is a JSON object
+  # which is part of a larger JSON object: the value of the col record's decks column.
   class Deck
     include SharedConstantsHelper
     include TimeHelper
 
     ##
-    # The collection object that the deck belongs to
+    # The deck's collection object.
     attr_reader :collection
 
     ##
-    # The name of the deck
+    # The deck's name.
     attr_accessor :name
 
     ##
-    # The description of the deck
+    # The deck's description.
     attr_accessor :description
 
     ##
-    # The id of the deck
+    # The deck's id.
     attr_reader :id
 
     ##
-    # The last time the deck was modified in number of seconds since the epoch
-    #
-    # TODO: is this really supposed to be seconds? Should it be milliseconds?
+    # The number of seconds since the 1970 epoch when the deck was last modified.
     attr_reader :last_modified_time
 
-    # TODO: Probably this should be an accessor for the deck options group object instead of the id?
     ##
-    # The id of the eck options/settings group that is applied to the deck
-    attr_reader :deck_options_group_id
+    # The deck's deck options group object.
+    attr_reader :deck_options_group
 
     ##
-    # Instantiates a new Deck object
+    # Instantiates a new Deck object belonging to +collection+ with name +name+.
     def initialize(collection:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
@@ -56,7 +55,7 @@ module AnkiRecord
     end
 
     ##
-    # Saves the deck to the collection.anki21 database
+    # Saves the deck (or updates it) in the collection.anki21 database.
     def save
       collection_decks_hash = collection.decks_json
       collection_decks_hash[@id] = to_h
@@ -69,8 +68,7 @@ module AnkiRecord
         id: @id, mod: @last_modified_time, name: @name, usn: @usn,
         lrnToday: @learn_today, revToday: @review_today, newToday: @new_today, timeToday: @time_today,
         collapsed: @collapsed_in_main_window, browserCollapsed: @collapsed_in_browser,
-        desc: @description, dyn: @dyn,
-        conf: @deck_options_group_id,
+        desc: @description, dyn: @dyn, conf: @deck_options_group.id,
         extendNew: @extend_new, extendRev: @extend_review
       }
     end
@@ -92,7 +90,7 @@ module AnkiRecord
         @collapsed_in_browser = args["browserCollapsed"]
         @description = args["desc"]
         @dyn = args["dyn"]
-        @deck_options_group_id = args["conf"]
+        @deck_options_group = @collection.find_deck_options_group_by id: args["conf"]
         @extend_new = args["extendNew"]
         @extend_review = args["extendRev"]
       end
@@ -110,7 +108,7 @@ module AnkiRecord
         @collapsed_in_browser = default_collapsed
         @description = ""
         @dyn = NON_FILTERED_DECK_DYN
-        @deck_options_group_id = default_deck_options_group_id
+        @deck_options_group = @collection.find_deck_options_group_by id: default_deck_options_group_id
         @extend_new = 0
         @extend_review = 0
       end

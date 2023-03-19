@@ -14,7 +14,7 @@ RSpec.describe AnkiRecord::Deck do
   describe "::new" do
     context "when passed collection and name arguments" do
       it "should instantiate a new Deck object" do
-        expect(deck.instance_of?(AnkiRecord::Deck)).to eq true
+        expect(deck).to be_a AnkiRecord::Deck
       end
       it "should instantiate a deck with collection attribute which is the collection argument" do
         expect(deck.collection).to eq collection_argument
@@ -26,13 +26,16 @@ RSpec.describe AnkiRecord::Deck do
         expect(deck.description).to eq ""
       end
       it "should instantiate a deck with an integer id attribute" do
-        expect(deck.id.instance_of?(Integer)).to eq true
+        expect(deck.id).to be_a Integer
       end
       it "should instantiate a deck with an integer last_modified_time attribute" do
-        expect(deck.id.instance_of?(Integer)).to eq true
+        expect(deck.id).to be_a Integer
       end
-      it "should instantiate a deck with a deck_options_group_id being 1" do
-        expect(deck.deck_options_group_id).to eq 1
+      it "should instantiate a deck with deck_options_group returning a deck options group object" do
+        expect(deck.deck_options_group).to be_a AnkiRecord::DeckOptionsGroup
+      end
+      it "should instantiate a deck with deck_options_group returning a deck options group object with an id equal to 1" do
+        expect(deck.deck_options_group.id).to eq 1
       end
     end
     context "when passed a collection argument, and name and args arguments" do
@@ -82,8 +85,11 @@ RSpec.describe AnkiRecord::Deck do
         it "should instantiate a deck with the description from the deck JSON" do
           expect(deck_from_existing.description).to eq ""
         end
-        it "should instantiate a deck with the deck options group id from the deck JSON (the conf)" do
-          expect(deck_from_existing.deck_options_group_id).to eq 1
+        it "should instantiate a deck with deck_options_group returning a deck options group object" do
+          expect(deck_from_existing.deck_options_group).to be_a AnkiRecord::DeckOptionsGroup
+        end
+        it "should instantiate a deck with deck_options_group returnign a deck options group object with id equal to id the value from the deck JSON (the conf)" do
+          expect(deck_from_existing.deck_options_group.id).to eq 1
         end
       end
     end
@@ -149,8 +155,8 @@ RSpec.describe AnkiRecord::Deck do
       it "with 0 for the value of the dyn key in the deck hash" do
         expect(crazy_deck_hash["dyn"]).to eq 0
       end
-      it "with the deck object's deck_options_group_id attribute as the value for the conf key in the deck hash" do
-        expect(crazy_deck_hash["conf"]).to eq crazy_deck.deck_options_group_id
+      it "with the deck object's deck options group's id attribute as the value for the conf key in the deck hash" do
+        expect(crazy_deck_hash["conf"]).to eq crazy_deck.deck_options_group.id
       end
       it "with 0 for the value of the extendNew key in the deck hash" do
         expect(crazy_deck_hash["extendNew"]).to eq 0

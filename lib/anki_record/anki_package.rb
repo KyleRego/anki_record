@@ -4,17 +4,17 @@ require "pry"
 require "pathname"
 
 require_relative "card"
+require_relative "collection"
 require_relative "note"
 
 require_relative "db/anki_schema_definition"
 require_relative "db/clean_collection2_record"
 require_relative "db/clean_collection21_record"
-require_relative "collection"
 
+# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
-  # Represents an Anki package.
-  # rubocop:disable Metrics/ClassLength
+  # AnkiPackage represents an Anki package.
   class AnkiPackage
     include AnkiRecord::DataQueryHelper
 
@@ -23,7 +23,9 @@ module AnkiRecord
     attr_reader :collection
 
     ##
-    # Instantiates a new Anki package object. See the README for usage details.
+    # Instantiates a new Anki package object.
+    #
+    # See the README for usage details.
     def initialize(name:, target_directory: Dir.pwd, data: nil, open_path: nil, &closure)
       check_name_argument_is_valid(name:)
       @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
@@ -33,10 +35,11 @@ module AnkiRecord
       setup_other_package_instance_variables
       insert_existing_data(data: data) if data
 
-      execute_closure_and_zip(self, &closure) if block_given?
+      execute_closure_and_zip(collection, &closure) if block_given?
     end
 
     # Returns an SQLite3::Statement object representing the given SQL.
+    #
     # The Statement is executed using Statement#execute (refer to the sqlite3 gem documentation).
     def prepare(sql)
       @anki21_database.prepare sql
@@ -127,8 +130,9 @@ module AnkiRecord
     public
 
     ##
-    # Instantiates a new object which is a copy of an already existing Anki package. See README for details.
-    # rubocop:disable Metrics/MethodLength
+    # Instantiates a new Anki package object which is a copy of an already existing Anki package.
+    #
+    # See the README for details.
     def self.open(path:, target_directory: nil, &closure)
       pathname = Pathname.new(path)
       raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
@@ -136,15 +140,13 @@ module AnkiRecord
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
       data = col_record_and_note_ids_to_copy_over(pathname: pathname)
 
-      @anki_package = if target_directory
-                        new(name: new_apkg_name, target_directory: target_directory, data: data, open_path: pathname)
-                      else
-                        new(name: new_apkg_name, data: data, open_path: pathname)
-                      end
-      @anki_package.send :execute_closure_and_zip, @anki_package, &closure if block_given?
-      @anki_package
+      if target_directory
+        new(name: new_apkg_name, data: data, open_path: pathname,
+            target_directory: target_directory, &closure)
+      else
+        new(name: new_apkg_name, data: data, open_path: pathname, &closure)
+      end
     end
-    # rubocop:enable Metrics/MethodLength
 
     ##
     # Returns true if the Anki package object was instantiated using ::open.
@@ -152,11 +154,15 @@ module AnkiRecord
       !@open_path.nil?
     end
 
-    ##
-    # If the Anki package was instantiated using ::open, this method
-    # will unzip the opened *.apkg file and yield its collection.anki21 database
-    # as a SQLite3::Database object to the block argument.
     # rubocop:disable Metrics/MethodLength
+
+    ##
+    # Will throw an error if the Anki package was not instantiated using ::open.
+    #
+    # Temporarily unzips the *.apkg file that was opened and yields its collection.anki21 database
+    # as a SQLite3::Database object to the block argument.
+    #
+    # After the block executes, the unzipped *.apkg files are deleted.
     def temporarily_unzip_source_apkg
       raise ArgumentError unless @open_path && block_given?
 
@@ -202,7 +208,8 @@ module AnkiRecord
     end
 
     ##
-    # Zips the temporary files (collection.anki21, collection.anki2, and media) into the *.apkg package file.
+    # Zips the temporary files (collection.anki21, collection.anki2, and media) into a new *.apkg package file.
+    #
     # The temporary files, and the temporary directory they were in, are deleted after zipping.
     def zip
       create_zip_file && destroy_temporary_directory
@@ -237,5 +244,5 @@ module AnkiRecord
       @anki21_database.closed?
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end
+# rubocop:enable Metrics/ClassLength

@@ -13,41 +13,40 @@ module AnkiRecord
     include SharedConstantsHelper
 
     ##
-    # The note object that the card belongs to
+    # The card's note object
     attr_reader :note
 
     ##
-    # The deck object that the card belongs to
+    # The card's deck object
     attr_reader :deck
 
     ##
-    # The collection object that the card belongs to
+    # The card's collection object
     attr_reader :collection
 
     ##
-    # The card template object that the card uses as its template
+    # The card's card template object
     attr_reader :card_template
 
     ##
-    # The id of the card.
-    # This is approximately the number of milliseconds since the 1970 epoch when the card was created.
+    # The card's id.
+    #
+    # This is also the number of milliseconds since the 1970 epoch when the card was created.
     attr_reader :id
 
     ##
-    # The number of seconds since the 1970 epoch when the card was most recently modified.
+    # The number of seconds since the 1970 epoch when the card was last modified.
     attr_reader :last_modified_time
 
     ##
-    # The usn (update sequence number) of the card
+    # The card's update sequence number
     attr_reader :usn
 
     ##
-    # TODO: Investigate all these
+    # TODO: Attribute needs to be investigated
     attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags, :data
 
-    # rubocop:disable Metrics/MethodLength
-    # rubocop:disable Metrics/AbcSize
-    def initialize(note:, card_template: nil, card_data: nil)
+    def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
       if note && card_template && (note.note_type == card_template.note_type)
         setup_instance_variables(note: note, card_template: card_template)
       elsif note && card_data
@@ -57,32 +56,34 @@ module AnkiRecord
       end
     end
 
-    def setup_instance_variables(note:, card_template:)
-      @note = note
-      @deck = @note.deck
-      @collection = @deck.collection
-      @card_template = card_template
-
-      @id = milliseconds_since_epoch
-      @last_modified_time = seconds_since_epoch
-      @usn = NEW_OBJECT_USN
-      @type = 0
-      @queue = 0
-      @due = 0
-      @ivl = 0
-      @factor = 0
-      @reps = 0
-      @lapses = 0
-      @left = 0
-      @odue = 0
-      @odid = 0
-      @flags = 0
-      @data = "{}"
-    end
-    # rubocop:enable Metrics/MethodLength
-    # rubocop:enable Metrics/AbcSize
-
     private
+
+      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize
+      def setup_instance_variables(note:, card_template:)
+        @note = note
+        @deck = @note.deck
+        @collection = @deck.collection
+        @card_template = card_template
+
+        @id = milliseconds_since_epoch
+        @last_modified_time = seconds_since_epoch
+        @usn = NEW_OBJECT_USN
+        @type = 0
+        @queue = 0
+        @due = 0
+        @ivl = 0
+        @factor = 0
+        @reps = 0
+        @lapses = 0
+        @left = 0
+        @odue = 0
+        @odid = 0
+        @flags = 0
+        @data = "{}"
+      end
+      # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize
 
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/MethodLength

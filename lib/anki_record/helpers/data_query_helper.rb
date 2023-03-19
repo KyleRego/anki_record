@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 module AnkiRecord
-  # Helper module for methods that can be used with the +sql_able+ duck type.
-  module DataQueryHelper
-    def note_cards_data_for_note_id(sql_able:, id:) # :nodoc:
+  module DataQueryHelper # :nodoc:
+    def note_cards_data_for_note_id(sql_able:, id:)
       note_data = sql_able.prepare("select * from notes where id = ?").execute([id]).first
       return nil unless note_data
 

@@ -10,7 +10,7 @@ RSpec.describe AnkiRecord::Collection do
 
     describe "::new" do
       it "should instantiate a new Collection object" do
-        expect(collection.instance_of?(AnkiRecord::Collection)).to eq true
+        expect(collection).to be_a AnkiRecord::Collection
       end
       it "should instantiate a new Collection object with anki_package attribute which is the AnkiPackage object argument" do
         expect(collection.anki_package).to eq anki_package
@@ -19,7 +19,7 @@ RSpec.describe AnkiRecord::Collection do
         expect(collection.id).to eq 1
       end
       it "should instantiate a new Collection object with the creation_timestamp attribute having an integer value" do
-        expect(collection.creation_timestamp.instance_of?(Integer)).to eq true
+        expect(collection.creation_timestamp).to be_a Integer
       end
       it "should instantiate a new Collection object with a last_modified_time attribute having the value 0" do
         expect(collection.last_modified_time).to eq 0
@@ -32,7 +32,7 @@ RSpec.describe AnkiRecord::Collection do
         expect(collection.note_types.map(&:name).sort).to eq default_note_type_names_array
       end
       it "should instantiate a new Collection object with note_types that are all instances of NoteType" do
-        expect(collection.note_types.all? { |note_type| note_type.instance_of?(AnkiRecord::NoteType) }).to eq true
+        collection.note_types.all? { |note_type| expect(note_type).to be_a AnkiRecord::NoteType }
       end
       it "should instantiate a new Collection object with 1 deck" do
         expect(collection.decks.count).to eq 1
@@ -41,7 +41,7 @@ RSpec.describe AnkiRecord::Collection do
         expect(collection.decks.first.name).to eq "Default"
       end
       it "should instantiate a new Collection object with decks that are all instances of Deck" do
-        expect(collection.decks.all? { |deck| deck.instance_of?(AnkiRecord::Deck) }).to eq true
+        collection.decks.all? { |deck| expect(deck).to be_a AnkiRecord::Deck }
       end
       it "should instantiate a new Collection object with 1 deck options group" do
         expect(collection.deck_options_groups.count).to eq 1
@@ -50,7 +50,7 @@ RSpec.describe AnkiRecord::Collection do
         expect(collection.deck_options_groups.first.name).to eq "Default"
       end
       it "should instantiate a new Collection object with deck_options_groups that are all instances of DeckOptionsGroup" do
-        expect(collection.deck_options_groups.all? { |deck_opts| deck_opts.instance_of?(AnkiRecord::DeckOptionsGroup) }).to eq true
+        collection.deck_options_groups.all? { |deck_opts| expect(deck_opts).to be_a AnkiRecord::DeckOptionsGroup }
       end
     end
 
@@ -97,8 +97,7 @@ RSpec.describe AnkiRecord::Collection do
         let(:path_argument) { "./#{opened_apkg_name}.apkg" }
         let(:note_type_name) { "crazy note type" }
         before do
-          AnkiRecord::AnkiPackage.new(name: opened_apkg_name) do |apkg|
-            collection = apkg.collection
+          AnkiRecord::AnkiPackage.new(name: opened_apkg_name) do |collection|
             default_deck = collection.find_deck_by name: "Default"
             crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
             AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
@@ -164,10 +163,27 @@ RSpec.describe AnkiRecord::Collection do
       context "when passed an id argument where the collection has a deck with that id" do
         let(:default_deck_id) { collection.find_deck_by(name: "Default").id }
         it "should return a note type object" do
-          expect(collection.find_deck_by(id: default_deck_id).instance_of?(AnkiRecord::Deck)).to eq true
+          expect(collection.find_deck_by(id: default_deck_id)).to be_a AnkiRecord::Deck
         end
         it "should return a note type object with name equal to the name argument" do
           expect(collection.find_deck_by(id: default_deck_id).id).to eq default_deck_id
+        end
+      end
+    end
+
+    describe "#find_deck_options_group_by" do
+      context "when passed an id argument where the collection does not have a note type with that id" do
+        it "should return nil" do
+          expect(collection.find_deck_options_group_by(id: "1234")).to eq nil
+        end
+      end
+      context "when passed an id argument where the collection has a deck with that id" do
+        let(:default_deck_options_group_id) { collection.find_deck_by(name: "Default").deck_options_group.id }
+        it "should return a note type object" do
+          expect(collection.find_deck_options_group_by(id: default_deck_options_group_id)).to be_a AnkiRecord::DeckOptionsGroup
+        end
+        it "should return a note type object with name equal to the name argument" do
+          expect(collection.find_deck_by(id: default_deck_options_group_id).id).to eq default_deck_options_group_id
         end
       end
     end
@@ -201,6 +217,24 @@ RSpec.describe AnkiRecord::Collection do
             expect(@collection.find_note_by(id: @note.id).cards.first.id).to eq @note.cards.first.id
           end
         end
+      end
+    end
+
+    describe "#add_note_type" do
+      it "should throw an error if the argument object is not an instance of NoteType" do
+        expect { collection.add_note_type("bad object") }.to raise_error ArgumentError
+      end
+    end
+
+    describe "#add_deck" do
+      it "should throw an error if the argument object is not an instance of Deck" do
+        expect { collection.add_deck("bad object") }.to raise_error ArgumentError
+      end
+    end
+
+    describe "#add_deck_options_group" do
+      it "should throw an error if the argument object is not an instance of DeckOptionsGroup" do
+        expect { collection.add_deck_options_group("bad object") }.to raise_error ArgumentError
       end
     end
   end

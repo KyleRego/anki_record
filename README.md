@@ -2,7 +2,7 @@
 
 Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases).
 
-**It is in an early stage of development and the API is not stable.**
+**It is in an early stage of development and the API is not finalized.**
 
 ## Installation
 
@@ -13,24 +13,6 @@ Install the gem and add to the application's Gemfile by executing:
 If bundler is not being used to manage dependencies, install the gem by executing:
 
     $ gem install anki_record
-
-## Documentation
-
-The section following this one should have examples showing the most common use cases, but the gem also has some additional documentation.
-
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
-
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. The following is an example of output from one example in `spec/anki_record/note_spec.rb`:
-
-```
-AnkiRecord::Note
-  #save
-    for a note with 2 card templates, that does not exist yet in the collection.anki21 database
-      should save two card records to the collection.anki21 database
-        with nid values equal to the id of the cards' note object's id
-```
-
-The RSpec test suite files in `spec` should have a 1-to-1 mapping with the source code files in `lib`.
 
 ## Usage
 
@@ -118,6 +100,22 @@ end
 
 This creates `crazy.apkg` with a new custom note type called "crazy note type" and one note using it.
 
+## Documentation
+
+The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
+
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. The following is an example of output from one example in `spec/anki_record/note_spec.rb`:
+
+```
+AnkiRecord::Note
+  #save
+    for a note with 2 card templates, that does not exist yet in the collection.anki21 database
+      should save two card records to the collection.anki21 database
+        with nid values equal to the id of the cards' note object's id
+```
+
+The RSpec test suite files in `spec` should have a 1-to-1 mapping with the source code files in `lib`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -144,6 +142,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Investigate if note guid is determined in Anki in a non-random way
   - Note method missing should throw an error if the missing method is not one it responds to
   - Figure out if the database ever needs to be explicitly opened or closed
+  - Defining #inspect for the objects, so when the objects are shown in output, they are easier to look at
 
 ### Release checklist
 - Remove `require "pry"`
