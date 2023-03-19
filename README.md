@@ -50,7 +50,7 @@ A new Anki package object is initialized with the "Default" deck and the default
 ```ruby
 require "anki_record"
 
-apkg = AnkiRecord::AnkiPackage.new(name: "test") do
+apkg = AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
   deck = apkg.collection.find_deck_by name: "Default"
 
   note_type = apkg.collection.find_note_type_by name: "Basic"
