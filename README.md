@@ -132,6 +132,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Work on adding media support
     - The checksum calculation for notes will need to be updated to account for HTML in the content
 - Saving note types, decks, and deck options groups to the collection.anki21 database
+  - Deck options groups cannot be saved yet.
   - Add being able to handle subdecks
   - Updating them when they already exist
   - Setters for any relevant attributes with validation
@@ -140,7 +141,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
   - Use more specific RSpec matchers than `eq` everywhere
   - Reduce TODO comments
   - Investigate if note guid is determined in Anki in a non-random way
-  - Note method missing should throw an error if the missing method is not one it responds to
   - Figure out if the database ever needs to be explicitly opened or closed
   - Defining #inspect for the objects, so when the objects are shown in output, they are easier to look at
 

@@ -13,44 +13,43 @@ module AnkiRecord
     include SharedConstantsHelper
 
     ##
-    # The card's note object
+    # The card's note object.
     attr_reader :note
 
     ##
-    # The card's deck object
+    # The card's deck object.
     attr_reader :deck
 
     ##
-    # The card's collection object
+    # The card's collection object.
     attr_reader :collection
 
     ##
-    # The card's card template object
+    # The card's card template object.
     attr_reader :card_template
 
     ##
     # The card's id.
     #
-    # This is also the number of milliseconds since the 1970 epoch when the card was created.
+    # This is also the number of milliseconds since the 1970 epoch at which the card was created.
     attr_reader :id
 
     ##
-    # The number of seconds since the 1970 epoch when the card was last modified.
-    attr_reader :last_modified_time
+    # The number of seconds since the 1970 epoch at which the card was last modified.
+    attr_reader :last_modified_timestamp
 
     ##
-    # The card's update sequence number
+    # The card's update sequence number.
     attr_reader :usn
 
-    ##
-    # TODO: Attribute needs to be investigated
     attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags, :data
 
     def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
-      if note && card_template && (note.note_type == card_template.note_type)
-        setup_instance_variables(note: note, card_template: card_template)
-      elsif note && card_data
-        setup_instance_variables_from_existing(note: note, card_data: card_data)
+      @note = note
+      if card_template
+        setup_instance_variables_for_new_card(card_template: card_template)
+      elsif card_data
+        setup_instance_variables_from_existing(card_data: card_data)
       else
         raise ArgumentError
       end
@@ -58,74 +57,70 @@ module AnkiRecord
 
     private
 
-      # rubocop:disable Metrics/MethodLength
-      # rubocop:disable Metrics/AbcSize
-      def setup_instance_variables(note:, card_template:)
-        @note = note
+      def setup_instance_variables_for_new_card(card_template:)
+        raise ArgumentError unless @note.note_type == card_template.note_type
+
+        setup_collaborator_object_instance_variables_for_new_card(card_template: card_template)
+        setup_simple_instance_variables_for_new_card
+      end
+
+      def setup_collaborator_object_instance_variables_for_new_card(card_template:)
+        @card_template = card_template
         @deck = @note.deck
         @collection = @deck.collection
-        @card_template = card_template
+      end
 
+      def setup_simple_instance_variables_for_new_card
         @id = milliseconds_since_epoch
-        @last_modified_time = seconds_since_epoch
+        @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
-        @type = 0
-        @queue = 0
-        @due = 0
-        @ivl = 0
-        @factor = 0
-        @reps = 0
-        @lapses = 0
-        @left = 0
-        @odue = 0
-        @odid = 0
-        @flags = 0
+        %w[type queue due ivl factor reps lapses left odue odid flags].each do |instance_variable_name|
+          instance_variable_set "@#{instance_variable_name}", 0
+        end
         @data = "{}"
       end
-      # rubocop:enable Metrics/MethodLength
-      # rubocop:enable Metrics/AbcSize
 
-      # rubocop:disable Metrics/AbcSize
-      # rubocop:disable Metrics/MethodLength
-      def setup_instance_variables_from_existing(note:, card_data:)
-        @note = note
+      def setup_instance_variables_from_existing(card_data:)
+        setup_collaborator_object_instance_variables_from_existing(card_data: card_data)
+        setup_simple_instance_variables_from_existing(card_data: card_data)
+      end
+
+      def setup_collaborator_object_instance_variables_from_existing(card_data:)
         @collection = note.note_type.collection
         @deck = collection.find_deck_by id: card_data["did"]
-        @id = card_data["id"]
-        @ordinal_number = card_data["ord"]
-        @last_modified_time = card_data["mod"]
-        @usn = card_data["usn"]
-        @type = card_data["type"]
-        @queue = card_data["queue"]
-        @due = card_data["due"]
-        @ivl = card_data["ivl"]
-        @factor = card_data["factor"]
-        @reps = card_data["reps"]
-        @lapses = card_data["lapses"]
-        @left = card_data["left"]
-        @odue = card_data["odue"]
-        @odid = card_data["odid"]
-        @flags = card_data["flags"]
-        @data = card_data["data"]
+        @card_template = note.note_type.card_templates.find do |card_template|
+          card_template.ordinal_number == card_data["ord"]
+        end
       end
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
+
+      def setup_simple_instance_variables_from_existing(card_data:)
+        @last_modified_timestamp = card_data["mod"]
+        %w[id usn type queue due ivl factor reps lapses left odue odid flags data].each do |instance_variable_name|
+          instance_variable_set "@#{instance_variable_name}", card_data[instance_variable_name]
+        end
+      end
 
     public
 
-    # rubocop:disable Metrics/MethodLength
     def save(note_exists_already: false) # :nodoc:
-      if note_exists_already
+      note_exists_already ? update_card_in_collection_anki21 : insert_new_card_in_collection_anki21
+    end
+
+    private
+
+      def update_card_in_collection_anki21
         statement = @collection.anki_package.prepare <<~SQL
           update cards set nid = ?, did = ?, ord = ?, mod = ?, usn = ?, type = ?,
                             queue = ?, due = ?, ivl = ?, factor = ?, reps = ?, lapses = ?,
                             left = ?, odue = ?, odid = ?, flags = ?, data = ? where id = ?
         SQL
         statement.execute [@note.id, @deck.id, ordinal_number,
-                           @last_modified_time, @usn, @type, @queue,
+                           @last_modified_timestamp, @usn, @type, @queue,
                            @due, @ivl, @factor, @reps,
                            @lapses, @left, @odue, @odid, @flags, @data, @id]
-      else
+      end
+
+      def insert_new_card_in_collection_anki21
         statement = @collection.anki_package.prepare <<~SQL
           insert into cards (id, nid, did, ord,
                             mod, usn, type, queue,
@@ -134,17 +129,12 @@ module AnkiRecord
                       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL
         statement.execute [@id, @note.id, @deck.id, ordinal_number,
-                           @last_modified_time, @usn, @type, @queue,
-                           @due, @ivl, @factor, @reps,
-                           @lapses, @left, @odue, @odid, @flags, @data]
+                           @last_modified_timestamp, @usn, @type, @queue,
+                           @due, @ivl, @factor, @reps, @lapses, @left, @odue, @odid, @flags, @data]
       end
-    end
-    # rubocop:enable Metrics/MethodLength
-
-    private
 
       def ordinal_number
-        @card_template&.ordinal_number || @ordinal_number
+        @card_template&.ordinal_number
       end
   end
 end

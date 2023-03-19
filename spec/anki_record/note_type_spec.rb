@@ -130,8 +130,8 @@ RSpec.describe AnkiRecord::NoteType do
       it "with 0 for the value of the type in the note hash because this is a non-cloze note type" do
         expect(crazy_note_type_hash["type"]).to eq 0
       end
-      it "with the note type's last_modified_time attribute as the value for the mod in the note type hash" do
-        expect(crazy_note_type_hash["mod"]).to eq crazy_note_type.last_modified_time
+      it "with the note type's last_modified_timestamp attribute as the value for the mod in the note type hash" do
+        expect(crazy_note_type_hash["mod"]).to eq crazy_note_type.last_modified_timestamp
       end
       it "with -1 for the value of the usn key in the note hash" do
         expect(crazy_note_type_hash["usn"]).to eq(-1)

@@ -27,11 +27,11 @@ module AnkiRecord
 
     ##
     # The number of milliseconds that passed since the 1970 epoch when the collection record was created
-    attr_reader :creation_timestamp
+    attr_reader :created_at_timestamp
 
     ##
     # The number of milliseconds that passed since the 1970 epoch since the collection record was modified
-    attr_reader :last_modified_time
+    attr_reader :last_modified_timestamp
 
     ##
     # The collection's note type objects as an array.
@@ -68,7 +68,7 @@ module AnkiRecord
     end
 
     ##
-    # Returns the collection's note type object found by either +name+ or +id+, and nil if it is not found.
+    # Returns the collection's note type object found by either +name+ or +id+, or nil if it is not found.
     def find_note_type_by(name: nil, id: nil)
       return note_types.find { |note_type| note_type.name == name } if name && id.nil?
 
@@ -78,7 +78,7 @@ module AnkiRecord
     end
 
     ##
-    # Returns the collection's deck object found by either +name+ or +id+, and nil if it is not found.
+    # Returns the collection's deck object found by either +name+ or +id+, or nil if it is not found.
     def find_deck_by(name: nil, id: nil)
       return decks.find { |deck| deck.name == name } if name && id.nil?
 
@@ -88,7 +88,7 @@ module AnkiRecord
     end
 
     ##
-    # Returns the collection's deck options group object found by +id+, and nil if it is not found.
+    # Returns the collection's deck options group object found by +id+, or nil if it is not found.
     def find_deck_options_group_by(id:)
       deck_options_groups.find { |deck_options_group| deck_options_group.id == id }
     end
@@ -133,8 +133,8 @@ module AnkiRecord
       # rubocop:disable Metrics/AbcSize
       def setup_simple_collaborator_objects
         @id = col_record["id"]
-        @creation_timestamp = col_record["crt"]
-        @last_modified_time = col_record["mod"]
+        @created_at_timestamp = col_record["crt"]
+        @last_modified_timestamp = col_record["mod"]
         @scm = col_record["scm"]
         @ver = col_record["ver"]
         @dty = col_record["dty"]

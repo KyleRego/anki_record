@@ -7,7 +7,7 @@ require_relative "helpers/time_helper"
 
 module AnkiRecord
   ##
-  # Represents the set of options that can be applied to a deck
+  # DeckOptionsGroup represents a set of options that can be applied to an Anki deck.
   class DeckOptionsGroup
     include SharedConstantsHelper
     include TimeHelper
@@ -17,17 +17,19 @@ module AnkiRecord
     attr_reader :collection
 
     ##
-    # The name of the deck options group
+    # The deck option group's name.
     attr_accessor :name
 
     ##
-    # The id of the deck options group
+    # The deck option group's id.
     attr_reader :id
 
     ##
-    # The last time that this deck options group was modified in milliseconds since the 1970 epoch
-    attr_reader :last_modified_time
+    # The number of milliseconds since the 1970 epoch at which the deck options group was modified.
+    attr_reader :last_modified_timestamp
 
+    ##
+    # Instantiates a new deck options group belonging to +collection+ with name +name+.
     def initialize(collection:, name: nil, args: nil)
       # TODO: extract this check to a shared helper
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
@@ -53,7 +55,7 @@ module AnkiRecord
       # rubocop:disable Metrics/AbcSize
       def setup_deck_options_group_instance_variables_from_existing(args:)
         @id = args["id"]
-        @last_modified_time = args["mod"]
+        @last_modified_timestamp = args["mod"]
         @name = args["name"]
         @usn = args["usn"]
         @max_taken = args["maxTaken"]
@@ -79,7 +81,7 @@ module AnkiRecord
       # rubocop:disable Metrics/AbcSize
       def setup_deck_options_group_instance_variables(name:)
         @id = milliseconds_since_epoch
-        @last_modified_time = seconds_since_epoch
+        @last_modified_timestamp = seconds_since_epoch
         @name = name
         @usn = NEW_OBJECT_USN
         @max_taken = 60

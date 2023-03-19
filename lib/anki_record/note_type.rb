@@ -35,7 +35,7 @@ module AnkiRecord
 
     ##
     # The time that the note type was last modified as the number of seconds since the 1970 epoch
-    attr_reader :last_modified_time
+    attr_reader :last_modified_timestamp
 
     ##
     # The CSS styling of the note type
@@ -96,7 +96,7 @@ module AnkiRecord
 
     def to_h # :nodoc:
       { id: @id, name: @name, type: @cloze ? 1 : 0,
-        mod: @last_modified_time,
+        mod: @last_modified_timestamp,
         usn: @usn, sortf: @sort_field, did: @deck_id,
         tmpls: @card_templates.map(&:to_h),
         flds: @note_fields.map(&:to_h), css: @css,
@@ -173,7 +173,7 @@ module AnkiRecord
         @id = args["id"]
         @name = args["name"]
         @cloze = args["type"] == 1
-        @last_modified_time = args["mod"]
+        @last_modified_timestamp = args["mod"]
         @usn = args["usn"]
         @sort_field = args["sortf"]
         @deck_id = args["did"]
@@ -197,7 +197,7 @@ module AnkiRecord
         @id = milliseconds_since_epoch
         @name = name
         @cloze = cloze
-        @last_modified_time = seconds_since_epoch
+        @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @sort_field = NEW_NOTE_TYPE_SORT_FIELD
         @deck_id = nil

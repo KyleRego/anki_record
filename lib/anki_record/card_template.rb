@@ -2,30 +2,30 @@
 
 require "pry"
 
-# TODO: All instance variables should at least be readable
-
 module AnkiRecord
   ##
-  # CardTemplate represents a card template of an Anki note type
+  # CardTemplate represents a card template of an Anki note type.
   class CardTemplate
     ##
-    # The name of the card template
+    # The card template's name.
     attr_accessor :name
 
     ##
-    # The font style shown for the card template in the browser
+    # The card template's font style in the browser.
     attr_accessor :browser_font_style
 
     ##
-    # The font size used for the card template in the browser
+    # The card template's font size used in the browser.
     attr_accessor :browser_font_size
 
     ##
-    # The question format of the card template
+    # The card template's question format.
     attr_reader :question_format
 
     ##
-    # Sets the question format and raises an ArgumentError if the specified format uses invalid fields
+    # Sets the question format of the card template.
+    #
+    # Raises an ArgumentError if the specified format attempts to use invalid fields.
     def question_format=(format)
       fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
         capture.chomp("}}").reverse.chomp("{{").reverse
@@ -38,11 +38,13 @@ module AnkiRecord
     end
 
     ##
-    # The answer format of the card template
+    # The card template's answer format.
     attr_reader :answer_format
 
     ##
-    # Sets the answer format and raises an ArgumentError if the specified format uses invalid fields
+    # Sets the answer format of the card template.
+    #
+    # Raises an ArgumentError if the specified format attempts to use invalid fields.
     def answer_format=(format)
       fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
         capture.chomp("}}").reverse.chomp("{{").reverse
@@ -55,13 +57,14 @@ module AnkiRecord
     end
 
     ##
-    # The note type that the card template belongs to
+    # The card template's note type object.
     attr_reader :note_type
 
     ##
     # 0 for the first card template of the note type, 1 for the second, etc.
     attr_reader :ordinal_number
 
+    # Instantiates a new card template with name +name+ for the note type +note_type+.
     def initialize(note_type:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 

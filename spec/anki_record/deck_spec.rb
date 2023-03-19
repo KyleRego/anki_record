@@ -28,7 +28,7 @@ RSpec.describe AnkiRecord::Deck do
       it "should instantiate a deck with an integer id attribute" do
         expect(deck.id).to be_a Integer
       end
-      it "should instantiate a deck with an integer last_modified_time attribute" do
+      it "should instantiate a deck with an integer last_modified_timestamp attribute" do
         expect(deck.id).to be_a Integer
       end
       it "should instantiate a deck with deck_options_group returning a deck options group object" do
@@ -77,7 +77,7 @@ RSpec.describe AnkiRecord::Deck do
           expect(deck_from_existing.id).to eq 1
         end
         it "should instantiate a deck with the last modified time from the deck JSON" do
-          expect(deck_from_existing.last_modified_time).to eq 0
+          expect(deck_from_existing.last_modified_timestamp).to eq 0
         end
         it "should instantiate a deck with the name Default" do
           expect(deck_from_existing.name).to eq "Default"
@@ -122,8 +122,8 @@ RSpec.describe AnkiRecord::Deck do
       it "with the deck object's id attribute as the value for the id key in the deck hash" do
         expect(crazy_deck_hash["id"]).to eq crazy_deck.id
       end
-      it "with the deck object's last_modified_time attribute as the value for the mod key in the deck hash" do
-        expect(crazy_deck_hash["mod"]).to eq crazy_deck.last_modified_time
+      it "with the deck object's last_modified_timestamp attribute as the value for the mod key in the deck hash" do
+        expect(crazy_deck_hash["mod"]).to eq crazy_deck.last_modified_timestamp
       end
       it "with the deck object's name attribute as the value for the name key in the deck hash" do
         expect(crazy_deck_hash["name"]).to eq crazy_deck.name

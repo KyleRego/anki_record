@@ -65,8 +65,8 @@ RSpec.describe AnkiRecord::Card do
       it "should instantiate a card object with an integer id attribute" do
         expect(new_card.id.instance_of?(Integer)).to eq true
       end
-      it "should instantiate a card object with an integer last_modified_time attribute" do
-        expect(new_card.last_modified_time.instance_of?(Integer)).to eq true
+      it "should instantiate a card object with an integer last_modified_timestamp attribute" do
+        expect(new_card.last_modified_timestamp.instance_of?(Integer)).to eq true
       end
       it "should instantiate a card object with an usn attribute equal to -1" do
         expect(new_card.usn).to eq(-1)

@@ -387,8 +387,8 @@ RSpec.describe AnkiRecord::AnkiPackage do
             expect(copied_over_note).to be_a AnkiRecord::Note
           end
           context "the note is present" do
-            it "and it has the same id, guid, last_modified_time, usn, tags, field_contents, flags, and data attributes as the original note" do
-              %w[id guid last_modified_time usn tags field_contents flags data].each do |note_attribute|
+            it "and it has the same id, guid, last_modified_timestamp, usn, tags, field_contents, flags, and data attributes as the original note" do
+              %w[id guid last_modified_timestamp usn tags field_contents flags data].each do |note_attribute|
                 expect(copied_over_note.send(note_attribute)).to eq @original_note.send(note_attribute)
               end
             end

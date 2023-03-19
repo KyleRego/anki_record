@@ -25,7 +25,7 @@ module AnkiRecord
 
     ##
     # The last time the note was modified in seconds since the 1970 epoch
-    attr_reader :last_modified_time
+    attr_reader :last_modified_timestamp
 
     ##
     # The note's update sequence number
@@ -87,7 +87,7 @@ module AnkiRecord
         @collection = deck.collection
         @id = milliseconds_since_epoch
         @guid = globally_unique_id
-        @last_modified_time = seconds_since_epoch
+        @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @tags = []
         @field_contents = setup_field_contents
@@ -104,7 +104,7 @@ module AnkiRecord
         @note_type = collection.find_note_type_by id: note_data["mid"]
         @id = note_data["id"]
         @guid = note_data["guid"]
-        @last_modified_time = note_data["mod"]
+        @last_modified_timestamp = note_data["mod"]
         @usn = note_data["usn"]
         @tags = note_data["tags"].split
         snake_case_field_names_in_order = note_type.snake_case_field_names
@@ -134,7 +134,7 @@ module AnkiRecord
                                      flds = ?, sfld = ?, csum = ?, flags = ?, data = ?
                            where id = ?
         SQL
-        statement.execute([@guid, note_type.id, @last_modified_time,
+        statement.execute([@guid, note_type.id, @last_modified_timestamp,
                            @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
                            checksum(sort_field_value), @flags, @data, @id])
         cards.each { |card| card.save(note_exists_already: true) }
@@ -143,7 +143,7 @@ module AnkiRecord
           insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
                       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL
-        statement.execute([@id, @guid, note_type.id, @last_modified_time,
+        statement.execute([@id, @guid, note_type.id, @last_modified_timestamp,
                            @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
                            checksum(sort_field_value), @flags, @data])
         cards.each(&:save)

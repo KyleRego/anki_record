@@ -15,6 +15,8 @@ require_relative "db/clean_collection21_record"
 module AnkiRecord
   ##
   # AnkiPackage represents an Anki package.
+  #
+  # Here, Anki package refers to the zip file that Anki can export and import.
   class AnkiPackage
     include AnkiRecord::DataQueryHelper
 
@@ -38,7 +40,7 @@ module AnkiRecord
       execute_closure_and_zip(collection, &closure) if block_given?
     end
 
-    # Returns an SQLite3::Statement object representing the given SQL.
+    # Returns an SQLite3::Statement object representing the given SQL and coupled to the collection.anki21 database.
     #
     # The Statement is executed using Statement#execute (refer to the sqlite3 gem documentation).
     def prepare(sql)
@@ -130,7 +132,7 @@ module AnkiRecord
     public
 
     ##
-    # Instantiates a new Anki package object which is a copy of an already existing Anki package.
+    # Instantiates a new Anki package object which seeded with data from an already existing Anki package.
     #
     # See the README for details.
     def self.open(path:, target_directory: nil, &closure)
@@ -157,12 +159,13 @@ module AnkiRecord
     # rubocop:disable Metrics/MethodLength
 
     ##
-    # Will throw an error if the Anki package was not instantiated using ::open.
-    #
-    # Temporarily unzips the *.apkg file that was opened and yields its collection.anki21 database
+    # Unzips the *.apkg file that was opened and yields its collection.anki21 database
     # as a SQLite3::Database object to the block argument.
     #
-    # After the block executes, the unzipped *.apkg files are deleted.
+    # After the block executes, the files created by unzipping are deleted.
+    #
+    # Throws an error if the Anki package was not instantiated using ::open.
+    #
     def temporarily_unzip_source_apkg
       raise ArgumentError unless @open_path && block_given?
 

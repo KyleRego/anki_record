@@ -49,8 +49,8 @@ RSpec.describe AnkiRecord::Note do
       it "should instantiate a note with a guid which is 10 characters" do
         expect(note.guid.length).to eq 10
       end
-      it "should instantiate a note with a last_modified_time attribute which is an integer" do
-        expect(note.last_modified_time).to be_a Integer
+      it "should instantiate a note with a last_modified_timestamp attribute which is an integer" do
+        expect(note.last_modified_timestamp).to be_a Integer
       end
       it "should instantiate a note with a tags attribute which is an empty array" do
         expect(note.tags).to eq []
@@ -91,8 +91,8 @@ RSpec.describe AnkiRecord::Note do
         it "should instantiate a note object with guid attribute equal to the guid of the note in the data" do
           expect(note_from_existing_record.guid).to eq note_data["guid"]
         end
-        it "should instantiate a note object with last_modified_time attribute equal to the mod of the note in the data" do
-          expect(note_from_existing_record.last_modified_time).to eq note_data["mod"]
+        it "should instantiate a note object with last_modified_timestamp attribute equal to the mod of the note in the data" do
+          expect(note_from_existing_record.last_modified_timestamp).to eq note_data["mod"]
         end
         it "should instantiate a note object with tags attribute equal to an empty array (because the note has no tags)" do
           expect(note_from_existing_record.tags).to eq []
@@ -121,11 +121,17 @@ RSpec.describe AnkiRecord::Note do
           it "should have note attribute equal to the note object that is instantiated" do
             note_from_existing_record.cards.each { |card| expect(card.note).to eq note_from_existing_record }
           end
+          it "should have card_template attributes with values that are card template objects" do
+            note_from_existing_record.cards.each { |card| expect(card.card_template).to be_a AnkiRecord::CardTemplate }
+          end
+          it "should have card_template attributes with card template object values with ordinal number 0 and 1" do
+            expect(note_from_existing_record.cards.map { |card| card.card_template.ordinal_number }.sort).to eq [0, 1]
+          end
           it "should have id attributes equal to the ids of the card records in the data" do
             expect(note_from_existing_record.cards.map(&:id)).to eq(cards_data.map { |cd| cd["id"] })
           end
-          it "should have last_modified_time attributes equal to the mod values of the card records in the data" do
-            expect(note_from_existing_record.cards.map(&:last_modified_time)).to eq(cards_data.map { |cd| cd["mod"] })
+          it "should have last_modified_timestamp attributes equal to the mod values of the card records in the data" do
+            expect(note_from_existing_record.cards.map(&:last_modified_timestamp)).to eq(cards_data.map { |cd| cd["mod"] })
           end
           it "should have deck attribute equal to the deck object with id equal to the did of the card records in the data" do
             expect(note_from_existing_record.cards.map(&:deck)).to eq(cards_data.map do |cd|
@@ -181,8 +187,8 @@ RSpec.describe AnkiRecord::Note do
         it "with an mid value equal to the id of the note's note type's id" do
           expect(note_record_data["mid"]).to eq note_with_two_cards.note_type.id
         end
-        it "with an mod value equal to the last_modified_time attribute of the note object" do
-          expect(note_record_data["mod"]).to eq note_with_two_cards.last_modified_time
+        it "with an mod value equal to the last_modified_timestamp attribute of the note object" do
+          expect(note_record_data["mod"]).to eq note_with_two_cards.last_modified_timestamp
         end
         it "with an usn value equal to -1" do
           expect(note_record_data["usn"]).to eq(-1)
@@ -222,8 +228,8 @@ RSpec.describe AnkiRecord::Note do
         it "with ord values equal to the ordinal_number attributes of the corresponding card templates" do
           expect(cards_records_data.map { |hash| hash["ord"] }.sort).to eq note_with_two_cards.note_type.card_templates.map(&:ordinal_number).sort
         end
-        it "with mod values equal to the last_modified_time attributes of the card objects" do
-          expect(cards_records_data.map { |hash| hash["mod"] }.sort).to eq note_with_two_cards.cards.map(&:last_modified_time).sort
+        it "with mod values equal to the last_modified_timestamp attributes of the card objects" do
+          expect(cards_records_data.map { |hash| hash["mod"] }.sort).to eq note_with_two_cards.cards.map(&:last_modified_timestamp).sort
         end
         it "with usn values equal to -1" do
           expect(cards_records_data.map { |hash| hash["usn"] }).to eq [-1, -1]

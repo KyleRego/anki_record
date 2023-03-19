@@ -32,7 +32,7 @@ module AnkiRecord
 
     ##
     # The number of seconds since the 1970 epoch when the deck was last modified.
-    attr_reader :last_modified_time
+    attr_reader :last_modified_timestamp
 
     ##
     # The deck's deck options group object.
@@ -65,7 +65,7 @@ module AnkiRecord
 
     def to_h # :nodoc:
       {
-        id: @id, mod: @last_modified_time, name: @name, usn: @usn,
+        id: @id, mod: @last_modified_timestamp, name: @name, usn: @usn,
         lrnToday: @learn_today, revToday: @review_today, newToday: @new_today, timeToday: @time_today,
         collapsed: @collapsed_in_main_window, browserCollapsed: @collapsed_in_browser,
         desc: @description, dyn: @dyn, conf: @deck_options_group.id,
@@ -79,7 +79,7 @@ module AnkiRecord
       # rubocop:disable Metrics/AbcSize
       def setup_deck_instance_variables_from_existing(args:)
         @id = args["id"]
-        @last_modified_time = args["mod"]
+        @last_modified_timestamp = args["mod"]
         @name = args["name"]
         @usn = args["usn"]
         @learn_today = args["lrnToday"]
@@ -100,7 +100,7 @@ module AnkiRecord
       # rubocop:disable Metrics/MethodLength
       def setup_deck_instance_variables(name:)
         @id = milliseconds_since_epoch
-        @last_modified_time = seconds_since_epoch
+        @last_modified_timestamp = seconds_since_epoch
         @name = name
         @usn = NEW_OBJECT_USN
         @learn_today = @review_today = @new_today = @time_today = default_deck_today_array

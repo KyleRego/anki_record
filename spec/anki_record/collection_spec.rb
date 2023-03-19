@@ -18,11 +18,11 @@ RSpec.describe AnkiRecord::Collection do
       it "should instantiate a new Collection object with an id of 1" do
         expect(collection.id).to eq 1
       end
-      it "should instantiate a new Collection object with the creation_timestamp attribute having an integer value" do
-        expect(collection.creation_timestamp).to be_a Integer
+      it "should instantiate a new Collection object with the created_at_timestamp attribute having an integer value" do
+        expect(collection.created_at_timestamp).to be_a Integer
       end
-      it "should instantiate a new Collection object with a last_modified_time attribute having the value 0" do
-        expect(collection.last_modified_time).to eq 0
+      it "should instantiate a new Collection object with a last_modified_timestamp attribute having the value 0" do
+        expect(collection.last_modified_timestamp).to eq 0
       end
       it "should instantiate a new Collection object with 5 note types" do
         expect(collection.note_types.count).to eq 5

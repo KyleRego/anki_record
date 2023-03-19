@@ -31,8 +31,8 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
       it "should instantiate a new deck options group with an integer id" do
         expect(deck_options_group.id).to be_a Integer
       end
-      it "should instantiate a new deck options group with an integer last_modified_time" do
-        expect(deck_options_group.last_modified_time).to be_a Integer
+      it "should instantiate a new deck options group with an integer last_modified_timestamp" do
+        expect(deck_options_group.last_modified_timestamp).to be_a Integer
       end
     end
 
@@ -75,7 +75,7 @@ RSpec.describe AnkiRecord::DeckOptionsGroup do
           expect(deck_options_group_from_existing.id).to eq 1
         end
         it "should instantiate a deck options group with a last modified time from the JSON data" do
-          expect(deck_options_group_from_existing.last_modified_time).to eq 0
+          expect(deck_options_group_from_existing.last_modified_timestamp).to eq 0
         end
       end
     end
