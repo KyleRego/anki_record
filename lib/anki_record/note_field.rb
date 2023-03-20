@@ -1,39 +1,39 @@
 # frozen_string_literal: true
 
-# TODO: raise exceptions on invalid assignment to prevent downstream errors and specs for the writeable attributes
-
 require "pry"
 
 module AnkiRecord
   ##
-  # NoteField represents a field of an Anki note type
+  # NoteField represents a field of an Anki note type.
   class NoteField
     ##
-    # The note type object that the note field object belongs to
+    # The field's note type.
     attr_reader :note_type
 
     ##
-    # The name of the note field
+    # The field's name.
     attr_accessor :name
 
     ##
-    # A boolean that indicates if this field is sticky
+    # A boolean that indicates if the field is sticky.
+    #
+    # A sticky field does not clear its input when a note is created.
     attr_accessor :sticky
 
     ##
-    # A boolean that indicates if this field should be right to left in Anki
+    # A boolean that indicates if the field should be right to left in Anki.
     attr_accessor :right_to_left
 
     ##
-    # The font style used when editing the field in Anki
+    # The field's font style used when editing.
     attr_accessor :font_style
 
     ##
-    # The font size used when editing the field in Anki
+    # The field's font size used when editing.
     attr_accessor :font_size
 
     ##
-    # The description of the note field
+    # The field's description.
     attr_accessor :description
 
     ##
@@ -41,7 +41,7 @@ module AnkiRecord
     attr_reader :ordinal_number
 
     ##
-    # Instantiates a new field for the given note type
+    # Instantiates a new field for the note type +note_type+ with name +name+.
     def initialize(note_type:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 

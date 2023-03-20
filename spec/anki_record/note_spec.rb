@@ -40,6 +40,9 @@ RSpec.describe AnkiRecord::Note do
       it "should instantiate a note" do
         expect(note).to be_a AnkiRecord::Note
       end
+      it "should instantiate a note with collection attribute being an instance of a Collection" do
+        expect(note.collection).to be_a AnkiRecord::Collection
+      end
       it "should instantiate a note with an integer id" do
         expect(note.id).to be_a Integer
       end
@@ -87,6 +90,9 @@ RSpec.describe AnkiRecord::Note do
         end
         it "should instantiate a note object with id attribute equal to the id of the note in the data" do
           expect(note_from_existing_record.id).to eq note_data["id"]
+        end
+        it "should instantiate a note with collection attribute being an instance of a Collection" do
+          expect(note.collection).to be_a AnkiRecord::Collection
         end
         it "should instantiate a note object with guid attribute equal to the guid of the note in the data" do
           expect(note_from_existing_record.guid).to eq note_data["guid"]
