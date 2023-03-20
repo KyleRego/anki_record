@@ -91,7 +91,6 @@ RSpec.describe AnkiRecord::NoteType do
       second_crazy_card_template.answer_format = "{{crazy front}}"
       crazy_note_type
     end
-    # TODO: These specs can be written in a much more DRY way
 
     let(:col_models_hash) { collection_argument.models_json }
     let(:crazy_note_type_hash) do
@@ -289,6 +288,9 @@ RSpec.describe AnkiRecord::NoteType do
       it "should instantiate a note type with the same deck id as the data (NULL or nil)" do
         expect(basic_note_type_from_existing.deck_id).to eq nil
       end
+      it "should instantiate a note type where the deck method returns nil" do
+        expect(basic_note_type_from_existing.deck).to be_nil
+      end
       it "should instantiate a note type with one card template" do
         expect(basic_note_type_from_existing.card_templates.count).to eq 1
       end
@@ -483,6 +485,33 @@ RSpec.describe AnkiRecord::NoteType do
       it "should return a card template object with name equal to the name argument" do
         expect(basic_note_type_from_existing.find_card_template_by(name: "Card 1").name).to eq "Card 1"
       end
+    end
+  end
+
+  describe "#deck=" do
+    let(:default_deck) { basic_note_type_from_existing.collection.find_deck_by name: "Default" }
+    context "when used to set the deck to be a deck object" do
+      it "should set the deck object to be the deck" do
+        basic_note_type_from_existing.deck = default_deck
+        expect(basic_note_type_from_existing.deck).to eq default_deck
+      end
+    end
+    context "when used to set the deck to a non-deck object" do
+      it "should raise an ArgumentError" do
+        expect { basic_note_type_from_existing.deck = "Meg" }.to raise_error ArgumentError
+      end
+    end
+  end
+
+  describe "#add_note_field" do
+    it "should raise an ArgumentError when passed an argument which is not a note field" do
+      expect { basic_note_type_from_existing.add_note_field("not valid") }.to raise_error ArgumentError
+    end
+  end
+
+  describe "#add_card_template" do
+    it "should raise an ArgumentError when passed an argument which is not a card template" do
+      expect { basic_note_type_from_existing.add_card_template("not valid") }.to raise_error ArgumentError
     end
   end
 end

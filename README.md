@@ -139,10 +139,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Refactoring
   - Specs need to be refactored to be more DRY and also start using doubles to improve performance
   - Use more specific RSpec matchers than `eq` everywhere
-  - Reduce TODO comments
   - Investigate if note guid is determined in Anki in a non-random way
   - Figure out if the database ever needs to be explicitly opened or closed
   - Defining #inspect for the objects, so when the objects are shown in output, they are easier to look at
+- Note type allowed fields: investigate if there are other special field names that should be allowed.
 
 ### Release checklist
 - Remove `require "pry"`

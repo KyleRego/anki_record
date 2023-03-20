@@ -22,15 +22,15 @@ module AnkiRecord
     attr_reader :anki_package
 
     ##
-    # The collection's id, and the id of the corresponding col record (usually 1).
+    # The collection's id, which is also the id of the col record in the collection.anki21 database (usually 1).
     attr_reader :id
 
     ##
-    # The number of milliseconds that passed since the 1970 epoch when the collection record was created
+    # The number of milliseconds since the 1970 epoch when the collection record was created.
     attr_reader :created_at_timestamp
 
     ##
-    # The number of milliseconds that passed since the 1970 epoch since the collection record was modified
+    # The number of milliseconds since the 1970 epoch at which the collection record was last modified.
     attr_reader :last_modified_timestamp
 
     ##
@@ -70,22 +70,42 @@ module AnkiRecord
     ##
     # Returns the collection's note type object found by either +name+ or +id+, or nil if it is not found.
     def find_note_type_by(name: nil, id: nil)
-      return note_types.find { |note_type| note_type.name == name } if name && id.nil?
+      raise ArgumentError if (id && name) || (id.nil? && name.nil?)
 
-      return note_types.find { |note_type| note_type.id == id } if id && name.nil?
-
-      raise ArgumentError
+      name ? find_note_type_by_name(name: name) : find_note_type_by_id(id: id)
     end
+
+    private
+
+      def find_note_type_by_name(name:)
+        note_types.find { |note_type| note_type.name == name }
+      end
+
+      def find_note_type_by_id(id:)
+        note_types.find { |note_type| note_type.id == id }
+      end
+
+    public
 
     ##
     # Returns the collection's deck object found by either +name+ or +id+, or nil if it is not found.
     def find_deck_by(name: nil, id: nil)
-      return decks.find { |deck| deck.name == name } if name && id.nil?
+      raise ArgumentError if (id && name) || (id.nil? && name.nil?)
 
-      return decks.find { |deck| deck.id == id } if id && name.nil?
-
-      raise ArgumentError
+      name ? find_deck_by_name(name: name) : find_deck_by_id(id: id)
     end
+
+    private
+
+      def find_deck_by_name(name:)
+        decks.find { |deck| deck.name == name }
+      end
+
+      def find_deck_by_id(id:)
+        decks.find { |deck| deck.id == id }
+      end
+
+    public
 
     ##
     # Returns the collection's deck options group object found by +id+, or nil if it is not found.

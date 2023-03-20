@@ -6,8 +6,6 @@ RSpec.describe AnkiRecord::CardTemplate do
   after { cleanup_test_files(directory: ".") }
 
   let(:collection_argument) do
-    # TODO: since this exact helper is used in many spec files, extract it to a shared one
-    # TODO: in future, certain (most) tests should use a double of this to decrease the test suite run time
     anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
     AnkiRecord::Collection.new(anki_package: anki_package)
   end

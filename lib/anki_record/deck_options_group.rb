@@ -31,7 +31,6 @@ module AnkiRecord
     ##
     # Instantiates a new deck options group belonging to +collection+ with name +name+.
     def initialize(collection:, name: nil, args: nil)
-      # TODO: extract this check to a shared helper
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
       @collection = collection
@@ -43,10 +42,6 @@ module AnkiRecord
       end
 
       @collection.add_deck_options_group self
-    end
-
-    def save # :nodoc:
-      false # TODO
     end
 
     private
