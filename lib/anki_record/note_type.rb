@@ -33,7 +33,7 @@ module AnkiRecord
 
     ##
     # The note type's CSS.
-    attr_reader :css
+    attr_accessor :css
 
     ##
     # The note type's LaTeX preamble.
@@ -82,29 +82,29 @@ module AnkiRecord
       end
 
       def default_css
-        <<-CSS
-        .card {
-          color: black;
-          background-color: transparent;
-          text-align: center;
-        }
+        <<~CSS
+          .card {
+            color: black;
+            background-color: transparent;
+            text-align: center;
+          }
         CSS
       end
 
       def default_latex_preamble
-        <<-LATEX_PRE
-        \\documentclass[12pt]{article}
-        \\special{papersize=3in,5in}
-        \\usepackage{amssymb,amsmath}
-        \\pagestyle{empty}
-        \\setlength{\\parindent}{0in}
-        \\begin{document}
+        <<~LATEX_PRE
+          \\documentclass[12pt]{article}
+          \\special{papersize=3in,5in}
+          \\usepackage{amssymb,amsmath}
+          \\pagestyle{empty}
+          \\setlength{\\parindent}{0in}
+          \\begin{document}
         LATEX_PRE
       end
 
       def default_latex_postamble
-        <<-LATEX_POST
-        \\end{document}
+        <<~LATEX_POST
+          \\end{document}
         LATEX_POST
       end
   end

@@ -18,6 +18,17 @@ RSpec.describe AnkiRecord do
       second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
       second_crazy_card_template.question_format = "{{crazy back}}"
       second_crazy_card_template.answer_format = "{{crazy front}}"
+
+      css = <<~CSS
+        .card {
+          font-size: 16px;
+          font-style: Verdana;
+          background: transparent;
+          text-align: center;
+        }
+      CSS
+
+      crazy_note_type.css = css
       crazy_note_type.save
 
       note = AnkiRecord::Note.new note_type: crazy_note_type, deck: crazy_deck
