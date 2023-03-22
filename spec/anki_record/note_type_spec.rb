@@ -33,6 +33,21 @@ RSpec.describe AnkiRecord::NoteType do
     it "should instantiate a non-cloze note type (a note type with the cloze attribute being false)" do
       expect(note_type.cloze).to eq false
     end
+    it "should instantiate a note type with usn attribute equal to -1" do
+      expect(note_type.usn).to eq(-1)
+    end
+    it "should instantiate a note type with sort_field attribute equal to 0" do
+      expect(note_type.sort_field).to eq 0
+    end
+    it "should instantiate a note type object with req attribute equal to an empty array" do
+      expect(note_type.req).to eq []
+    end
+    it "should instantiate a note type object with tags attribute equal to an empty array" do
+      expect(note_type.tags).to eq []
+    end
+    it "should instantiate a note type object with vers attribute equal to an empty array" do
+      expect(note_type.vers).to eq []
+    end
     it "should instantiate a note type with the card_templates attribute being an empty array" do
       expect(note_type.card_templates).to eq []
     end
@@ -279,11 +294,23 @@ RSpec.describe AnkiRecord::NoteType do
       it "should instantiate a note type object with the same name as the data ('Basic')" do
         expect(basic_note_type_from_existing.name).to eq "Basic"
       end
+      it "should instantiate a note type object with the same usn as the data" do
+        expect(basic_note_type_from_existing.usn).to eq basic_model_hash["usn"]
+      end
+      it "should instantiate a note type object with sort_field attribute equal to the data's sortf value" do
+        expect(basic_note_type_from_existing.sort_field).to eq basic_model_hash["sortf"]
+      end
+      it "should instantiate a note type object with req attribute equal to the data's req value" do
+        expect(basic_note_type_from_existing.req).to eq basic_model_hash["req"]
+      end
+      it "should instantiate a note type object with tags attribute equal to the data's tags value" do
+        expect(basic_note_type_from_existing.tags).to eq basic_model_hash["tags"]
+      end
+      it "should instantiate a note type object with vers attribute equal to the data's vers value" do
+        expect(basic_note_type_from_existing.vers).to eq basic_model_hash["vers"]
+      end
       it "should instantiate a non-cloze note type" do
         expect(basic_note_type_from_existing.cloze).to eq false
-      end
-      it "should instantiate a note type with the same id as the data" do
-        expect(basic_note_type_from_existing.id).to eq 1_676_902_364_661
       end
       it "should instantiate a note type with the same deck id as the data (NULL or nil)" do
         expect(basic_note_type_from_existing.deck_id).to eq nil

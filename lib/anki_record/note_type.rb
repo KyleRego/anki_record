@@ -9,7 +9,7 @@ require_relative "note_field"
 
 module AnkiRecord
   ##
-  # Module with the NoteType class's attribute macros.
+  # Module with the NoteType class's attribute readers, writers, and accessors.
   module NoteTypeAttributes
     ##
     # The note type's collection object.
@@ -30,6 +30,14 @@ module AnkiRecord
     ##
     # The number of seconds since the 1970 epoch at which the note type was last modified.
     attr_reader :last_modified_timestamp
+
+    ##
+    # The note type's update sequence number.
+    attr_reader :usn
+
+    ##
+    # The note type's sort field.
+    attr_reader :sort_field
 
     ##
     # The note type's CSS.
@@ -71,7 +79,7 @@ module AnkiRecord
       @deck_id = deck.id
     end
 
-    attr_reader :latex_svg, :tags
+    attr_reader :latex_svg, :tags, :req, :vers
   end
 
   module NoteTypeDefaults # :nodoc:
@@ -246,12 +254,12 @@ module AnkiRecord
         @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @sort_field = default_note_type_sort_field
-        @deck_id = @req = nil
+        @deck_id = nil
         @css = default_css
         @latex_preamble = default_latex_preamble
         @latex_postamble = default_latex_postamble
         @latex_svg = false
-        @tags = @vers = []
+        @req = @tags = @vers = []
       end
   end
 end

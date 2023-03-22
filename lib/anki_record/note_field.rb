@@ -16,12 +16,10 @@ module AnkiRecord
 
     ##
     # A boolean that indicates if the field is sticky.
-    #
-    # A sticky field does not clear its input when a note is created.
     attr_accessor :sticky
 
     ##
-    # A boolean that indicates if the field should be right to left in Anki.
+    # A boolean that indicates if the field is right to left.
     attr_accessor :right_to_left
 
     ##
@@ -49,7 +47,7 @@ module AnkiRecord
       if args
         setup_note_field_instance_variables_from_existing(args: args)
       else
-        setup_note_field_instance_variables(name: name)
+        setup_note_field_instance_variables_for_new_field(name: name)
       end
 
       @note_type.add_note_field self
@@ -79,7 +77,7 @@ module AnkiRecord
         @description = args["description"]
       end
 
-      def setup_note_field_instance_variables(name:)
+      def setup_note_field_instance_variables_for_new_field(name:)
         @name = name
         @ordinal_number = @note_type.note_fields.length
         @sticky = false
