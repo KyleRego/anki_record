@@ -123,8 +123,8 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
-- Figure out bug that causes Anki importer to get stuck; seems to be related to note types
-  - May be due to req being nil in crazy note type
+- Refactor tests to improve speed
+- Remove passing a cloze boolean to note type constructor; let this attribute be set after initialization.
 - Copying the contents of an existing package into the new package when it is opened
   - Add more unit tests
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database

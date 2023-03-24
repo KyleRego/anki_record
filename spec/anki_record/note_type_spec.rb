@@ -17,217 +17,230 @@ RSpec.describe AnkiRecord::NoteType do
     AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
-  describe "::new with name argument" do
-    it "should instantiate a note type with collection attribute equal to the collection argument" do
-      expect(note_type.collection).to eq collection_argument
+  describe "::new when passed a name argument" do
+    before(:all) do
+      @anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+      @collection = @anki_package.collection
+      @name = "test note type"
+      @note_type = AnkiRecord::NoteType.new collection: @collection, name: @name
     end
-    it "should instantiate a new note type which is added to the collection's note_types attribute" do
-      expect(note_type.collection.note_types).to include note_type
+    it "should instantiate a note type with collection attribute equal to the collection argument" do
+      expect(@note_type.collection).to eq @collection
+    end
+    it "should instantiate a new note type which is added to the collection's @note_types attribute" do
+      expect(@note_type.collection.note_types).to include @note_type
     end
     it "should instantiate a note type with an integer id" do
-      expect(note_type.id).to be_a Integer
+      expect(@note_type.id).to be_a Integer
     end
     it "should instantiate a note type with name attribute equal to the name argument" do
-      expect(note_type.name).to eq name_argument
+      expect(@note_type.name).to eq @name
     end
     it "should instantiate a non-cloze note type (a note type with the cloze attribute being false)" do
-      expect(note_type.cloze).to eq false
+      expect(@note_type.cloze).to eq false
     end
     it "should instantiate a note type with usn attribute equal to -1" do
-      expect(note_type.usn).to eq(-1)
+      expect(@note_type.usn).to eq(-1)
     end
     it "should instantiate a note type with sort_field attribute equal to 0" do
-      expect(note_type.sort_field).to eq 0
+      expect(@note_type.sort_field).to eq 0
     end
     it "should instantiate a note type object with req attribute equal to an empty array" do
-      expect(note_type.req).to eq []
+      expect(@note_type.req).to eq []
     end
     it "should instantiate a note type object with tags attribute equal to an empty array" do
-      expect(note_type.tags).to eq []
+      expect(@note_type.tags).to eq []
     end
     it "should instantiate a note type object with vers attribute equal to an empty array" do
-      expect(note_type.vers).to eq []
+      expect(@note_type.vers).to eq []
     end
     it "should instantiate a note type with the card_templates attribute being an empty array" do
-      expect(note_type.card_templates).to eq []
+      expect(@note_type.card_templates).to eq []
     end
     it "should instantiate a note type with the note_fields attribute being an empty array" do
-      expect(note_type.note_fields).to eq []
+      expect(@note_type.note_fields).to eq []
     end
     it "should instantiate a note type with a deck_id attribute of nil" do
-      expect(note_type.deck_id).to eq nil
+      expect(@note_type.deck_id).to eq nil
     end
     it "should instantiate a note type with the tags attribute being an empty array" do
-      expect(note_type.tags).to eq []
+      expect(@note_type.tags).to eq []
     end
     context "should instantiate a note type with default CSS styling" do
       it "that defines styling for the 'card' CSS class" do
-        expect(note_type.css).to include ".card {"
+        expect(@note_type.css).to include ".card {"
       end
       it "that includes .card: color: black;" do
-        expect(note_type.css).to include "color: black;"
+        expect(@note_type.css).to include "color: black;"
       end
       it "that includes .card: background-color: transparent;" do
-        expect(note_type.css).to include "background-color: transparent;"
+        expect(@note_type.css).to include "background-color: transparent;"
       end
       it "that includes .card: text-align: center;" do
-        expect(note_type.css).to include "text-align: center;"
+        expect(@note_type.css).to include "text-align: center;"
       end
     end
-    context "and with a cloze: true argument" do
-      let(:cloze_argument) { true }
-      it "should instantiate a cloze note type (a note type with the cloze attribute being true)" do
-        expect(note_type.cloze).to eq true
-      end
+    # TODO: Remove cloze argument from the constructor; let it be set afterwards.
+    # context "and with a cloze: true argument" do
+    #   let(:cloze_argument) { true }
+    #   it "should instantiate a cloze note type (a note type with the cloze attribute being true)" do
+    #     expect(@note_type.cloze).to eq true
+    #   end
+    # end
+  end
+
+  describe "::new when passed no name or args arguments" do
+    let(:note_type_instantiated_with_only_collection) do
+      anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+      AnkiRecord::NoteType.new collection: anki_package.collection
     end
-    context "without a name argument" do
-      let(:name_argument) { nil }
-      it "should throw an ArgumentError" do
-        expect { note_type }.to raise_error ArgumentError
-      end
+    it "should throw an ArgumentError" do
+      expect { note_type_instantiated_with_only_collection }.to raise_error ArgumentError
     end
-    context "and an args argument" do
-      it "should throw an ArgumentError" do
-        expect { AnkiRecord::NoteType.new(collection: collection_argument, name: "test", args: {}) }.to raise_error ArgumentError
-      end
+  end
+
+  describe "::new when passed name and args arguments" do
+    let(:note_type_instantiated_with_both_args_and_name) do
+      anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+      AnkiRecord::NoteType.new collection: anki_package.collection, name: "namo", args: {}
+    end
+    it "should throw an ArgumentError" do
+      expect { note_type_instantiated_with_both_args_and_name }.to raise_error ArgumentError
     end
   end
 
   describe "#save" do
-    subject(:crazy_note_type) do
-      crazy_note_type = AnkiRecord::NoteType.new collection: collection_argument, name: "crazy note type"
-      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
-      AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-      crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+    before(:all) do
+      @anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+      @collection = @anki_package.collection
+      @name = "crazy note type"
+      @crazy_note_type = AnkiRecord::NoteType.new collection: @collection, name: @name
+      AnkiRecord::NoteField.new note_type: @crazy_note_type, name: "crazy front"
+      AnkiRecord::NoteField.new note_type: @crazy_note_type, name: "crazy back"
+      crazy_card_template = AnkiRecord::CardTemplate.new note_type: @crazy_note_type, name: "crazy card 1"
       crazy_card_template.question_format = "{{crazy front}}"
       crazy_card_template.answer_format = "{{crazy back}}"
-      second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
+      second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: @crazy_note_type, name: "crazy card 2"
       second_crazy_card_template.question_format = "{{crazy back}}"
       second_crazy_card_template.answer_format = "{{crazy front}}"
-      crazy_note_type
-    end
+      @crazy_note_type.save
 
-    let(:col_models_hash) { collection_argument.models_json }
-    let(:crazy_note_type_hash) do
-      col_models_hash[crazy_note_type.id.to_s]
+      @col_models_hash = @collection.models_json
+      @crazy_note_type_hash = @col_models_hash[@crazy_note_type.id.to_s]
+      @tmpls_array = @crazy_note_type_hash["tmpls"]
+      @flds_array = @crazy_note_type_hash["flds"]
     end
-    before { crazy_note_type.save }
-
     it "should save the note type object's id as a key in the models column's JSON object in the collection.anki21 database" do
-      expect(col_models_hash.keys).to include crazy_note_type.id.to_s
+      expect(@col_models_hash.keys).to include @crazy_note_type.id.to_s
     end
     it "should save the note type object as a JSON object value, as the value of the note type object's id key, in the models JSON object" do
-      expect(crazy_note_type_hash).to be_a Hash
+      expect(@crazy_note_type_hash).to be_a Hash
     end
     it "should save the note type object's two card templates as JSON object values in the models JSON object tmpls array value" do
-      expect(crazy_note_type_hash["tmpls"].count).to eq 2
+      expect(@crazy_note_type_hash["tmpls"].count).to eq 2
     end
     it "should save the note type object's two fields as JSON object values in the models JSON object flds array value" do
-      expect(crazy_note_type_hash["flds"].count).to eq 2
+      expect(@crazy_note_type_hash["flds"].count).to eq 2
     end
     it "should save the note type object as a JSON object value with the following keys:
       'id', 'name', 'type', 'mod', 'usn',
       'sortf', 'did', 'tmpls', 'flds', 'css',
       'latexPre', 'latexPost', 'latexsvg', 'req', and 'tags'" do
       %w[id name type mod usn sortf did tmpls flds css latexPre latexPost latexsvg req tags vers].each do |key|
-        expect(crazy_note_type_hash.keys).to include key
+        expect(@crazy_note_type_hash.keys).to include key
       end
     end
-
     context "should save the note type object as a JSON object value" do
       it "with the note type object's id attribute as the value for the id in the note type hash" do
-        expect(crazy_note_type_hash["id"]).to eq crazy_note_type.id
+        expect(@crazy_note_type_hash["id"]).to eq @crazy_note_type.id
       end
       it "with the note type object's name attribute as the value for the name key in the note type hash" do
-        expect(crazy_note_type_hash["name"]).to eq crazy_note_type.name
+        expect(@crazy_note_type_hash["name"]).to eq @crazy_note_type.name
       end
       it "with 0 for the value of the type in the note hash because this is a non-cloze note type" do
-        expect(crazy_note_type_hash["type"]).to eq 0
+        expect(@crazy_note_type_hash["type"]).to eq 0
       end
       it "with the note type's last_modified_timestamp attribute as the value for the mod in the note type hash" do
-        expect(crazy_note_type_hash["mod"]).to eq crazy_note_type.last_modified_timestamp
+        expect(@crazy_note_type_hash["mod"]).to eq @crazy_note_type.last_modified_timestamp
       end
       it "with -1 for the value of the usn key in the note hash" do
-        expect(crazy_note_type_hash["usn"]).to eq(-1)
+        expect(@crazy_note_type_hash["usn"]).to eq(-1)
       end
       it "with 0 for the value of the sortf key in the note hash" do
-        expect(crazy_note_type_hash["sortf"]).to eq 0
+        expect(@crazy_note_type_hash["sortf"]).to eq 0
       end
       it "with the note type's deck_id for the value of the did key in the note hash" do
-        expect(crazy_note_type_hash["did"]).to eq crazy_note_type.deck_id
+        expect(@crazy_note_type_hash["did"]).to eq @crazy_note_type.deck_id
       end
       it "with an array value for the tmpls key in the note hash" do
-        expect(crazy_note_type_hash["tmpls"].instance_of?(Array)).to eq true
+        expect(@crazy_note_type_hash["tmpls"].instance_of?(Array)).to eq true
       end
       context "with an array value for the tmpls key in the note hash" do
-        let(:tmpls_array) { crazy_note_type_hash["tmpls"] }
         it "with values which are hashes" do
-          expect(tmpls_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
+          expect(@tmpls_array.all? { |tmpl| tmpl.instance_of?(Hash) }).to eq true
         end
         it "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
           %w[name ord qfmt afmt bqfmt bafmt did bfont bsize].each do |key|
-            expect(tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to eq true
+            expect(@tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to eq true
           end
         end
         context "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
           it "and the value for the name key should be equal to the name attribute of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["name"] }).to eq ["crazy card 1", "crazy card 2"]
+            expect(@tmpls_array.map { |tmpl| tmpl["name"] }).to eq ["crazy card 1", "crazy card 2"]
           end
           it "and the value for the ord key should be the ordinal_number attribute of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["ord"] }).to eq [0, 1]
+            expect(@tmpls_array.map { |tmpl| tmpl["ord"] }).to eq [0, 1]
           end
           it "and the value for the qfmt key should be the question format string of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["qfmt"] }).to eq ["{{crazy front}}", "{{crazy back}}"]
+            expect(@tmpls_array.map { |tmpl| tmpl["qfmt"] }).to eq ["{{crazy front}}", "{{crazy back}}"]
           end
           it "and the value for the qfmt key should be the answer format string of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["afmt"] }).to eq ["{{crazy back}}", "{{crazy front}}"]
+            expect(@tmpls_array.map { |tmpl| tmpl["afmt"] }).to eq ["{{crazy back}}", "{{crazy front}}"]
           end
           it "and the value for the did key should be the deck_id attribute of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["did"] }).to eq [nil, nil]
+            expect(@tmpls_array.map { |tmpl| tmpl["did"] }).to eq [nil, nil]
           end
           it "and the value for the bfont key should be equal to the bfont attribute of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["bfont"] }).to eq ["", ""]
+            expect(@tmpls_array.map { |tmpl| tmpl["bfont"] }).to eq ["", ""]
           end
           it "and the value for the bsize key should be equal to the bsize attribute of the card template" do
-            expect(tmpls_array.map { |tmpl| tmpl["bsize"] }).to eq [0, 0]
+            expect(@tmpls_array.map { |tmpl| tmpl["bsize"] }).to eq [0, 0]
           end
         end
       end
-
       it "with an array value for the flds key in the note hash" do
-        expect(crazy_note_type_hash["flds"].instance_of?(Array)).to eq true
+        expect(@crazy_note_type_hash["flds"].instance_of?(Array)).to eq true
       end
       context "with an array value for the flds key in the note hash" do
-        let(:flds_array) { crazy_note_type_hash["flds"] }
         it "with values which are hashes" do
-          expect(flds_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
+          expect(@flds_array.all? { |fld| fld.instance_of?(Hash) }).to eq true
         end
         it "with hash values with keys that include: 'name', 'ord', 'sticky', 'rtl', 'font', 'size' and 'description'" do
           %w[name ord sticky rtl font size description].each do |key|
-            expect(flds_array.all? { |fld| fld.keys.include?(key) }).to eq true
+            expect(@flds_array.all? { |fld| fld.keys.include?(key) }).to eq true
           end
         end
         context "with hash values with keys that include: 'name', 'ord', 'sticky', 'rtl', 'font', 'size' and 'description'" do
           it "and the value for the name key should be the name attribute of the note field" do
-            expect(flds_array.map { |fld| fld["name"] }).to eq ["crazy front", "crazy back"]
+            expect(@flds_array.map { |fld| fld["name"] }).to eq ["crazy front", "crazy back"]
           end
           it "and the value for the ord key should be the ordinal_number attribute of the note field" do
-            expect(flds_array.map { |fld| fld["ord"] }).to eq [0, 1]
+            expect(@flds_array.map { |fld| fld["ord"] }).to eq [0, 1]
           end
           it "and the value for the sticky key should be the sticky attribute of the note field" do
-            expect(flds_array.map { |fld| fld["sticky"] }).to eq [false, false]
+            expect(@flds_array.map { |fld| fld["sticky"] }).to eq [false, false]
           end
           it "and the value for the rtl key should be the right_to_left attribute of the note field" do
-            expect(flds_array.map { |fld| fld["rtl"] }).to eq [false, false]
+            expect(@flds_array.map { |fld| fld["rtl"] }).to eq [false, false]
           end
           it "and the value for the font key should be equal to the font_style attribute of the note field" do
-            expect(flds_array.map { |fld| fld["font"] }).to eq %w[Arial Arial]
+            expect(@flds_array.map { |fld| fld["font"] }).to eq %w[Arial Arial]
           end
           it "and the value for the size key should be equal to the font_size attribute of the note field" do
-            expect(flds_array.map { |fld| fld["size"] }).to eq [20, 20]
+            expect(@flds_array.map { |fld| fld["size"] }).to eq [20, 20]
           end
           it "and the value for the description key should be equal to the description attribute of the note field" do
-            expect(flds_array.map { |fld| fld["description"] }).to eq ["", ""]
+            expect(@flds_array.map { |fld| fld["description"] }).to eq ["", ""]
           end
         end
       end
