@@ -38,6 +38,10 @@ module AnkiRecord
     # The deck's deck options group object.
     attr_reader :deck_options_group
 
+    def inspect
+      "#<AnkiRecord::Deck:#{object_id} id: #{id} name: #{name} description: #{description}>"
+    end
+
     ##
     # Instantiates a new Deck object belonging to +collection+ with name +name+.
     def initialize(collection:, name: nil, args: nil)

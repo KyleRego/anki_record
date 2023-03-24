@@ -52,6 +52,12 @@ module AnkiRecord
     def add_note_type(note_type) # :nodoc:
       raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
 
+      existing_note_type = nil
+      @note_types.each do |nt|
+        existing_note_type = nt if nt.id == note_type.id
+      end
+      @note_types.delete(existing_note_type) if existing_note_type
+
       @note_types << note_type
     end
 

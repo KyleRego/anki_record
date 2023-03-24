@@ -1,21 +1,107 @@
 # frozen_string_literal: true
 
 RSpec.describe AnkiRecord::NoteType do
-  subject(:note_type) do
-    if defined?(cloze_argument)
-      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument, cloze: cloze_argument
-    else
-      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument
-    end
-  end
-
   after { cleanup_test_files(directory: ".") }
-
-  let(:name_argument) { "test note type" }
-  let(:collection_argument) do
-    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_package: anki_package)
+  # rubocop:disable Layout/LineContinuationLeadingSpace
+  # rubocop:disable Metrics/MethodLength
+  ##
+  # Returns the Ruby hash representing the default Basic note type args
+  def basic_model_hash
+    { "id" => 1_676_902_364_661,
+      "name" => "Basic",
+      "type" => 0,
+      "mod" => 0,
+      "usn" => 0,
+      "sortf" => 0,
+      "did" => nil,
+      "tmpls" =>
+      [{ "name" => "Card 1",
+         "ord" => 0,
+         "qfmt" => "{{Front}}",
+         "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+         "bqfmt" => "",
+         "bafmt" => "",
+         "did" => nil,
+         "bfont" => "",
+         "bsize" => 0 }],
+      "flds" =>
+      [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
+       { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
+      "css" =>
+      ".card {\n" \
+      "    font-family: arial;\n" \
+      "    font-size: 20px;\n" \
+      "    text-align: center;\n" \
+      "    color: black;\n" \
+      "    background-color: white;\n" \
+      "}\n",
+      "latexPre" =>
+      "\\documentclass[12pt]{article}\n" \
+      "\\special{papersize=3in,5in}\n" \
+      "\\usepackage[utf8]{inputenc}\n" \
+      "\\usepackage{amssymb,amsmath}\n" \
+      "\\pagestyle{empty}\n" \
+      "\\setlength{\\parindent}{0in}\n" \
+      "\\begin{document}\n",
+      "latexPost" => "\\end{document}",
+      "latexsvg" => false,
+      "req" => [[0, "any", [0]]] }
   end
+
+  ##
+  # Returns the Ruby hash representing the default Basic and Reversed Card note type args
+  def basic_and_reversed_card_model_hash
+    { "id" => 1_676_902_364_662,
+      "name" => "Basic (and reversed card)",
+      "type" => 0,
+      "mod" => 0,
+      "usn" => 0,
+      "sortf" => 0,
+      "did" => nil,
+      "tmpls" =>
+    [{ "name" => "Card 1",
+       "ord" => 0,
+       "qfmt" => "{{Front}}",
+       "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
+       "bqfmt" => "",
+       "bafmt" => "",
+       "did" => nil,
+       "bfont" => "",
+       "bsize" => 0 },
+     { "name" => "Card 2",
+       "ord" => 1,
+       "qfmt" => "{{Back}}",
+       "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}",
+       "bqfmt" => "",
+       "bafmt" => "",
+       "did" => nil,
+       "bfont" => "",
+       "bsize" => 0 }],
+      "flds" =>
+    [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
+     { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
+      "css" =>
+    ".card {\n" \
+    "    font-family: arial;\n" \
+    "    font-size: 20px;\n" \
+    "    text-align: center;\n" \
+    "    color: black;\n" \
+    "    background-color: white;\n" \
+    "}\n",
+      "latexPre" =>
+    "\\documentclass[12pt]{article}\n" \
+    "\\special{papersize=3in,5in}\n" \
+    "\\usepackage[utf8]{inputenc}\n" \
+    "\\usepackage{amssymb,amsmath}\n" \
+    "\\pagestyle{empty}\n" \
+    "\\setlength{\\parindent}{0in}\n" \
+    "\\begin{document}\n",
+      "latexPost" => "\\end{document}",
+      "latexsvg" => false,
+      "req" => [[0, "any", [0]], [1, "any", [1]]] }
+  end
+  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Layout/LineContinuationLeadingSpace
 
   describe "::new when passed a name argument" do
     before(:all) do
@@ -247,185 +333,111 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
-  let(:template_name_argument) { "test template name argument" }
-
-  subject(:basic_note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
-  # rubocop:disable Layout/LineContinuationLeadingSpace
-  let(:basic_model_hash) do
-    { "id" => 1_676_902_364_661,
-      "name" => "Basic",
-      "type" => 0,
-      "mod" => 0,
-      "usn" => 0,
-      "sortf" => 0,
-      "did" => nil,
-      "tmpls" =>
-      [{ "name" => "Card 1",
-         "ord" => 0,
-         "qfmt" => "{{Front}}",
-         "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
-         "bqfmt" => "",
-         "bafmt" => "",
-         "did" => nil,
-         "bfont" => "",
-         "bsize" => 0 }],
-      "flds" =>
-      [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
-       { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
-      "css" =>
-      ".card {\n" \
-      "    font-family: arial;\n" \
-      "    font-size: 20px;\n" \
-      "    text-align: center;\n" \
-      "    color: black;\n" \
-      "    background-color: white;\n" \
-      "}\n",
-      "latexPre" =>
-      "\\documentclass[12pt]{article}\n" \
-      "\\special{papersize=3in,5in}\n" \
-      "\\usepackage[utf8]{inputenc}\n" \
-      "\\usepackage{amssymb,amsmath}\n" \
-      "\\pagestyle{empty}\n" \
-      "\\setlength{\\parindent}{0in}\n" \
-      "\\begin{document}\n",
-      "latexPost" => "\\end{document}",
-      "latexsvg" => false,
-      "req" => [[0, "any", [0]]] }
-  end
-  # rubocop:enable Layout/LineContinuationLeadingSpace
-  describe "::new passed an args hash" do
+  describe "::new when passed an args hash (of the existing default basic note type)" do
+    before(:all) do
+      @anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+      @collection = @anki_package.collection
+      @basic_note_type_from_existing = AnkiRecord::NoteType.new(collection: @collection, args: basic_model_hash)
+      @basic_note_type_from_existing.save
+    end
     context "when the args hash is the default JSON object for the Basic note type exported from a fresh Anki 2.1.54 profile" do
       it "should instantiate a note type with collection attribute equal to the collection argument" do
-        expect(note_type.collection).to eq collection_argument
+        expect(@basic_note_type_from_existing.collection).to eq @collection
       end
       it "should instantiate a new note type which is added to the collection's note_types attribute" do
-        expect(note_type.collection.note_types).to include note_type
+        expect(@collection.note_types).to include @basic_note_type_from_existing
+      end
+      it "should not change the number of note types in the collection's note_types attribute" do
+        expect(@collection.note_types.count).to eq 5
       end
       it "should instantiate a note type object with id the same as the data" do
-        expect(basic_note_type_from_existing.id).to eq basic_model_hash["id"]
+        expect(@basic_note_type_from_existing.id).to eq basic_model_hash["id"]
       end
       it "should instantiate a note type object with the same name as the data ('Basic')" do
-        expect(basic_note_type_from_existing.name).to eq "Basic"
+        expect(@basic_note_type_from_existing.name).to eq "Basic"
       end
       it "should instantiate a note type object with the same usn as the data" do
-        expect(basic_note_type_from_existing.usn).to eq basic_model_hash["usn"]
+        expect(@basic_note_type_from_existing.usn).to eq basic_model_hash["usn"]
       end
       it "should instantiate a note type object with sort_field attribute equal to the data's sortf value" do
-        expect(basic_note_type_from_existing.sort_field).to eq basic_model_hash["sortf"]
+        expect(@basic_note_type_from_existing.sort_field).to eq basic_model_hash["sortf"]
       end
       it "should instantiate a note type object with req attribute equal to the data's req value" do
-        expect(basic_note_type_from_existing.req).to eq basic_model_hash["req"]
+        expect(@basic_note_type_from_existing.req).to eq basic_model_hash["req"]
       end
       it "should instantiate a note type object with tags attribute equal to the data's tags value" do
-        expect(basic_note_type_from_existing.tags).to eq basic_model_hash["tags"]
+        expect(@basic_note_type_from_existing.tags).to eq basic_model_hash["tags"]
       end
       it "should instantiate a note type object with vers attribute equal to the data's vers value" do
-        expect(basic_note_type_from_existing.vers).to eq basic_model_hash["vers"]
+        expect(@basic_note_type_from_existing.vers).to eq basic_model_hash["vers"]
       end
       it "should instantiate a non-cloze note type" do
-        expect(basic_note_type_from_existing.cloze).to eq false
+        expect(@basic_note_type_from_existing.cloze).to eq false
       end
       it "should instantiate a note type with the same deck id as the data (NULL or nil)" do
-        expect(basic_note_type_from_existing.deck_id).to eq nil
+        expect(@basic_note_type_from_existing.deck_id).to eq nil
       end
       it "should instantiate a note type where the deck method returns nil" do
-        expect(basic_note_type_from_existing.deck).to be_nil
+        expect(@basic_note_type_from_existing.deck).to be_nil
       end
       it "should instantiate a note type with one card template" do
-        expect(basic_note_type_from_existing.card_templates.count).to eq 1
+        expect(@basic_note_type_from_existing.card_templates.count).to eq 1
       end
       it "should instantiate a note type with a template with the name Card 1" do
-        expect(basic_note_type_from_existing.card_templates.first.name).to eq "Card 1"
+        expect(@basic_note_type_from_existing.card_templates.first.name).to eq "Card 1"
       end
       it "should instantiate a note type with a template that is of type CardTemplate" do
-        expect(basic_note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
+        expect(@basic_note_type_from_existing.card_templates.all? { |obj| obj.instance_of?(AnkiRecord::CardTemplate) }).to eq true
       end
       it "should instantiate a note type with 2 fields" do
-        expect(basic_note_type_from_existing.note_fields.count).to eq 2
+        expect(@basic_note_type_from_existing.note_fields.count).to eq 2
       end
       it "should instantiate a note type with 2 fields that are of class NoteField" do
-        expect(basic_note_type_from_existing.note_fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
+        expect(@basic_note_type_from_existing.note_fields.all? { |obj| obj.instance_of?(AnkiRecord::NoteField) }).to eq true
       end
       it "should instantiate a note type with a 'Front' field and a 'Back' field" do
-        expect(basic_note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
+        expect(@basic_note_type_from_existing.note_fields.map(&:name).sort).to eq %w[Back Front]
       end
       it "should instantiate a note type with the CSS styling from the data" do
-        expect(basic_note_type_from_existing.css).to eq basic_model_hash["css"]
+        expect(@basic_note_type_from_existing.css).to eq basic_model_hash["css"]
       end
       it "should instantiate a note type with the data's LaTeX preamble" do
-        expect(basic_note_type_from_existing.latex_preamble).to eq basic_model_hash["latexPre"]
+        expect(@basic_note_type_from_existing.latex_preamble).to eq basic_model_hash["latexPre"]
       end
       it "should instantiate a note type with the data's LaTeX postamble" do
-        expect(basic_note_type_from_existing.latex_postamble).to eq basic_model_hash["latexPost"]
+        expect(@basic_note_type_from_existing.latex_postamble).to eq basic_model_hash["latexPost"]
       end
       it "should instantiate a note type with latex_svg false" do
-        expect(basic_note_type_from_existing.latex_svg).to eq false
+        expect(@basic_note_type_from_existing.latex_svg).to eq false
       end
       it "should instantiate a note type with nil tags attribute because it is missing from the data" do
-        expect(basic_note_type_from_existing.tags).to eq nil
+        expect(@basic_note_type_from_existing.tags).to eq nil
       end
     end
+  end
 
-    context "when the args hash is the default JSON object for the basic and reversed card note type" do
-      subject(:basic_and_reversed_card_note_type_from_existing) do
-        AnkiRecord::NoteType.new(collection: collection_argument, args: basic_and_reversed_card_model_hash)
-      end
-      # rubocop:disable Layout/LineContinuationLeadingSpace
-      let(:basic_and_reversed_card_model_hash) do
-        { "id" => 1_676_902_364_662,
-          "name" => "Basic (and reversed card)",
-          "type" => 0,
-          "mod" => 0,
-          "usn" => 0,
-          "sortf" => 0,
-          "did" => nil,
-          "tmpls" =>
-        [{ "name" => "Card 1",
-           "ord" => 0,
-           "qfmt" => "{{Front}}",
-           "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}",
-           "bqfmt" => "",
-           "bafmt" => "",
-           "did" => nil,
-           "bfont" => "",
-           "bsize" => 0 },
-         { "name" => "Card 2",
-           "ord" => 1,
-           "qfmt" => "{{Back}}",
-           "afmt" => "{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}",
-           "bqfmt" => "",
-           "bafmt" => "",
-           "did" => nil,
-           "bfont" => "",
-           "bsize" => 0 }],
-          "flds" =>
-        [{ "name" => "Front", "ord" => 0, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" },
-         { "name" => "Back", "ord" => 1, "sticky" => false, "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }],
-          "css" =>
-        ".card {\n" \
-        "    font-family: arial;\n" \
-        "    font-size: 20px;\n" \
-        "    text-align: center;\n" \
-        "    color: black;\n" \
-        "    background-color: white;\n" \
-        "}\n",
-          "latexPre" =>
-        "\\documentclass[12pt]{article}\n" \
-        "\\special{papersize=3in,5in}\n" \
-        "\\usepackage[utf8]{inputenc}\n" \
-        "\\usepackage{amssymb,amsmath}\n" \
-        "\\pagestyle{empty}\n" \
-        "\\setlength{\\parindent}{0in}\n" \
-        "\\begin{document}\n",
-          "latexPost" => "\\end{document}",
-          "latexsvg" => false,
-          "req" => [[0, "any", [0]], [1, "any", [1]]] }
-      end
-      # rubocop:enable Layout/LineContinuationLeadingSpace
-      it "should instantiate a note type with two card templates" do
-        expect(basic_and_reversed_card_note_type_from_existing.card_templates.count).to eq 2
-      end
+  describe "::new when when passed an args hash (of the default basic and reversed card note type)" do
+    before(:all) do
+      collection = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
+      @basic_and_reversed_card_note_type_from_existing = AnkiRecord::NoteType.new(collection: collection, args: basic_and_reversed_card_model_hash)
     end
+    it "should instantiate a note type with two card templates" do
+      expect(@basic_and_reversed_card_note_type_from_existing.card_templates.count).to eq 2
+    end
+  end
+
+  subject(:note_type) do
+    if defined?(cloze_argument)
+      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument, cloze: cloze_argument
+    else
+      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument
+    end
+  end
+  subject(:basic_note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
+  let(:name_argument) { "test note type" }
+  let(:collection_argument) do
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    AnkiRecord::Collection.new(anki_package: anki_package)
   end
 
   describe "#field_names_in_order" do

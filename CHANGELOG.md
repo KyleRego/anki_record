@@ -20,3 +20,7 @@
   - An opened Anki package now has its contents copied into the new collection.anki21 database.
 - `Deck` has been changed to have a `deck_options_group` attribute instead of a `deck_options_group_id`
 - Deck options groups can be accessed through the collection object using `Collection#find_deck_options_group_by`
+- Fix 2 bugs that may have been in previous versions but were not part of the recommended API:
+  - Instantiating a note type from an existing Anki package no longer duplicates the note type when it is saved
+  - Note types are not instantiated/saved with an invalid req value
+- `#inspect` added to `Deck`
