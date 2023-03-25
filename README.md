@@ -114,7 +114,7 @@ AnkiRecord::Note
         with nid values equal to the id of the cards' note object's id
 ```
 
-The RSpec test suite files in `spec` should have a 1-to-1 mapping with the source code files in `lib`.
+The RSpec test suite files in `spec` should roughly have a 1-to-1 mapping with the source code files in `lib`.
 
 ## Development
 
@@ -123,6 +123,7 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ### Development road map:
+- Better messages when `ArgumentError` raised
 - Add #inspect methods
 - Refactor tests to improve speed
 - Remove passing a cloze boolean to note type constructor; let this attribute be set after initialization.

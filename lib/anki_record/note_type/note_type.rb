@@ -1,122 +1,13 @@
 # frozen_string_literal: true
 
-require "pry"
-
-require_relative "card_template"
-require_relative "helpers/shared_constants_helper"
-require_relative "helpers/time_helper"
-require_relative "note_field"
+require_relative "../card_template"
+require_relative "../helpers/shared_constants_helper"
+require_relative "../helpers/time_helper"
+require_relative "../note_field"
+require_relative "note_type_attributes"
+require_relative "note_type_defaults"
 
 module AnkiRecord
-  ##
-  # Module with the NoteType class's attribute readers, writers, and accessors.
-  module NoteTypeAttributes
-    ##
-    # The note type's collection object.
-    attr_reader :collection
-
-    ##
-    # The note type's id.
-    attr_reader :id
-
-    ##
-    # The note type's name.
-    attr_accessor :name
-
-    ##
-    # A boolean that indicates if this note type is a cloze-deletion note type.
-    attr_accessor :cloze
-
-    ##
-    # The number of seconds since the 1970 epoch at which the note type was last modified.
-    attr_reader :last_modified_timestamp
-
-    ##
-    # The note type's update sequence number.
-    attr_reader :usn
-
-    ##
-    # The note type's sort field.
-    attr_reader :sort_field
-
-    ##
-    # The note type's CSS.
-    attr_accessor :css
-
-    ##
-    # The note type's LaTeX preamble.
-    attr_reader :latex_preamble
-
-    ##
-    # The note type's LaTeX postamble.
-    attr_reader :latex_postamble
-
-    ##
-    # The note type's card template objects, as an array.
-    attr_reader :card_templates
-
-    ##
-    # The note type's field objects, as an array.
-    attr_reader :note_fields
-
-    ##
-    # The note type's deck's id.
-    attr_reader :deck_id
-
-    ##
-    # The note type's deck.
-    def deck
-      return nil unless @deck_id
-
-      @collection.find_deck_by id: @deck_id
-    end
-
-    ##
-    # Sets the note type's deck object.
-    def deck=(deck)
-      raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
-
-      @deck_id = deck.id
-    end
-
-    attr_reader :latex_svg, :tags, :req, :vers
-  end
-
-  module NoteTypeDefaults # :nodoc:
-    private
-
-      def default_note_type_sort_field
-        0
-      end
-
-      def default_css
-        <<~CSS
-          .card {
-            color: black;
-            background-color: transparent;
-            text-align: center;
-          }
-        CSS
-      end
-
-      def default_latex_preamble
-        <<~LATEX_PRE
-          \\documentclass[12pt]{article}
-          \\special{papersize=3in,5in}
-          \\usepackage{amssymb,amsmath}
-          \\pagestyle{empty}
-          \\setlength{\\parindent}{0in}
-          \\begin{document}
-        LATEX_PRE
-      end
-
-      def default_latex_postamble
-        <<~LATEX_POST
-          \\end{document}
-        LATEX_POST
-      end
-  end
-
   ##
   # NoteType represents an Anki note type (also called a model).
   #
@@ -127,7 +18,7 @@ module AnkiRecord
     include AnkiRecord::NoteTypeAttributes
     include AnkiRecord::NoteTypeDefaults
 
-    def initialize(collection:, name: nil, cloze: false, args: nil)
+    def initialize(collection:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
       @collection = collection
@@ -135,7 +26,7 @@ module AnkiRecord
       if args
         setup_note_type_instance_variables_from_existing(args: args)
       else
-        setup_instance_variables_for_new_note_type(name: name, cloze: cloze)
+        setup_instance_variables_for_new_note_type(name: name)
       end
 
       @collection.add_note_type self
@@ -237,9 +128,9 @@ module AnkiRecord
         @latex_svg = args["latexsvg"]
       end
 
-      def setup_instance_variables_for_new_note_type(name:, cloze:)
+      def setup_instance_variables_for_new_note_type(name:)
         @name = name
-        @cloze = cloze
+        @cloze = false
         setup_collaborator_object_instance_variables_for_new_note_type
         setup_simple_instance_variables_for_new_note_type
       end
@@ -254,12 +145,12 @@ module AnkiRecord
         @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @sort_field = default_note_type_sort_field
-        @deck_id = nil
+        @deck_id = @tags = @vers = nil
         @css = default_css
         @latex_preamble = default_latex_preamble
         @latex_postamble = default_latex_postamble
         @latex_svg = false
-        @req = @tags = @vers = []
+        @req = []
       end
   end
 end

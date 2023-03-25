@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 

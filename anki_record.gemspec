@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Automate Anki flashcard editing with the Ruby programming language."
   spec.description = <<-DESC
-  This Ruby library, which is currently in development, will provide an interface to inspect, update, and create Anki SQLite3 databases (*.apkg files).
+  A Ruby library which provides a programmatic interface to Anki flashcard decks (.apkg files/zipped Anki SQLite databases).
   DESC
   spec.homepage = "https://github.com/KyleRego/anki_record"
   spec.license = "MIT"
@@ -34,7 +34,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rubyzip", ">= 2.3"
   spec.add_dependency "sqlite3", "~> 1.3"
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
 end

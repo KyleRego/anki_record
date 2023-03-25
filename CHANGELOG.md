@@ -24,3 +24,5 @@
   - Instantiating a note type from an existing Anki package no longer duplicates the note type when it is saved
   - Note types are not instantiated/saved with an invalid req value
 - `#inspect` added to `Deck`
+- `cloze` is no longer an argument to the `NoteType` constructor (this attribute can be set after the object is instantiated.)
+- More helpful error messages with raising `ArgumentError` in a few places.

@@ -134,11 +134,11 @@ RSpec.describe AnkiRecord::NoteType do
     it "should instantiate a note type object with req attribute equal to an empty array" do
       expect(@note_type.req).to eq []
     end
-    it "should instantiate a note type object with tags attribute equal to an empty array" do
-      expect(@note_type.tags).to eq []
+    it "should instantiate a note type object with tags attribute being nil" do
+      expect(@note_type.tags).to eq nil
     end
-    it "should instantiate a note type object with vers attribute equal to an empty array" do
-      expect(@note_type.vers).to eq []
+    it "should instantiate a note type object with vers attribute being nil" do
+      expect(@note_type.vers).to eq nil
     end
     it "should instantiate a note type with the card_templates attribute being an empty array" do
       expect(@note_type.card_templates).to eq []
@@ -148,9 +148,6 @@ RSpec.describe AnkiRecord::NoteType do
     end
     it "should instantiate a note type with a deck_id attribute of nil" do
       expect(@note_type.deck_id).to eq nil
-    end
-    it "should instantiate a note type with the tags attribute being an empty array" do
-      expect(@note_type.tags).to eq []
     end
     context "should instantiate a note type with default CSS styling" do
       it "that defines styling for the 'card' CSS class" do
@@ -166,13 +163,6 @@ RSpec.describe AnkiRecord::NoteType do
         expect(@note_type.css).to include "text-align: center;"
       end
     end
-    # TODO: Remove cloze argument from the constructor; let it be set afterwards.
-    # context "and with a cloze: true argument" do
-    #   let(:cloze_argument) { true }
-    #   it "should instantiate a cloze note type (a note type with the cloze attribute being true)" do
-    #     expect(@note_type.cloze).to eq true
-    #   end
-    # end
   end
 
   describe "::new when passed no name or args arguments" do
@@ -426,13 +416,7 @@ RSpec.describe AnkiRecord::NoteType do
     end
   end
 
-  subject(:note_type) do
-    if defined?(cloze_argument)
-      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument, cloze: cloze_argument
-    else
-      AnkiRecord::NoteType.new collection: collection_argument, name: name_argument
-    end
-  end
+  subject(:note_type) { AnkiRecord::NoteType.new collection: collection_argument, name: name_argument }
   subject(:basic_note_type_from_existing) { AnkiRecord::NoteType.new(collection: collection_argument, args: basic_model_hash) }
   let(:name_argument) { "test note type" }
   let(:collection_argument) do

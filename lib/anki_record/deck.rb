@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 require_relative "helpers/shared_constants_helper"
 require_relative "helpers/time_helper"
 
@@ -38,6 +36,8 @@ module AnkiRecord
     # The deck's deck options group object.
     attr_reader :deck_options_group
 
+    # :nodoc:
+    # :nocov:
     def inspect
       "#<AnkiRecord::Deck:#{object_id} id: #{id} name: #{name} description: #{description}>"
     end

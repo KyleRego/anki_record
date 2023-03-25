@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 module AnkiRecord
   ##
   # NoteField represents a field of an Anki note type.

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
 require "securerandom"
 
 require_relative "helpers/checksum_helper"

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 module AnkiRecord
   ##
   # CardTemplate represents a card template of an Anki note type.
@@ -30,9 +28,11 @@ module AnkiRecord
       fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
         capture.chomp("}}").reverse.chomp("{{").reverse
       end
-      raise ArgumentError if fields_in_specified_format.any? do |field_name|
-                               !note_type.allowed_card_template_question_format_field_names.include?(field_name)
-                             end
+      if fields_in_specified_format.any? do |field_name|
+        !note_type.allowed_card_template_question_format_field_names.include?(field_name)
+      end
+        raise ArgumentError, "You tried to use a field that the note type does not have."
+      end
 
       @question_format = format
     end
@@ -49,9 +49,11 @@ module AnkiRecord
       fields_in_specified_format = format.scan(/{{.+?}}/).map do |capture|
         capture.chomp("}}").reverse.chomp("{{").reverse
       end
-      raise ArgumentError if fields_in_specified_format.any? do |field_name|
-                               !note_type.allowed_card_template_answer_format_field_names.include?(field_name)
-                             end
+      if fields_in_specified_format.any? do |field_name|
+        !note_type.allowed_card_template_answer_format_field_names.include?(field_name)
+      end
+        raise ArgumentError, "You tried to use a field that the note type does not have."
+      end
 
       @answer_format = format
     end

@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require "pry"
 require "pathname"
 
 require_relative "card"
-require_relative "collection"
+require_relative "collection/collection"
 require_relative "note"
 
 require_relative "db/anki_schema_definition"

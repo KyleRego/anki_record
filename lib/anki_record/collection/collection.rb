@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require "pry"
 require "json"
 
-require_relative "deck"
-require_relative "deck_options_group"
-require_relative "helpers/data_query_helper"
-require_relative "helpers/time_helper"
-require_relative "note_type"
+require_relative "../deck"
+require_relative "../deck_options_group"
+require_relative "../helpers/data_query_helper"
+require_relative "../helpers/time_helper"
+require_relative "../note_type/note_type"
+require_relative "collection_attributes"
 
 module AnkiRecord
   ##
@@ -16,34 +16,7 @@ module AnkiRecord
   class Collection
     include AnkiRecord::DataQueryHelper
     include AnkiRecord::TimeHelper
-
-    ##
-    # The collection's Anki package object.
-    attr_reader :anki_package
-
-    ##
-    # The collection's id, which is also the id of the col record in the collection.anki21 database (usually 1).
-    attr_reader :id
-
-    ##
-    # The number of milliseconds since the 1970 epoch when the collection record was created.
-    attr_reader :created_at_timestamp
-
-    ##
-    # The number of milliseconds since the 1970 epoch at which the collection record was last modified.
-    attr_reader :last_modified_timestamp
-
-    ##
-    # The collection's note type objects as an array.
-    attr_reader :note_types
-
-    ##
-    # The collection's deck objects as an array
-    attr_reader :decks
-
-    ##
-    # The collection's deck option group objects as an array.
-    attr_reader :deck_options_groups
+    include AnkiRecord::CollectionAttributes
 
     def initialize(anki_package:) # :nodoc:
       setup_collection_instance_variables(anki_package: anki_package)
@@ -76,7 +49,10 @@ module AnkiRecord
     ##
     # Returns the collection's note type object found by either +name+ or +id+, or nil if it is not found.
     def find_note_type_by(name: nil, id: nil)
-      raise ArgumentError if (id && name) || (id.nil? && name.nil?)
+      if (id && name) || (id.nil? && name.nil?)
+        raise ArgumentError,
+              "You must pass either an id or name keyword argument."
+      end
 
       name ? find_note_type_by_name(name: name) : find_note_type_by_id(id: id)
     end
@@ -96,7 +72,10 @@ module AnkiRecord
     ##
     # Returns the collection's deck object found by either +name+ or +id+, or nil if it is not found.
     def find_deck_by(name: nil, id: nil)
-      raise ArgumentError if (id && name) || (id.nil? && name.nil?)
+      if (id && name) || (id.nil? && name.nil?)
+        raise ArgumentError,
+              "You must pass either an id or name keyword argument."
+      end
 
       name ? find_deck_by_name(name: name) : find_deck_by_id(id: id)
     end
