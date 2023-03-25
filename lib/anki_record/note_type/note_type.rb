@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "../card_template"
+require_relative "../card_template/card_template"
 require_relative "../helpers/shared_constants_helper"
 require_relative "../helpers/time_helper"
-require_relative "../note_field"
+require_relative "../note_field/note_field"
 require_relative "note_type_attributes"
 require_relative "note_type_defaults"
 

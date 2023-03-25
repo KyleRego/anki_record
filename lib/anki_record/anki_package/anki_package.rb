@@ -2,13 +2,10 @@
 
 require "pathname"
 
-require_relative "card"
-require_relative "collection/collection"
-require_relative "note"
-
-require_relative "db/anki_schema_definition"
-require_relative "db/clean_collection2_record"
-require_relative "db/clean_collection21_record"
+require_relative "../card/card"
+require_relative "../collection/collection"
+require_relative "../note/note"
+require_relative "database_setup_constants"
 
 # rubocop:disable Metrics/ClassLength
 module AnkiRecord
@@ -69,7 +66,7 @@ module AnkiRecord
       def check_name_argument_is_valid(name:)
         return if name.instance_of?(String) && !name.empty? && !name.include?(" ")
 
-        raise ArgumentError, "The name argument must be a string without spaces."
+        raise ArgumentError, "The package name must be a string without spaces."
       end
 
       def check_directory_argument_is_valid
@@ -81,7 +78,7 @@ module AnkiRecord
         db = SQLite3::Database.new "#{@tmpdir}/#{anki21_file_name}", options: {}
         @tmp_files << anki21_file_name
         db.execute_batch ANKI_SCHEMA_DEFINITION
-        db.execute CLEAN_COLLECTION_21_RECORD
+        db.execute INSERT_COLLECTION_ANKI_21_COL_RECORD
         db.results_as_hash = true
         db
       end
@@ -91,7 +88,7 @@ module AnkiRecord
         db = SQLite3::Database.new "#{@tmpdir}/#{anki2_file_name}", options: {}
         @tmp_files << anki2_file_name
         db.execute_batch ANKI_SCHEMA_DEFINITION
-        db.execute CLEAN_COLLECTION_2_RECORD
+        db.execute INSERT_COLLECTION_ANKI_2_COL_RECORD
         db.close
         db
       end

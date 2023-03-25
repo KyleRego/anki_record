@@ -2,8 +2,8 @@
 
 require "json"
 
-require_relative "../deck"
-require_relative "../deck_options_group"
+require_relative "../deck/deck"
+require_relative "../deck_options_group/deck_options_group"
 require_relative "../helpers/data_query_helper"
 require_relative "../helpers/time_helper"
 require_relative "../note_type/note_type"

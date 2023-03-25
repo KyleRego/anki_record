@@ -116,7 +116,7 @@ AnkiRecord::Note
         with nid values equal to the id of the cards' note object's id
 ```
 
-The RSpec test suite files in `spec` should roughly have a 1-to-1 mapping with the source code files in `lib`.
+The RSpec test suite files in `spec` have a mapping with the source code files in `lib`.
 
 ## Development
 

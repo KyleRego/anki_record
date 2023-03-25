@@ -15,13 +15,9 @@ RSpec.describe AnkiRecord::AnkiPackage do
 
   let(:database_name) { "default" }
 
-  before do
-    # :nocov:
-    # The test temporary directory might exist if RSpec was force quit/interrupted
-    cleanup_test_files(directory: TEST_TMP_DIRECTORY) && Dir.rmdir(TEST_TMP_DIRECTORY) if Dir.exist?(TEST_TMP_DIRECTORY)
-    # :nocov:
-    Dir.mkdir(TEST_TMP_DIRECTORY)
-  end
+  before { Dir.mkdir(TEST_TMP_DIRECTORY) }
+
+  after { cleanup_test_files(directory: TEST_TMP_DIRECTORY) && Dir.rmdir(TEST_TMP_DIRECTORY) }
 
   def tmp_directory
     anki_package.instance_variable_get(:@tmpdir)

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "helpers/shared_constants_helper"
-require_relative "helpers/time_helper"
+require_relative "deck_attributes"
+require_relative "deck_defaults"
+require_relative "../helpers/shared_constants_helper"
+require_relative "../helpers/time_helper"
 
 module AnkiRecord
   ##
@@ -9,38 +11,10 @@ module AnkiRecord
   # In the collection.anki21 database, the deck is a JSON object
   # which is part of a larger JSON object: the value of the col record's decks column.
   class Deck
+    include DeckAttributes
+    include DeckDefaults
     include SharedConstantsHelper
     include TimeHelper
-
-    ##
-    # The deck's collection object.
-    attr_reader :collection
-
-    ##
-    # The deck's name.
-    attr_accessor :name
-
-    ##
-    # The deck's description.
-    attr_accessor :description
-
-    ##
-    # The deck's id.
-    attr_reader :id
-
-    ##
-    # The number of seconds since the 1970 epoch when the deck was last modified.
-    attr_reader :last_modified_timestamp
-
-    ##
-    # The deck's deck options group object.
-    attr_reader :deck_options_group
-
-    # :nodoc:
-    # :nocov:
-    def inspect
-      "#<AnkiRecord::Deck:#{object_id} id: #{id} name: #{name} description: #{description}>"
-    end
 
     ##
     # Instantiates a new Deck object belonging to +collection+ with name +name+.
@@ -75,6 +49,12 @@ module AnkiRecord
         desc: @description, dyn: @dyn, conf: @deck_options_group.id,
         extendNew: @extend_new, extendRev: @extend_review
       }
+    end
+
+    # :nodoc:
+    # :nocov:
+    def inspect
+      "#<AnkiRecord::Deck:#{object_id} id: #{id} name: #{name} description: #{description}>"
     end
 
     private
@@ -116,18 +96,6 @@ module AnkiRecord
         @extend_new = 0
         @extend_review = 0
       end
-      # rubocop:enable Metrics/MethodLength
-
-      def default_deck_options_group_id
-        collection.deck_options_groups.min_by(&:id).id
-      end
-
-      def default_deck_today_array
-        [0, 0].freeze
-      end
-
-      def default_collapsed
-        false
-      end
+    # rubocop:enable Metrics/MethodLength
   end
 end

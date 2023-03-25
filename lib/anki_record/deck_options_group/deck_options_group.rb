@@ -1,30 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "helpers/shared_constants_helper"
-require_relative "helpers/time_helper"
+require_relative "../helpers/shared_constants_helper"
+require_relative "../helpers/time_helper"
+require_relative "deck_options_group_attributes"
 
 module AnkiRecord
   ##
   # DeckOptionsGroup represents a set of options that can be applied to an Anki deck.
   class DeckOptionsGroup
+    include DeckOptionsGroupAttributes
     include SharedConstantsHelper
     include TimeHelper
-
-    ##
-    # The deck options group's collection object.
-    attr_reader :collection
-
-    ##
-    # The deck option group's name.
-    attr_accessor :name
-
-    ##
-    # The deck option group's id.
-    attr_reader :id
-
-    ##
-    # The number of milliseconds since the 1970 epoch at which the deck options group was modified.
-    attr_reader :last_modified_timestamp
 
     ##
     # Instantiates a new deck options group belonging to +collection+ with name +name+.
@@ -67,11 +53,7 @@ module AnkiRecord
         @new_gather_priority = args["newGatherPriority"]
         @bury_interday_learning = args["buryInterdayLearning"]
       end
-      # rubocop:enable Metrics/AbcSize
-      # rubocop:enable Metrics/MethodLength
 
-      # rubocop:disable Metrics/MethodLength
-      # rubocop:disable Metrics/AbcSize
       def setup_deck_options_group_instance_variables(name:)
         @id = milliseconds_since_epoch
         @last_modified_timestamp = seconds_since_epoch

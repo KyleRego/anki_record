@@ -1,46 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "helpers/shared_constants_helper"
-require_relative "helpers/time_helper"
+require_relative "../helpers/shared_constants_helper"
+require_relative "../helpers/time_helper"
+require_relative "card_attributes"
 
 module AnkiRecord
   ##
   # Card represents an Anki card.
   class Card
+    include CardAttributes
     include TimeHelper
     include SharedConstantsHelper
-
-    ##
-    # The card's note object.
-    attr_reader :note
-
-    ##
-    # The card's deck object.
-    attr_reader :deck
-
-    ##
-    # The card's collection object.
-    attr_reader :collection
-
-    ##
-    # The card's card template object.
-    attr_reader :card_template
-
-    ##
-    # The card's id.
-    #
-    # This is also the number of milliseconds since the 1970 epoch at which the card was created.
-    attr_reader :id
-
-    ##
-    # The number of seconds since the 1970 epoch at which the card was last modified.
-    attr_reader :last_modified_timestamp
-
-    ##
-    # The card's update sequence number.
-    attr_reader :usn
-
-    attr_reader :type, :queue, :due, :ivl, :factor, :reps, :lapses, :left, :odue, :odid, :flags, :data
 
     def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
       @note = note

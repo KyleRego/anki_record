@@ -1,40 +1,14 @@
 # frozen_string_literal: true
 
+require_relative "note_field_attributes"
+require_relative "note_field_defaults"
+
 module AnkiRecord
   ##
   # NoteField represents a field of an Anki note type.
   class NoteField
-    ##
-    # The field's note type.
-    attr_reader :note_type
-
-    ##
-    # The field's name.
-    attr_accessor :name
-
-    ##
-    # A boolean that indicates if the field is sticky.
-    attr_accessor :sticky
-
-    ##
-    # A boolean that indicates if the field is right to left.
-    attr_accessor :right_to_left
-
-    ##
-    # The field's font style used when editing.
-    attr_accessor :font_style
-
-    ##
-    # The field's font size used when editing.
-    attr_accessor :font_size
-
-    ##
-    # The field's description.
-    attr_accessor :description
-
-    ##
-    # 0 for the first field of the note type, 1 for the second, etc.
-    attr_reader :ordinal_number
+    include NoteFieldAttributes
+    include NoteFieldDefaults
 
     ##
     # Instantiates a new field for the note type +note_type+ with name +name+.
@@ -83,18 +57,6 @@ module AnkiRecord
         @font_style = default_field_font_style
         @font_size = default_field_font_size
         @description = default_field_description
-      end
-
-      def default_field_font_style
-        "Arial"
-      end
-
-      def default_field_font_size
-        20
-      end
-
-      def default_field_description
-        ""
       end
   end
 end
