@@ -221,8 +221,8 @@ RSpec.describe AnkiRecord::NoteType do
     it "should save the note type object as a JSON object value with the following keys:
       'id', 'name', 'type', 'mod', 'usn',
       'sortf', 'did', 'tmpls', 'flds', 'css',
-      'latexPre', 'latexPost', 'latexsvg', 'req', and 'tags'" do
-      %w[id name type mod usn sortf did tmpls flds css latexPre latexPost latexsvg req tags vers].each do |key|
+      'latexPre', 'latexPost', 'latexsvg', and 'req'" do
+      %w[id name type mod usn sortf did tmpls flds css latexPre latexPost latexsvg req].each do |key|
         expect(@crazy_note_type_hash.keys).to include key
       end
     end

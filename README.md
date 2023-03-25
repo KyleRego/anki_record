@@ -2,7 +2,9 @@
 
 Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases).
 
-**It is in an early stage of development and the API is not finalized.**
+**It is in an early stage of development, so the API is not finalized, and currently released versions may have some bugs.**
+
+**To import the deck packages into Anki, click the File menu and then "Import" from inside Anki. Do not double click the `.apkg` file to open Anki and import it at the same time.**
 
 ## Installation
 

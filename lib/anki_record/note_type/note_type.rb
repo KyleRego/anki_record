@@ -18,6 +18,9 @@ module AnkiRecord
     include AnkiRecord::NoteTypeAttributes
     include AnkiRecord::NoteTypeDefaults
 
+    NOTE_TYPES_WITHOUT_TAGS_AND_VERS_VALUES = ["Basic", "Basic (and reversed card)",
+                                               "Basic (optional reversed card)", "Basic (type in the answer)"].freeze
+
     def initialize(collection:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
@@ -43,11 +46,13 @@ module AnkiRecord
     end
 
     def to_h # :nodoc:
-      { id: @id, name: @name, type: @cloze ? 1 : 0,
-        mod: @last_modified_timestamp, usn: @usn, sortf: @sort_field, did: @deck_id,
-        tmpls: @card_templates.map(&:to_h), flds: @note_fields.map(&:to_h), css: @css,
-        latexPre: @latex_preamble, latexPost: @latex_postamble, latexsvg: @latex_svg,
-        req: @req, tags: @tags, vers: @vers }
+      self_to_h = { id: @id, name: @name, type: @cloze ? 1 : 0,
+                    mod: @last_modified_timestamp, usn: @usn, sortf: @sort_field, did: @deck_id,
+                    tmpls: @card_templates.map(&:to_h), flds: @note_fields.map(&:to_h), css: @css,
+                    latexPre: @latex_preamble, latexPost: @latex_postamble, latexsvg: @latex_svg,
+                    req: @req }
+      self_to_h.merge({ tags: @tags, vers: @vers }) unless NOTE_TYPES_WITHOUT_TAGS_AND_VERS_VALUES.include?(@name)
+      self_to_h
     end
 
     ##
