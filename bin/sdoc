@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-rdoc --main README.md \
+sdoc --main README.md \
       --exclude="coverage" \
       --exclude="Gemfile" \
       --exclude="Rakefile" \
@@ -7,7 +7,7 @@ rdoc --main README.md \
       --title="AnkiRecord docs" \
       --op="../anki_record_docs"
 
-rdoc --main README.md \
+sdoc --main README.md \
       --exclude="coverage" \
       --exclude="Gemfile" \
       --exclude="Rakefile" \

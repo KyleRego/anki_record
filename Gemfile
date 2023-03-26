@@ -17,4 +17,4 @@ gem "rubocop", "~> 1.21"
 
 gem "pry"
 
-gem "rdoc"
+gem "sdoc", "~> 2.6"
