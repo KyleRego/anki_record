@@ -13,7 +13,7 @@
 - Note objects can be created and updated, and then saved to the `collection.anki21` database.
   - This also populates corresponding records in the `cards` table.
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 03-26-2023
 
 - `AnkiPackage::new` yields the collection object to the block instead of the Anki package object.
 - `AnkiPackage::open` has been developed to a point that it is useable.
