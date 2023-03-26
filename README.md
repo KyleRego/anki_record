@@ -45,7 +45,7 @@ apkg = AnkiRecord::AnkiPackage.new(name: "test")
 apkg.zip # This zips the temporary files into test.apkg, and then deletes them.
 ```
 
-The second, optional argument to `AnkiRecord::Package.new` is `directory`. The default value is the current working directory, but if a relative file path argument is given, the new `*.apkg` file will be saved in that directory. An exception will be raised if the relative file path is not to a directory that exists.
+The second, optional argument to `AnkiRecord::AnkiPackage.new` is `target_directory`. The default value is the current working directory, but if a relative file path argument is given, the new `*.apkg` file will be saved in that directory. An exception will be raised if the relative file path is not to a directory that exists.
 
 A new Anki package object is initialized with the "Default" deck and the default note types of a new Anki collection (including "Basic" and "Cloze"). The deck and note type objects are accessed through the `collection` attribute of the Anki package object through the `find_deck_by` and `find_note_type_by` methods passed the `name` keyword argument:
 
