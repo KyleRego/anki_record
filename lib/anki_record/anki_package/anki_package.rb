@@ -38,7 +38,7 @@ module AnkiRecord
 
     # Returns an SQLite3::Statement object representing the given SQL and coupled to the collection.anki21 database.
     #
-    # The Statement is executed using Statement#execute (refer to the sqlite3 gem documentation).
+    # The Statement is executed using Statement#execute (see sqlite3 gem).
     def prepare(sql)
       @anki21_database.prepare sql
     end
@@ -128,7 +128,7 @@ module AnkiRecord
     public
 
     ##
-    # Instantiates a new Anki package object which seeded with data from an already existing Anki package.
+    # Instantiates a new Anki package object seeded with data from the opened Anki package.
     #
     # See the README for details.
     def self.open(path:, target_directory: nil, &closure)
@@ -146,9 +146,7 @@ module AnkiRecord
       end
     end
 
-    ##
-    # Returns true if the Anki package object was instantiated using ::open.
-    def was_instantiated_from_existing_apkg?
+    def was_instantiated_from_existing_apkg? # :nodoc:
       !@open_path.nil?
     end
 
@@ -156,7 +154,7 @@ module AnkiRecord
 
     ##
     # Unzips the *.apkg file that was opened and yields its collection.anki21 database
-    # as a SQLite3::Database object to the block argument.
+    # as a SQLite3::Database object (see sqlite3 gem) to the block.
     #
     # After the block executes, the files created by unzipping are deleted.
     #

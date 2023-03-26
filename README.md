@@ -1,8 +1,8 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks (`*.apkg` files, or Anki SQLite databases).
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks/deck packages (`.apkg` files or Anki SQLite databases).
 
-**It is in an early stage of development, so the API is not finalized, and currently released versions may have some bugs.**
+**Development is ongoing and currently released versions may have some bugs. The library does not support media yet.**
 
 **To import the deck packages into Anki, click the File menu and then "Import" from inside Anki. Do not double click the `.apkg` file to open Anki and import it at the same time.**
 
@@ -74,49 +74,70 @@ end
 
 This example creates a `test.apkg` zip file in the current working directory, which when imported into Anki, will add one Basic note and one Cloze note.
 
-The following example is from the next version of the library which is unreleased.
+The next example shows some other features of the library:
 
 ```ruby
 require "anki_record"
 
-AnkiRecord::AnkiPackage.new(name: "crazy") do |apkg|
-  collection = apkg.collection
-  default_deck = collection.find_deck_by name: "Default"
-  crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "crazy note type"
+note_id = nil
+
+AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
+  crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
+
+  crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
   AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
   AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-  crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 1"
+  crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "test 1 card 1"
   crazy_card_template.question_format = "{{crazy front}}"
   crazy_card_template.answer_format = "{{crazy back}}"
-  crazy_card_template2 = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "crazy card 2"
-  crazy_card_template2.question_format = "{{crazy back}}"
-  crazy_card_template2.answer_format = "{{crazy front}}"
+  second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "test 1 card 2"
+  second_crazy_card_template.question_format = "{{crazy back}}"
+  second_crazy_card_template.answer_format = "{{crazy front}}"
+
+  css = <<~CSS
+    .card {
+      font-size: 16px;
+      font-style: Verdana;
+      background: transparent;
+      text-align: center;
+    }
+  CSS
+
+  crazy_note_type.css = css
   crazy_note_type.save
 
-  note = AnkiRecord::Note.new note_type: crazy_note_type, deck: default_deck
-  note.crazy_front = "Hello"
+  note = AnkiRecord::Note.new note_type: crazy_note_type, deck: crazy_deck
+  note.crazy_front = "Hello from test 1"
   note.crazy_back = "World"
+  note.save
+
+  note_id = note.id
+end
+
+AnkiRecord::AnkiPackage.open(path: "./test_1.apkg") do |collection|
+  note = collection.find_note_by id: note_id
+  note.crazy_back = "Ruby"
   note.save
 end
 ```
 
-This creates `crazy.apkg` with a new custom note type called "crazy note type" and one note using it.
+This script creates an Anki package `test_1.apkg` with a new deck and new note type, and one note in that deck using that type. It then opens that Anki package, and edits the note. Note that the `test_1.apkg` file is not changed by this. Instead, a new package with a name similar to `test_1-1679835468.apkg` is created (the number is a timestamp).
 
 ## Documentation
 
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using RDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
+The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using SDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
 The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. The following is an example of output from one example in `spec/anki_record/note_spec.rb`:
 
 ```
 AnkiRecord::Note
   #save
-    for a note with 2 card templates, that does not exist yet in the collection.anki21 database
+    for a note that does not exist in the collection.anki21 database (custom note type, 2 card templates)
       should save two card records to the collection.anki21 database
         with nid values equal to the id of the cards' note object's id
 ```
 
-The RSpec test suite files in `spec` have a mapping with the source code files in `lib`.
+The RSpec test suite files in `spec` have a mapping with the source code in `lib`.
 
 ## Development
 
@@ -128,25 +149,23 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Better messages when `ArgumentError` raised
 - Add #inspect methods
 - Refactor tests to improve speed
-- Remove passing a cloze boolean to note type constructor; let this attribute be set after initialization.
 - Copying the contents of an existing package into the new package when it is opened
-  - Add more unit tests
+    - Add more unit tests
 - Work on creating, updating, and saving notes and cards to the collection.anki21 database
-  - Updating notes when they already exist in the database
-      - Add more unit tests
-  - Validation logic of what makes the note valid based on the note type's card templates and fields
-  - Work on adding media support
-    - The checksum calculation for notes will need to be updated to account for HTML in the content
+    - Updating notes when they already exist in the database
+        - Add more unit tests
+    - Validation logic of what makes the note valid based on the note type's card templates and fields
+    - Work on adding media support
+      - The checksum calculation for notes will need to be updated to account for HTML in the content
 - Saving note types, decks, and deck options groups to the collection.anki21 database
-  - Deck options groups cannot be saved yet.
-  - Add being able to handle subdecks
-  - Updating them when they already exist
-  - Setters for any relevant attributes with validation
+    - Deck options groups cannot be saved yet.
+    - Add being able to handle subdecks
+    - Updating them when they already exist
+    - Setters for any relevant attributes with validation
 - Refactoring
-  - Specs need to be refactored to be more DRY and also start using doubles to improve performance
-  - Use more specific RSpec matchers than `eq` everywhere
-  - Investigate if note guid is determined in Anki in a non-random way
-  - Figure out if the database ever needs to be explicitly opened or closed
+    - Use more specific RSpec matchers than `eq` everywhere
+    - Investigate if note guid is determined in Anki in a non-random way
+    - Investigate if the database ever needs to be explicitly opened or closed
 - Note type allowed fields: investigate if there are other special field names that should be allowed.
 
 ### Release checklist

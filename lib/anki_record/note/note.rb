@@ -152,7 +152,7 @@ module AnkiRecord
     end
 
     ##
-    # This allows #respond_to? to be accurate for the ghost methods created by #method_missing
+    # This allows #respond_to? to be accurate for the ghost methods created by #method_missing.
     def respond_to_missing?(method_name, *)
       method_name = method_name.to_s
       if method_name.end_with?("=")

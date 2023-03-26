@@ -6,7 +6,7 @@ module AnkiRecord
   ##
   # A module for the method that calculates the checksum value of notes.
   #
-  # This checksum is used by Anki to detect duplicates.
+  # This checksum may be used by Anki to detect duplicates.
   module ChecksumHelper
     ##
     # Returns the integer representation of the first 8 characters of the SHA-1 digest of the +sfld+ argument

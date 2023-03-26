@@ -4,12 +4,14 @@ sdoc --main README.md \
       --exclude="Gemfile" \
       --exclude="Rakefile" \
       --exclude="bin" \
-      --title="AnkiRecord docs" \
-      --op="../anki_record_docs"
+      --title="Anki Record API documentation" \
+      --op="../anki_record_docs" \
+      --template=rails
 
 sdoc --main README.md \
       --exclude="coverage" \
       --exclude="Gemfile" \
       --exclude="Rakefile" \
       --exclude="bin" \
-      --title="AnkiRecord docs"
+      --title="Anki Record API documentation" \
+      --template=rails

@@ -4,9 +4,9 @@ require "date"
 
 module AnkiRecord
   ##
-  # Helper module to calculate integer time values since the 1970 epoch
+  # Helper module to calculate integer time values since the 1970 epoch.
   #
-  # Specifically, the time that has passed since 00:00:00 UTC Jan 1 1970
+  # Specifically, the time that has passed since 00:00:00 UTC Jan 1 1970.
   module TimeHelper
     ##
     # Returns approximately the number of milliseconds since the 1970 epoch.
