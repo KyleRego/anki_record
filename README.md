@@ -1,10 +1,6 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard decks/deck packages (`.apkg` files or Anki SQLite databases).
-
-**Development is ongoing and currently released versions may have some bugs. The library does not support media yet.**
-
-**To import the deck packages into Anki, click the File menu and then "Import" from inside Anki. Do not double click the `.apkg` file to open Anki and import it at the same time.**
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard deck package files (Anki SQLite databases). It isn't finished (the main thing it does not support yet is media). Development is currently paused (unless any bugs are discovered, which I will fix as soon as I know them) while I do some initial work on a Rails application that is the reason I developed the gem. But after that, Anki Record will have features added to add media to notes.
 
 ## Installation
 
@@ -17,6 +13,8 @@ If bundler is not being used to manage dependencies, install the gem by executin
     $ gem install anki_record
 
 ## Usage
+
+**To import any deck package (created by this gem or otherwise) into Anki, click the File menu and then "Import" from inside Anki. Do not double click the `.apkg` file to open Anki and import it at the same time.**
 
 The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip an `*.apkg` file where `*` is the name argument (this argument is not allowed to contain spaces):
 
@@ -52,17 +50,17 @@ A new Anki package object is initialized with the "Default" deck and the default
 ```ruby
 require "anki_record"
 
-apkg = AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
-  deck = apkg.collection.find_deck_by name: "Default"
+apkg = AnkiRecord::AnkiPackage.new(name: "test") do |collection|
+  deck = collection.find_deck_by name: "Default"
 
-  note_type = apkg.collection.find_note_type_by name: "Basic"
+  note_type = collection.find_note_type_by name: "Basic"
 
   note = AnkiRecord::Note.new note_type: note_type, deck: deck
   note.front = "Hello"
   note.back = "World"
   note.save
 
-  note_type2 = apkg.collection.find_note_type_by name: "Cloze"
+  note_type2 = collection.find_note_type_by name: "Cloze"
 
   note2 = AnkiRecord::Note.new note_type: note_type2, deck: deck
   note2.text = "Cloze {{c1::Hello}}"
@@ -139,7 +137,7 @@ AnkiRecord::Note
 
 The RSpec test suite files in `spec` have a mapping with the source code in `lib`.
 
-## Development
+<!-- ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
@@ -174,7 +172,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Update usage examples
 - Update and regenerate documentation
 - Bump version
-- Release gem
+- Release gem -->
 
 <!-- ## Contributing
 
