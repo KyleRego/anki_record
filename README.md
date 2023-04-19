@@ -1,6 +1,8 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard deck package files (Anki SQLite databases). It isn't finished (the main thing it does not support yet is media). Development is currently paused (unless any bugs are discovered, which I will fix as soon as I know them) while I do some initial work on a Rails application that is the reason I developed the gem. But after that, Anki Record will have features added to add media to notes.
+Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard deck package files (Anki SQLite databases). It isn't finished (the main thing it does not support yet is media). 
+
+Development is currently focused on the Ruby on Rails application that this gem was created for ([Anki Books](https://github.com/KyleRego/anki_books)), and refactoring the test suite to enforce cops from the `rubocop-rspec` extension to the RuboCop code linter.
 
 ## Installation
 
