@@ -1,0 +1,64 @@
+# frozen_string_literal: true
+
+RSpec.shared_context "anki package helpers" do
+  subject(:anki_package_from_existing) do
+    if defined?(closure_argument) && defined?(target_target_directory_argument)
+      described_class.open(path: path_to_file_to_open,
+                           target_directory: target_target_directory_argument,
+                          &closure_argument)
+    elsif defined?(closure_argument)
+      described_class.open(path: path_to_file_to_open, &closure_argument)
+    elsif defined?(target_target_directory_argument)
+      described_class.open(path: path_to_file_to_open, target_directory: target_target_directory_argument)
+    else
+      described_class.open(path: path_to_file_to_open)
+    end
+  end
+
+  let(:anki_package) do
+    if defined?(closure_argument) && defined?(target_directory_argument)
+      described_class.new(name: new_anki_package_name, target_directory: target_directory_argument, &closure_argument)
+    elsif defined?(closure_argument)
+      described_class.new(name: new_anki_package_name, &closure_argument)
+    elsif defined?(target_directory_argument)
+      described_class.new(name: new_anki_package_name, target_directory: target_directory_argument)
+    else
+      described_class.new(name: new_anki_package_name)
+    end
+  end
+
+  before { Dir.mkdir(TEST_TMP_DIRECTORY) }
+
+  after do
+    cleanup_test_files(directory: TEST_TMP_DIRECTORY) && Dir.rmdir(TEST_TMP_DIRECTORY)
+    if defined?(target_directory_argument) && File.directory?(target_directory_argument)
+      cleanup_test_files(directory: target_directory_argument)
+    else
+      cleanup_test_files(directory: ".")
+    end
+  end
+
+  def tmp_directory
+    anki_package.instance_variable_get(:@tmpdir)
+  end
+
+  def expect_num_anki21_files_in_package_tmp_directory(num:)
+    expect(Dir.entries(tmp_directory).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq num
+  end
+
+  def expect_num_anki2_files_in_package_tmp_directory(num:)
+    expect(Dir.entries(tmp_directory).select { |file| file.match(ANKI_COLLECTION_2_REGEX) }.count).to eq num
+  end
+
+  def expect_media_file_in_tmp_directory
+    expect(Dir.entries(tmp_directory).include?("media")).to be true
+  end
+
+  def expect_num_apkg_files_in_directory(num:, directory:)
+    expect(Dir.entries(directory).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq num
+  end
+
+  def expect_the_temporary_directory_to_not_exist
+    expect(Dir.exist?(tmp_directory)).to be false
+  end
+end
