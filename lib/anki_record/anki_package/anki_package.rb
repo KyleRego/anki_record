@@ -45,8 +45,8 @@ module AnkiRecord
 
     private
 
-      def execute_closure_and_zip(object_to_yield, &closure)
-        closure.call(object_to_yield)
+      def execute_closure_and_zip(collection, &closure)
+        closure.call(collection)
       rescue StandardError => e
         destroy_temporary_directory
         puts_error_and_standard_message(error: e)

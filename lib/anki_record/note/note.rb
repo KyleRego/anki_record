@@ -143,7 +143,9 @@ module AnkiRecord
     #
     # The ghost methods are the setters and getters for the note field values.
     def method_missing(method_name, field_content = nil)
-      raise NoMethodError, "##{method_name} is not defined or a ghost method" unless respond_to_missing? method_name
+      unless respond_to_missing? method_name
+        raise NoMethodError, "##{method_name} is not defined or a ghost method"
+      end
 
       method_name = method_name.to_s
       return @field_contents[method_name] unless method_name.end_with?("=")
