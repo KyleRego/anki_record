@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable RSpec/ContextWording
 RSpec.shared_context "card template helpers" do
   after { cleanup_test_files(directory: ".") }
 
@@ -19,6 +20,6 @@ RSpec.shared_context "card template helpers" do
       "did" => nil,
       "bfont" => "",
       "bsize" => 0 }
-    end
-
+  end
 end
+# rubocop:enable RSpec/ContextWording

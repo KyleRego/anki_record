@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "./spec/anki_record/support/anki_package_shared_context"
+require "./spec/anki_record/support/anki_package_spec_helpers"
 
 RSpec.describe AnkiRecord::AnkiPackage, "#zip" do
   include_context "anki package helpers"

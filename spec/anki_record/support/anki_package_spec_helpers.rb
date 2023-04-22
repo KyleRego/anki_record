@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable RSpec/ContextWording
 RSpec.shared_context "anki package helpers" do
   subject(:anki_package_from_existing) do
     if defined?(closure_argument) && defined?(target_target_directory_argument)
@@ -62,3 +63,4 @@ RSpec.shared_context "anki package helpers" do
     expect(Dir.exist?(tmp_directory)).to be false
   end
 end
+# rubocop:enable RSpec/ContextWording

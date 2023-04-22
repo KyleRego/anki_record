@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "./spec/anki_record/support/card_template_shared_context"
+require "./spec/anki_record/support/card_template_spec_helpers"
 
 RSpec.describe AnkiRecord::CardTemplate, ".new" do
   include_context "card template helpers"

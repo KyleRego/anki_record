@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "./spec/anki_record/support/card_template_shared_context"
+require "./spec/anki_record/support/card_template_spec_helpers"
 
 RSpec.describe AnkiRecord::CardTemplate, "#answer_format=" do
   subject(:card_template_from_existing) { described_class.new(note_type: note_type_argument, args: card_template_hash) }
