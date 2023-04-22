@@ -173,40 +173,52 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
 
     anki_package_open_integration_test = <<-DESC
       copies the data from the opened package such that in the new collection
-        the custom note type is present
-          and it has the same id as the original note type object
-          and it has two card templates
-            that have the same names as the original card templates
-          and it has two note fields
-            that have the same names as the original note fields
+        1a. the custom note type is present
+        1b. the custom note type has the same id as the original note type object
+        1c. the custom note type has two card templates
+        1d. the custom note type has two card templates with the same names as the original card templates
+        1e. the custom note type has two note fields
+        1f. the custom note type has two note fields with the same names as the original note fields
 
-        and the note is present
-          and it has the same id, guid, last_modified_timestamp, usn, tags, field_contents, flags, and data attributes as the original note
-          and it has two cards
-            that have the same ids as the original card records
+        2a. the note is present
+        2b. the note has the same id, guid, last_modified_timestamp, usn, tags, field_contents, flags, and data attributes as the original note
+        2c. the note has has two cards
+        2d. the note has two cards with the same ids as the original card records
 
       copies the data from the opened package such that in the new collection.anki21 database
-        there is an id key in the models JSON object of the col record equal to the custom model id
-        there is an id key in the decks JSON object of the col record equal to the custom deck id
+        3a. there is an id key in the models JSON object of the col record equal to the custom model id
+        3b. there is an id key in the decks JSON object of the col record equal to the custom deck id
     DESC
 
     # rubocop:disable RSpec/ExampleLength
     it(anki_package_open_integration_test) do
+      # 1a
       expect(copied_over_note_type).to be_a AnkiRecord::NoteType
+      # 1b
       expect(copied_over_note_type.id).to eq @original_note_type.id
+      # 1c
       expect(copied_over_note_type.card_templates.count).to eq @original_card_templates.count
+      # 1d
       expect(copied_over_note_type.card_templates.map(&:name).sort).to eq @original_card_templates.map(&:name).sort
+      # 1e
       expect(copied_over_note_type.note_fields.count).to eq @original_note_fields.count
+      # 1f
       expect(copied_over_note_type.note_fields.map(&:name).sort).to eq @original_note_fields.map(&:name).sort
 
+      # 2a
       expect(copied_over_note).to be_a AnkiRecord::Note
+      # 2b
       %w[id guid last_modified_timestamp usn tags field_contents flags data].each do |note_attribute|
         expect(copied_over_note.send(note_attribute)).to eq @original_note.send(note_attribute)
       end
+      # 2c
       expect(copied_over_note.cards.count).to eq @original_cards.count
+      # 2d
       expect(copied_over_note.cards.map(&:id).sort).to eq @original_cards.map(&:id).sort
 
+      # 3a
       expect(new_collection_from_opened_package.models_json.keys).to include @original_note_type.id.to_s
+      # 3b
       expect(new_collection_from_opened_package.decks_json.keys).to include @original_deck.id.to_s
     end
   end
