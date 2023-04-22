@@ -16,8 +16,6 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-**To import any deck package (created by this gem or otherwise) into Anki, click the File menu and then "Import" from inside Anki. Do not double click the `.apkg` file to open Anki and import it at the same time.**
-
 The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip an `*.apkg` file where `*` is the name argument (this argument is not allowed to contain spaces):
 
 ```ruby
