@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: Specs can be refactored for performance.
 RSpec.describe AnkiRecord::Deck, "#save" do
   after { cleanup_test_files(directory: ".") }
 

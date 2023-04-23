@@ -9,8 +9,8 @@ module AnkiRecord
   # Card represents an Anki card.
   class Card
     include CardAttributes
-    include TimeHelper
-    include SharedConstantsHelper
+    include Helpers::TimeHelper
+    include Helpers::SharedConstantsHelper
 
     def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
       @note = note

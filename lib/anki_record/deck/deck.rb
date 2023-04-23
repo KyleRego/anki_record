@@ -13,8 +13,8 @@ module AnkiRecord
   class Deck
     include DeckAttributes
     include DeckDefaults
-    include SharedConstantsHelper
-    include TimeHelper
+    include Helpers::SharedConstantsHelper
+    include Helpers::TimeHelper
 
     ##
     # Instantiates a new Deck object belonging to +collection+ with name +name+.

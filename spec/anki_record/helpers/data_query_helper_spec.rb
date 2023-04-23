@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MockDataQueryHelperClass
-  include AnkiRecord::DataQueryHelper
+  include AnkiRecord::Helpers::DataQueryHelper
 end
 
-RSpec.describe AnkiRecord::DataQueryHelper
+RSpec.describe AnkiRecord::Helpers::DataQueryHelper

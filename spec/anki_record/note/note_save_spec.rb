@@ -72,7 +72,7 @@ RSpec.describe AnkiRecord::Note, "#save" do
       expect(note_record_data["sfld"]).to eq "Hello"
     end
 
-    it "saves a note record to the collection.anki21 database with a csum value being an integer with 10 digits (see ChecksumHelper)" do
+    it "saves a note record to the collection.anki21 database with a csum value being an integer with 10 digits (see Helpers::ChecksumHelper)" do
       expect(note_record_data["csum"].to_s.length).to eq 10
     end
 

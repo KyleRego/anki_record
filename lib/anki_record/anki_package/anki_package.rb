@@ -14,7 +14,7 @@ module AnkiRecord
   #
   # Here, Anki package refers to the zip file that Anki can export and import.
   class AnkiPackage
-    include AnkiRecord::DataQueryHelper
+    include AnkiRecord::Helpers::DataQueryHelper
 
     ##
     # The package's collection object.
@@ -179,7 +179,7 @@ module AnkiRecord
     # rubocop:enable Metrics/MethodLength
 
     class << self
-      include TimeHelper
+      include Helpers::TimeHelper
 
       # rubocop:disable Metrics/MethodLength
       # rubocop:disable Metrics/AbcSize

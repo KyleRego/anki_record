@@ -40,3 +40,4 @@
 ## [0.4.0] - Not released
 
 - `Deck.new` was saving the deck to the `collection.anki21` database. Now it will only instantiate it and `#save` must be called to save it.
+- `Helper` modules moved into the `Helpers` module namespace.

@@ -13,10 +13,10 @@ module AnkiRecord
   #
   # The attributes are documented in the NoteTypeAttributes module.
   class NoteType
-    include AnkiRecord::SharedConstantsHelper
-    include AnkiRecord::TimeHelper
-    include AnkiRecord::NoteTypeAttributes
-    include AnkiRecord::NoteTypeDefaults
+    include Helpers::SharedConstantsHelper
+    include Helpers::TimeHelper
+    include NoteTypeAttributes
+    include NoteTypeDefaults
 
     NOTE_TYPES_WITHOUT_TAGS_AND_VERS_VALUES = ["Basic", "Basic (and reversed card)",
                                                "Basic (optional reversed card)", "Basic (type in the answer)"].freeze

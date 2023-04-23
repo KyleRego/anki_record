@@ -12,10 +12,10 @@ module AnkiRecord
   # Represents an Anki note. The note object corresponds to a record in the `notes`
   # table in the collection.anki21 database.
   class Note
-    include ChecksumHelper
+    include Helpers::ChecksumHelper
     include NoteAttributes
-    include TimeHelper
-    include SharedConstantsHelper
+    include Helpers::TimeHelper
+    include Helpers::SharedConstantsHelper
 
     ##
     # Instantiates a note of type +note_type+ and belonging to deck +deck+.

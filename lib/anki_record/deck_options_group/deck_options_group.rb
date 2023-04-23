@@ -9,8 +9,8 @@ module AnkiRecord
   # DeckOptionsGroup represents a set of options that can be applied to an Anki deck.
   class DeckOptionsGroup
     include DeckOptionsGroupAttributes
-    include SharedConstantsHelper
-    include TimeHelper
+    include Helpers::SharedConstantsHelper
+    include Helpers::TimeHelper
 
     ##
     # Instantiates a new deck options group belonging to +collection+ with name +name+.

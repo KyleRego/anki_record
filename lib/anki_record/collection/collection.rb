@@ -14,9 +14,9 @@ module AnkiRecord
   # Collection represents the single record in the Anki collection.anki21 database's `col` table.
   # The note types, decks, and deck options groups data are contained within this record.
   class Collection
-    include AnkiRecord::DataQueryHelper
-    include AnkiRecord::TimeHelper
-    include AnkiRecord::CollectionAttributes
+    include Helpers::DataQueryHelper
+    include Helpers::TimeHelper
+    include CollectionAttributes
 
     def initialize(anki_package:) # :nodoc:
       setup_collection_instance_variables(anki_package: anki_package)

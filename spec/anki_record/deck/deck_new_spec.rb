@@ -39,7 +39,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
       # 8
       expect(deck.deck_options_group.id).to eq 1
       # 9
-      expect(collection.decks_json.keys).to_not include deck.id.to_s
+      expect(collection.decks_json.keys).not_to include deck.id.to_s
     end
   end
   # rubocop:enable RSpec/ExampleLength
