@@ -17,6 +17,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
       6. instantiates a deck with an integer last_modified_timestamp attribute
       7. instantiates a deck with deck_options_group returning a deck options group object
       8. instantiates a deck with deck_options_group returning a deck options group object with an id equal to 1
+      9. does not save a deck to the collection.anki21 database
     DESC
 
     # rubocop:disable RSpec/ExampleLength
@@ -37,6 +38,8 @@ RSpec.describe AnkiRecord::Deck, "#new" do
       expect(deck.deck_options_group).to be_a AnkiRecord::DeckOptionsGroup
       # 8
       expect(deck.deck_options_group.id).to eq 1
+      # 9
+      expect(collection.decks_json.keys).to_not include deck.id.to_s
     end
   end
   # rubocop:enable RSpec/ExampleLength
@@ -77,14 +80,15 @@ RSpec.describe AnkiRecord::Deck, "#new" do
     let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_2").collection }
 
     deck_integration_test_two = <<~DESC
-      instantiates a deck with collection attribute equal to the collection argument
-      instantiates a deck which is added to the decks of the collection argument's decks attribute
-      instantiates a deck with the id from the deck JSON
-      instantiates a deck with the last modified time from the deck JSON
-      instantiates a deck with the name Default
-      instantiates a deck with the description from the deck JSON
-      instantiates a deck with deck_options_group returning a deck options group object
-      instantiates a deck with deck_options_group returnign a deck options group object with id equal to id the value from the deck JSON (the conf)
+      1. instantiates a deck with collection attribute equal to the collection argument
+      2. instantiates a deck which is added to the decks of the collection argument's decks attribute
+      3. instantiates a deck with the id from the deck JSON
+      4. instantiates a deck with the last modified time from the deck JSON
+      5. instantiates a deck with the name Default
+      6. instantiates a deck with the description from the deck JSON
+      7. instantiates a deck with deck_options_group returning a deck options group object
+      8. instantiates a deck with deck_options_group returning a deck options group object with id equal to id the value from the deck JSON (the conf)
+      9. saves a deck to the collection.anki21 database
     DESC
 
     # rubocop:disable RSpec/ExampleLength
@@ -105,6 +109,8 @@ RSpec.describe AnkiRecord::Deck, "#new" do
       expect(default_deck_from_existing.deck_options_group).to be_a AnkiRecord::DeckOptionsGroup
       # 8
       expect(default_deck_from_existing.deck_options_group.id).to eq 1
+      # 9
+      expect(collection.decks_json.keys).to include default_deck_from_existing.id.to_s
     end
     # rubocop:enable RSpec/ExampleLength
   end
