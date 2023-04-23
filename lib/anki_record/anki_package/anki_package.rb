@@ -5,7 +5,7 @@ require "pathname"
 require_relative "../card/card"
 require_relative "../collection/collection"
 require_relative "../note/note"
-require_relative "database_setup_constants"
+require_relative "../database_setup_constants"
 
 # rubocop:disable Metrics/ClassLength
 module AnkiRecord
@@ -233,11 +233,13 @@ module AnkiRecord
 
     public
 
-    def open? # :nodoc:
+    # :nodoc:
+    def open?
       !closed?
     end
 
-    def closed? # :nodoc:
+    # :nodoc:
+    def closed?
       @anki21_database.closed?
     end
   end
