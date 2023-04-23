@@ -6,7 +6,7 @@ note_id = nil
 
 AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
   crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
-
+  crazy_deck.save
   crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
   AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
   AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
