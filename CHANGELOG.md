@@ -36,3 +36,7 @@
     - It was also noticed that the default note types with "Basic" in the name should not have `tags` and `vers` so this was changed too.
 - API documentation changed from using RDoc to SDoc with the Rails template.
 - RSpec test suite was refactored to improve speed: 4 minutes -> 1.5 minutes.
+
+## [0.4.0] - Not released
+
+- `Deck.new` was saving the deck to the `collection.anki21` database. Now it will only instantiate it and `#save` must be called to save it.

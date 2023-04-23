@@ -147,6 +147,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
     before do
       described_class.new(name: path_to_file_to_open) do |collection|
         custom_deck = AnkiRecord::Deck.new collection: collection, name: "Test::Deck"
+        custom_deck.save
         custom_note_type = AnkiRecord::NoteType.new collection: collection, name: note_type_name
         AnkiRecord::NoteField.new note_type: custom_note_type, name: "crazy front"
         AnkiRecord::NoteField.new note_type: custom_note_type, name: "crazy back"

@@ -107,11 +107,13 @@ module AnkiRecord
       AnkiRecord::Note.new collection: self, data: note_cards_data
     end
 
-    def decks_json # :nodoc:
+    # :nodoc:
+    def decks_json
       JSON.parse(anki_package.prepare("select decks from col;").execute.first["decks"])
     end
 
-    def models_json # :nodoc:
+    # :nodoc:
+    def models_json
       JSON.parse(anki_package.prepare("select models from col;").execute.first["models"])
     end
 

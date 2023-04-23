@@ -29,7 +29,7 @@ module AnkiRecord
       end
 
       @collection.add_deck self
-      save
+      save if args
     end
 
     ##
