@@ -50,7 +50,7 @@ A new Anki package object is initialized with the "Default" deck and the default
 ```ruby
 require "anki_record"
 
-apkg = AnkiRecord::AnkiPackage.new(name: "test") do |collection|
+AnkiRecord::AnkiPackage.new(name: "test") do |collection|
   deck = collection.find_deck_by name: "Default"
 
   note_type = collection.find_note_type_by name: "Basic"
@@ -80,6 +80,8 @@ require "anki_record"
 note_id = nil
 
 AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
+  # There is a bug where instantiating a deck causes it to be saved without explicitly calling #save.
+  # This will be fixed in the next release of the gem.
   crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
 
   crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
