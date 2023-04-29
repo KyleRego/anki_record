@@ -11,10 +11,11 @@ module AnkiRecord
     module TimeHelper
       ##
       # Returns approximately the number of milliseconds since the 1970 epoch.
-      # A random amount of milliseconds between -5000 and 5000 is added so that
-      # primary key ids calculated with this should be unique.
+      # This is used for some of the primary key ids. To prevent violation of the
+      # uniqueness constraint, sleep is called for 1 millisecond.
       def milliseconds_since_epoch
-        DateTime.now.strftime("%Q").to_i + rand(-5000..5000)
+        sleep 0.001
+        DateTime.now.strftime("%Q").to_i
       end
 
       ##

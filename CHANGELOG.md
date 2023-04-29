@@ -41,3 +41,4 @@
 
 - `Deck.new` was saving the deck to the `collection.anki21` database. Now it will only instantiate it and `#save` must be called to save it.
 - `Helper` modules moved into the `Helpers` module namespace.
+- Bug fix addressing using the approximate milliseconds since the epoch as the primary key id causing the uniqueness constraint to fail when creating a lot of notes.

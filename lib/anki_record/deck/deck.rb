@@ -8,8 +8,6 @@ require_relative "../helpers/time_helper"
 module AnkiRecord
   ##
   # Deck represents an Anki deck.
-  # In the collection.anki21 database, the deck is a JSON object
-  # which is part of a larger JSON object: the value of the col record's decks column.
   class Deck
     include DeckAttributes
     include DeckDefaults
@@ -33,7 +31,7 @@ module AnkiRecord
     end
 
     ##
-    # Saves the deck (or updates it) in the collection.anki21 database.
+    # Saves the deck to the collection.anki21 database.
     def save
       collection_decks_hash = collection.decks_json
       collection_decks_hash[@id] = to_h

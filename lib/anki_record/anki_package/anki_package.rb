@@ -10,9 +10,7 @@ require_relative "../database_setup_constants"
 # rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
-  # AnkiPackage represents an Anki package.
-  #
-  # Here, Anki package refers to the zip file that Anki can export and import.
+  # AnkiPackage represents an Anki package deck file.
   class AnkiPackage
     include AnkiRecord::Helpers::DataQueryHelper
 
@@ -151,15 +149,7 @@ module AnkiRecord
     end
 
     # rubocop:disable Metrics/MethodLength
-
-    ##
-    # Unzips the *.apkg file that was opened and yields its collection.anki21 database
-    # as a SQLite3::Database object (see sqlite3 gem) to the block.
-    #
-    # After the block executes, the files created by unzipping are deleted.
-    #
-    # Throws an error if the Anki package was not instantiated using ::open.
-    #
+    # :nodoc:
     def temporarily_unzip_source_apkg
       raise ArgumentError unless @open_path && block_given?
 

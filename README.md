@@ -1,8 +1,6 @@
 # Anki Record
 
-Anki Record is a Ruby library which provides a programmatic interface to Anki flashcard deck package files (Anki SQLite databases). It isn't finished (the main thing it does not support yet is media). 
-
-Development is currently focused on the Ruby on Rails application that this gem was created for ([Anki Books](https://github.com/KyleRego/anki_books)), and refactoring the test suite to enforce cops from the `rubocop-rspec` extension to the RuboCop code linter.
+Anki Record is a Ruby gem providing an API to Anki flashcard deck packages (zipped SQLite databases). The main thing it does not support yet is adding media to the notes.
 
 ## Installation
 
@@ -16,12 +14,12 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, it will execute the block, and afterwards zip an `*.apkg` file where `*` is the name argument (this argument is not allowed to contain spaces):
+The Anki package object is instantiated with `AnkiRecord::AnkiPackage.new`. If this is passed a block, the collection object is yielded to the block, and an Anki deck package file is created after execution of the block:
 
 ```ruby
 require "anki_record"
 
-AnkiRecord::AnkiPackage.new(name: "test") do |apkg|
+AnkiRecord::AnkiPackage.new(name: "test") do |collection|
   3.times do |number|
     puts "#{3 - number}..."
   end
@@ -40,6 +38,8 @@ Alternatively, if `AnkiRecord::Package::new` is not passed a block, the `zip` me
 require "anki_record"
 
 apkg = AnkiRecord::AnkiPackage.new(name: "test")
+collection = apkg.collection
+# Add notes to the collection
 apkg.zip # This zips the temporary files into test.apkg, and then deletes them.
 ```
 
@@ -80,9 +80,8 @@ require "anki_record"
 note_id = nil
 
 AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
-  # There is a bug where instantiating a deck causes it to be saved without explicitly calling #save.
-  # This will be fixed in the next release of the gem.
   crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
+  crazy_deck.save
 
   crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
   AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
@@ -127,17 +126,20 @@ This script creates an Anki package `test_1.apkg` with a new deck and new note t
 
 The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using SDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
 
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. The following is an example of output from one example in `spec/anki_record/note_spec.rb`:
+The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. This is an example of part of the output:
 
 ```
-AnkiRecord::Note
-  #save
-    for a note that does not exist in the collection.anki21 database (custom note type, 2 card templates)
-      should save two card records to the collection.anki21 database
-        with nid values equal to the id of the cards' note object's id
+AnkiRecord::Deck#save
+  when the deck does not exist in the collection.anki21 database
+    saves the deck object's id as a key in the decks column's JSON object in the collection.anki21 database
+    saves the deck object as a hash, as the value of the deck object's id key, in the decks hash
+    saves the deck object as a hash with the following keys: 'id', 'mod', 'name', 'usn', 'lrnToday', 'revToday', 'newToday', 'timeToday', 'collapsed', 'browserCollapsed', 'desc', 'dyn', 'conf', 'extendNew', 'extendRev'
+    saves the deck object as a hash with the deck object's id attribute as the value for the id key in the deck hash
+    saves the deck object as a hash with the deck object's last_modified_timestamp attribute as the value for the mod key in the deck hash
+
 ```
 
-The RSpec test suite files in `spec` have a mapping with the source code in `lib`.
+The RSpec test suite files in `spec` are organized similarly to the the source code in `lib`.
 
 <!-- ## Development
 

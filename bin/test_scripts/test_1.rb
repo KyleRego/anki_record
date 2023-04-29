@@ -4,6 +4,8 @@ require "anki_record"
 
 note_id = nil
 
+FileUtils.rm_f("test_1.apkg")
+
 AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
   crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
   crazy_deck.save

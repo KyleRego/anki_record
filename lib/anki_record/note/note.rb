@@ -9,8 +9,7 @@ require_relative "note_attributes"
 # rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
-  # Represents an Anki note. The note object corresponds to a record in the `notes`
-  # table in the collection.anki21 database.
+  # Represents an Anki note.
   class Note
     include Helpers::ChecksumHelper
     include NoteAttributes
@@ -19,8 +18,6 @@ module AnkiRecord
 
     ##
     # Instantiates a note of type +note_type+ and belonging to deck +deck+.
-    #
-    # If +note_type+ and +deck+ arguments are used, +collection+ and +data should not be given.
     def initialize(note_type: nil, deck: nil, collection: nil, data: nil)
       if note_type && deck
         setup_instance_variables_for_new_note(note_type: note_type, deck: deck)
