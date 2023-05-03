@@ -37,7 +37,7 @@
 - API documentation changed from using RDoc to SDoc with the Rails template.
 - RSpec test suite was refactored to improve speed: 4 minutes -> 1.5 minutes.
 
-## [0.4.0] - Not released
+## [0.3.1] - 04-29-2023
 
 - `Deck.new` was saving the deck to the `collection.anki21` database. Now it will only instantiate it and `#save` must be called to save it.
 - `Helper` modules moved into the `Helpers` module namespace.
