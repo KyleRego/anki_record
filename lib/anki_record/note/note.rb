@@ -5,6 +5,7 @@ require "securerandom"
 require_relative "../helpers/checksum_helper"
 require_relative "../helpers/time_helper"
 require_relative "note_attributes"
+require_relative "note_guid_helper"
 
 # rubocop:disable Metrics/ClassLength
 module AnkiRecord
@@ -13,6 +14,7 @@ module AnkiRecord
   class Note
     include Helpers::ChecksumHelper
     include NoteAttributes
+    include NoteGuidHelper
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
@@ -160,10 +162,6 @@ module AnkiRecord
     end
 
     private
-
-      def globally_unique_id
-        SecureRandom.uuid.slice(5...15)
-      end
 
       def field_values_separated_by_us
         # The ASCII control code represented by hexadecimal 1F is the Unit Separator (US)

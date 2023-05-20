@@ -9,7 +9,7 @@ module AnkiRecord
 
     ##
     # The note's globally unique id.
-    attr_reader :guid
+    attr_accessor :guid
 
     ##
     # The number of seconds since the 1970 epoch at which the note was last modified.
