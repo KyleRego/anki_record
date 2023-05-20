@@ -42,3 +42,7 @@
 - `Deck.new` was saving the deck to the `collection.anki21` database. Now it will only instantiate it and `#save` must be called to save it.
 - `Helper` modules moved into the `Helpers` module namespace.
 - Bug fix addressing using the approximate milliseconds since the epoch as the primary key id causing the uniqueness constraint to fail when creating a lot of notes.
+
+## [0.3.2] - 05-20-2023
+- The private `Note` method `globally_unique_id` has been moved to `NoteGuidHelper` and included into note.
+- The `guid` attribute also now has a public setter.
