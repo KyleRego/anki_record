@@ -47,7 +47,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
     context "with no target_directory argument" do
       it "does not create a new *.apkg-number file where number is the number of seconds since the epoch" do
         anki_package_from_existing
-        expect(Dir.entries(".").select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
+        expect(Dir.entries(".").count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 0
       end
 
       it "saves one collection.anki21 file to a temporary directory" do
@@ -75,7 +75,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
 
     it "does not create a new *.apkg-number file in the specified directory" do
       anki_package_from_existing
-      expect(Dir.entries(target_target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
+      expect(Dir.entries(target_target_directory_argument).count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 0
     end
   end
 
@@ -93,7 +93,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
 
       it "creates a new *.apkg file ending with the number of seconds since the epoch" do
         anki_package_from_existing
-        expect(Dir.entries(".").select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 1
+        expect(Dir.entries(".").count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 1
       end
     end
   end
@@ -107,7 +107,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
 
     it "creates a new *.apkg-number file in the specified directory" do
       anki_package_from_existing
-      expect(Dir.entries(target_target_directory_argument).select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 1
+      expect(Dir.entries(target_target_directory_argument).count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 1
     end
   end
 
@@ -132,7 +132,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
 
     it "does not create a new *.apkg-number where number is the number of seconds since the epoch" do
       anki_package_from_existing
-      expect(Dir.entries(".").select { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }.count).to eq 0
+      expect(Dir.entries(".").count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 0
     end
   end
 

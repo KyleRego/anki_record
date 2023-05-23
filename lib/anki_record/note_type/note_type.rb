@@ -68,7 +68,7 @@ module AnkiRecord
     end
 
     def snake_case_field_names # :nodoc:
-      field_names_in_order.map { |field_name| field_name.downcase.gsub(" ", "_") }
+      field_names_in_order.map { |field_name| field_name.downcase.tr(" ", "_") }
     end
 
     ##
@@ -78,7 +78,7 @@ module AnkiRecord
     end
 
     def snake_case_sort_field_name # :nodoc:
-      sort_field_name.downcase.gsub(" ", "_")
+      sort_field_name.downcase.tr(" ", "_")
     end
 
     ##

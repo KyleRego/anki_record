@@ -31,7 +31,7 @@ module AnkiRecord
       setup_other_package_instance_variables
       insert_existing_data(data: data) if data
 
-      execute_closure_and_zip(collection, &closure) if block_given?
+      execute_closure_and_zip(collection, &closure) if closure
     end
 
     # Returns an SQLite3::Statement object representing the given SQL and coupled to the collection.anki21 database.
@@ -43,11 +43,11 @@ module AnkiRecord
 
     private
 
-      def execute_closure_and_zip(collection, &closure)
-        closure.call(collection)
+      def execute_closure_and_zip(collection)
+        yield(collection)
       rescue StandardError => e
         destroy_temporary_directory
-        puts_error_and_standard_message(error: e)
+        output_error(error: e)
       else
         zip
       end
@@ -118,7 +118,7 @@ module AnkiRecord
         "Any temporary files created have been deleted.\nNo new *.apkg zip file was saved."
       end
 
-      def puts_error_and_standard_message(error:)
+      def output_error(error:)
         puts error.backtrace
         puts "#{error}\n#{standard_error_thrown_in_block_message}"
       end

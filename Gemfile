@@ -20,3 +20,7 @@ gem "pry"
 gem "sdoc", "~> 2.6"
 
 gem "rubocop-rspec", "~> 2.20"
+
+gem "rubocop-rake", "~> 0.6.0"
+
+gem "rubocop-performance", "~> 1.18"

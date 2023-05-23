@@ -92,7 +92,7 @@ RSpec.describe AnkiRecord::NoteType, "#save" do
 
       it "with hash values with keys that include: 'name', 'ord', 'qfmt', 'afmt', 'bqfmt', 'bafmt', 'did', 'bfont', 'bsize'" do
         %w[name ord qfmt afmt bqfmt bafmt did bfont bsize].each do |key|
-          expect(tmpls_array.all? { |tmpl| tmpl.keys.include? key }).to be true
+          expect(tmpls_array.all? { |tmpl| tmpl.key?(key) }).to be true
         end
       end
 
@@ -138,7 +138,7 @@ RSpec.describe AnkiRecord::NoteType, "#save" do
 
       it "with hash values with keys that include: 'name', 'ord', 'sticky', 'rtl', 'font', 'size' and 'description'" do
         %w[name ord sticky rtl font size description].each do |key|
-          expect(flds_array.all? { |fld| fld.keys.include?(key) }).to be true
+          expect(flds_array.all? { |fld| fld.key?(key) }).to be true
         end
       end
 

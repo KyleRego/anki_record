@@ -44,11 +44,11 @@ RSpec.shared_context "anki package helpers" do
   end
 
   def expect_num_anki21_files_in_package_tmp_directory(num:)
-    expect(Dir.entries(tmp_directory).select { |file| file.match(ANKI_COLLECTION_21_REGEX) }.count).to eq num
+    expect(Dir.entries(tmp_directory).count { |file| file.match(ANKI_COLLECTION_21_REGEX) }).to eq num
   end
 
   def expect_num_anki2_files_in_package_tmp_directory(num:)
-    expect(Dir.entries(tmp_directory).select { |file| file.match(ANKI_COLLECTION_2_REGEX) }.count).to eq num
+    expect(Dir.entries(tmp_directory).count { |file| file.match(ANKI_COLLECTION_2_REGEX) }).to eq num
   end
 
   def expect_media_file_in_tmp_directory
@@ -56,7 +56,7 @@ RSpec.shared_context "anki package helpers" do
   end
 
   def expect_num_apkg_files_in_directory(num:, directory:)
-    expect(Dir.entries(directory).select { |file| file.match(ANKI_PACKAGE_REGEX) }.count).to eq num
+    expect(Dir.entries(directory).count { |file| file.match(ANKI_PACKAGE_REGEX) }).to eq num
   end
 
   def expect_the_temporary_directory_to_not_exist

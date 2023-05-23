@@ -2,6 +2,8 @@
 
 Anki Record is a Ruby gem providing an API to Anki flashcard deck packages (zipped SQLite databases). The main thing it does not support yet is adding media to the notes.
 
+After initial development of the gem, a vertical slice of the app it was created for was developed. With a better understanding of the requirements, the next release of the gem will probably have a very different API.
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -124,59 +126,13 @@ This script creates an Anki package `test_1.apkg` with a new deck and new note t
 
 ## Documentation
 
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated using SDoc from comments in the source code. You might notice that some public methods are intentionally omitted from this documentation. Although public, these methods are not intended to be used outside of the gem's implementation and should be treated as private.
+The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated from comments in the source code could be useful if the above examples are not sufficient for your use case.
 
-The RSpec examples are intended to provide executable documentation and may also be helpful to understand the API. Running the test suite with the `rspec` command will output these in a more readable way that also reflects the nesting of the RSpec examples and example groups. This is an example of part of the output:
-
-```
-AnkiRecord::Deck#save
-  when the deck does not exist in the collection.anki21 database
-    saves the deck object's id as a key in the decks column's JSON object in the collection.anki21 database
-    saves the deck object as a hash, as the value of the deck object's id key, in the decks hash
-    saves the deck object as a hash with the following keys: 'id', 'mod', 'name', 'usn', 'lrnToday', 'revToday', 'newToday', 'timeToday', 'collapsed', 'browserCollapsed', 'desc', 'dyn', 'conf', 'extendNew', 'extendRev'
-    saves the deck object as a hash with the deck object's id attribute as the value for the id key in the deck hash
-    saves the deck object as a hash with the deck object's last_modified_timestamp attribute as the value for the mod key in the deck hash
-
-```
-
-The RSpec test suite files in `spec` are organized similarly to the the source code in `lib`.
-
-<!-- ## Development
+## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-### Development road map:
-- Better messages when `ArgumentError` raised
-- Add #inspect methods
-- Refactor tests to improve speed
-- Copying the contents of an existing package into the new package when it is opened
-    - Add more unit tests
-- Work on creating, updating, and saving notes and cards to the collection.anki21 database
-    - Updating notes when they already exist in the database
-        - Add more unit tests
-    - Validation logic of what makes the note valid based on the note type's card templates and fields
-    - Work on adding media support
-      - The checksum calculation for notes will need to be updated to account for HTML in the content
-- Saving note types, decks, and deck options groups to the collection.anki21 database
-    - Deck options groups cannot be saved yet.
-    - Add being able to handle subdecks
-    - Updating them when they already exist
-    - Setters for any relevant attributes with validation
-- Refactoring
-    - Use more specific RSpec matchers than `eq` everywhere
-    - Investigate if note guid is determined in Anki in a non-random way
-    - Investigate if the database ever needs to be explicitly opened or closed
-- Note type allowed fields: investigate if there are other special field names that should be allowed.
-
-### Release checklist
-- Remove `require "pry"`
-- Update changelog
-- Update usage examples
-- Update and regenerate documentation
-- Bump version
-- Release gem -->
 
 <!-- ## Contributing
 
