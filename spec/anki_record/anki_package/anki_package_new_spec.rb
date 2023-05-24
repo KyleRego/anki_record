@@ -5,100 +5,64 @@ require "./spec/anki_record/support/anki_package_spec_helpers"
 RSpec.describe AnkiRecord::AnkiPackage, ".new" do
   include_context "anki package helpers"
 
-  describe "with invalid name arguments" do
-    context "when the name argument is nil, an empty string, a string with spaces,
-    or not a string (array, number, or hash)" do
-      invalid_name_arguments = [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }]
-      invalid_name_arguments.each do |invalid_name|
-        let(:new_anki_package_name) { invalid_name }
-        it "throws an ArgumentError" do
-          expect { anki_package }.to raise_error ArgumentError
-        end
-      end
+  [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }].each do |invalid_name|
+    let(:new_anki_package_name) { invalid_name }
+
+    it "throws an ArgumentError if the name argument is not a string with no spaces" do
+      expect { anki_package }.to raise_error ArgumentError
     end
   end
 
-  describe "with valid name arguments" do
-    context "when the name argument does not end with .apkg" do
-      let(:new_anki_package_name) { "test" }
-
-      it "zips a file with that name and .apkg appended to it" do
-        anki_package.zip
-        expect(File.exist?("#{new_anki_package_name}.apkg")).to be true
-      end
-    end
-
-    context "when the name argument already includes .apkg" do
-      let(:new_anki_package_name) { "test.apkg" }
-
-      it "zips a file with that name" do
-        anki_package.zip
-        expect(File.exist?(new_anki_package_name)).to be true
-      end
-    end
-  end
-
-  describe "with no block argument" do
+  context "when not passed a block" do
     let(:new_anki_package_name) { "new_anki_package_file_name" }
 
-    it "instantiates an Anki package object with a collection attribute which is an instance of Collection" do
+    # rubocop:disable RSpec/ExampleLength
+    it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
       expect(anki_package.collection).to be_a AnkiRecord::Collection
-    end
 
-    it "saves one collection.anki21 file to a temporary directory" do
-      anki_package
-      expect_num_anki21_files_in_package_tmp_directory num: 1
-    end
-
-    it "saves one collection.anki2 file to a temporary directory" do
-      anki_package
-      expect_num_anki2_files_in_package_tmp_directory num: 1
-    end
-
-    it "saves one file called 'media' to a temporary directory" do
-      anki_package
-      expect_media_file_in_tmp_directory
-    end
-
-    it "saves the media file with the content '{}'" do
-      anki_package
-      expect(File.read("#{tmp_directory}/media")).to eq "{}"
-    end
-
-    it "saves the temporary collection.anki21 database with with the following 5 tables: cards, col, graves, notes, revlog" do
-      expected_tables = %w[cards col graves notes revlog]
-      result = anki_package.instance_variable_get(:@anki21_database).prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
-        hash["name"]
-      end.sort
-      expect(result).to eq expected_tables
-    end
-
-    it "saves the temporary collection.anki21 database with with 7 indexes: ix_cards_nid, ix_cards_sched, ix_cards_usn, ix_notes_csum, ix_notes_usn, ix_revlog_cid, ix_revlog_usn" do
-      expected_indexes = %w[ix_cards_nid ix_cards_sched ix_cards_usn ix_notes_csum ix_notes_usn ix_revlog_cid ix_revlog_usn].sort
-      result = anki_package.instance_variable_get(:@anki21_database).prepare("select name from sqlite_master where type = 'index'").execute.map do |hash|
-        hash["name"]
-      end.sort
-      expect(result).to eq expected_indexes
-    end
-
-    it "saves the temporary collection.anki21 database with 1 record in the col table" do
-      result = anki_package.instance_variable_get(:@anki21_database).prepare("select count(*) from col").execute.first["count(*)"]
-
-      expect(result).to eq 1
-    end
-
-    it "does not save an *.apkg file" do
-      anki_package
       expect_num_apkg_files_in_directory num: 0, directory: "."
-    end
+      expect_num_anki21_files_in_package_tmp_directory num: 1
+      expect_num_anki2_files_in_package_tmp_directory num: 1
+      expect_media_file_in_tmp_directory
+      expect(File.read("#{tmp_directory}/media")).to eq "{}"
 
-    it "does not close the temporary collection.anki21 database" do
+      expected_tables = %w[cards col graves notes revlog]
+      anki_21_db_tables = anki_package.prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
+        hash["name"]
+      end.sort
+      expect(anki_21_db_tables).to eq expected_tables
+
+      expected_indexes = %w[ix_cards_nid ix_cards_sched ix_cards_usn ix_notes_csum ix_notes_usn ix_revlog_cid ix_revlog_usn].sort
+      anki_21_db_indexes = anki_package.prepare("select name from sqlite_master where type = 'index'").execute.map do |hash|
+        hash["name"]
+      end.sort
+      expect(anki_21_db_indexes).to eq expected_indexes
+
+      col_records_count = anki_package.prepare("select count(*) from col").execute.first["count(*)"]
+      expect(col_records_count).to eq 1
+
       expect(anki_package.open?).to be true
       expect(anki_package.closed?).to be false
     end
+
+    context "when passed a directory" do
+      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
+
+      it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
+        anki_package
+
+        expect_num_anki21_files_in_package_tmp_directory num: 1
+        expect_num_anki2_files_in_package_tmp_directory num: 1
+        expect_media_file_in_tmp_directory
+        expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
+        expect(anki_package.open?).to be true
+        expect(anki_package.closed?).to be false
+      end
+    end
+    # rubocop:enable RSpec/ExampleLength
   end
 
-  describe "with a block argument" do
+  describe "when passed a block" do
     let(:new_anki_package_name) { "new_anki_package_file_name" }
     let(:closure_argument) { proc {} }
 
@@ -108,83 +72,38 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       end
     end
 
-    it "deletes the temporary directory" do
+    it "saves an apkg file and deletes the temporary directory" do
       expect_the_temporary_directory_to_not_exist
-    end
-
-    it "saves one *.apkg file" do
-      anki_package
       expect_num_apkg_files_in_directory num: 1, directory: "."
     end
-  end
 
-  describe "with a block argument that throws an error" do
-    let(:new_anki_package_name) { "new_anki_package_file_name" }
-    let(:closure_argument) { proc { raise "runtime error" } }
+    context "when passed a directory that exists" do
+      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
 
-    # Silence output from the rescue clause which puts the error
-    # rubocop:disable RSpec/ExpectInHook
-    # rubocop:disable RSpec/MessageSpies
-    before { expect($stdout).to receive(:write).at_least(:once) }
-    # rubocop:enable RSpec/MessageSpies
-    # rubocop:enable RSpec/ExpectInHook
-
-    it "deletes the temporary directory" do
-      expect_the_temporary_directory_to_not_exist
-    end
-
-    it "does not save an *.apkg file" do
-      anki_package
-      expect_num_apkg_files_in_directory num: 0, directory: "."
-    end
-  end
-
-  describe "with a directory argument" do
-    let(:new_anki_package_name) { "new_anki_package_file_name" }
-    let(:target_directory_argument) { TEST_TMP_DIRECTORY }
-
-    context "with no block argument" do
-      it "saves one collection.anki21 file to a temporary directory" do
+      it "deletes the temporary directory and saves one *.apkg zip file in the specified directory" do
         anki_package
-        expect_num_anki21_files_in_package_tmp_directory num: 1
-      end
-
-      it "saves one collection.anki2 file to a temporary directory" do
-        anki_package
-        expect_num_anki2_files_in_package_tmp_directory num: 1
-      end
-
-      it "does not save an *.apkg zip file" do
-        anki_package
-        expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
-      end
-
-      it "does not close the temporary collection.anki21 database" do
-        expect(anki_package.open?).to be true
-        expect(anki_package.closed?).to be false
-      end
-    end
-
-    context "with a block argument" do
-      let(:closure_argument) { proc {} }
-
-      it "deletes the temporary directory" do
         expect_the_temporary_directory_to_not_exist
-      end
-
-      it "saves one *.apkg zip file in the specified directory" do
-        anki_package
         expect_num_apkg_files_in_directory num: 1, directory: target_directory_argument
       end
     end
 
-    context "with a block argument but the directory argument given is not a directory that exists" do
-      let(:closure_argument) { proc {} }
+    context "when passed a directory that does not exist" do
       let(:target_directory_argument) { "does_not_exist" }
 
       it "throws an error" do
         expect { anki_package }.to raise_error ArgumentError
       end
+    end
+  end
+
+  context "when passed a block that throws an exception" do
+    let(:new_anki_package_name) { "new_anki_package_file_name" }
+    let(:closure_argument) { proc { raise "runtime error" } }
+
+    it "does not save an apkg file and also deletes the temporary directory" do
+      expect { anki_package }.to output.to_stdout
+      expect_num_apkg_files_in_directory num: 0, directory: "."
+      expect_the_temporary_directory_to_not_exist
     end
   end
 end
