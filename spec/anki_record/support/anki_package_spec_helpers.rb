@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
+require "pry"
 # rubocop:disable RSpec/ContextWording
 RSpec.shared_context "anki package helpers" do
-  subject(:anki_package_from_existing) do
-    if defined?(closure_argument) && defined?(target_target_directory_argument)
+  let(:anki_package_from_existing) do
+    if defined?(closure_argument) && defined?(target_directory_argument)
       described_class.open(path: path_to_file_to_open,
-                           target_directory: target_target_directory_argument,
+                           target_directory: target_directory_argument,
                           &closure_argument)
     elsif defined?(closure_argument)
       described_class.open(path: path_to_file_to_open, &closure_argument)
-    elsif defined?(target_target_directory_argument)
-      described_class.open(path: path_to_file_to_open, target_directory: target_target_directory_argument)
+    elsif defined?(target_directory_argument)
+      described_class.open(path: path_to_file_to_open, target_directory: target_directory_argument)
     else
       described_class.open(path: path_to_file_to_open)
     end
@@ -39,8 +40,11 @@ RSpec.shared_context "anki package helpers" do
     end
   end
 
+  # FIXME
   def tmp_directory
     anki_package.instance_variable_get(:@tmpdir)
+  rescue StandardError
+    anki_package_from_existing.instance_variable_get(:@tmpdir)
   end
 
   def expect_num_anki21_files_in_package_tmp_directory(num:)
