@@ -10,8 +10,7 @@ RSpec.describe AnkiRecord::NoteType, "#snake_case_field_names" do
   let(:note_type) { described_class.new collection: collection_argument, name: name_argument }
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
-    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_package: anki_package)
+    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
   end
 
   context "when it is the default Basic note type" do

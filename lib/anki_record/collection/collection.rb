@@ -18,11 +18,15 @@ module AnkiRecord
     include Helpers::TimeHelper
     include CollectionAttributes
 
-    def initialize(anki_package:) # :nodoc:
-      setup_collection_instance_variables(anki_package: anki_package)
+    attr_reader :anki21_database
+
+    # :nodoc:
+    def initialize(anki21_database:)
+      setup_collection_instance_variables(anki21_database: anki21_database)
     end
 
-    def add_note_type(note_type) # :nodoc:
+    # :nodoc:
+    def add_note_type(note_type)
       raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
 
       existing_note_type = nil
@@ -34,13 +38,15 @@ module AnkiRecord
       @note_types << note_type
     end
 
-    def add_deck(deck) # :nodoc:
+    # :nodoc:
+    def add_deck(deck)
       raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
 
       @decks << deck
     end
 
-    def add_deck_options_group(deck_options_group) # :nodoc:
+    # :nodoc:
+    def add_deck_options_group(deck_options_group)
       raise ArgumentError unless deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)
 
       @deck_options_groups << deck_options_group
@@ -101,7 +107,7 @@ module AnkiRecord
     ##
     # Returns the collection's note object found by +id+, or nil if it is not found.
     def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id sql_able: anki_package, id: id
+      note_cards_data = note_cards_data_for_note_id sql_able: anki21_database, id: id
       return nil unless note_cards_data
 
       AnkiRecord::Note.new collection: self, data: note_cards_data
@@ -109,12 +115,12 @@ module AnkiRecord
 
     # :nodoc:
     def decks_json
-      JSON.parse(anki_package.prepare("select decks from col;").execute.first["decks"])
+      JSON.parse(anki21_database.prepare("select decks from col;").execute.first["decks"])
     end
 
     # :nodoc:
     def models_json
-      JSON.parse(anki_package.prepare("select models from col;").execute.first["models"])
+      JSON.parse(anki21_database.prepare("select models from col;").execute.first["models"])
     end
 
     def copy_over_existing(col_record:) # :nodoc:
@@ -126,15 +132,15 @@ module AnkiRecord
 
     private
 
-      def setup_collection_instance_variables(anki_package:)
-        @anki_package = anki_package
+      def setup_collection_instance_variables(anki21_database:)
+        @anki21_database = anki21_database
         setup_simple_collaborator_objects
         setup_custom_collaborator_objects
         remove_instance_variable(:@col_record)
       end
 
       def col_record
-        @col_record ||= @anki_package.prepare("select * from col").execute.first
+        @col_record ||= @anki21_database.prepare("select * from col").execute.first
       end
 
       # rubocop:disable Metrics/AbcSize

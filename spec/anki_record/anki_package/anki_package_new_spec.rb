@@ -27,18 +27,18 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       expect(File.read("#{tmp_directory}/media")).to eq "{}"
 
       expected_tables = %w[cards col graves notes revlog]
-      anki_21_db_tables = anki_package.prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
+      anki_21_db_tables = anki_package.anki21_database.prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
         hash["name"]
       end.sort
       expect(anki_21_db_tables).to eq expected_tables
 
       expected_indexes = %w[ix_cards_nid ix_cards_sched ix_cards_usn ix_notes_csum ix_notes_usn ix_revlog_cid ix_revlog_usn].sort
-      anki_21_db_indexes = anki_package.prepare("select name from sqlite_master where type = 'index'").execute.map do |hash|
+      anki_21_db_indexes = anki_package.anki21_database.prepare("select name from sqlite_master where type = 'index'").execute.map do |hash|
         hash["name"]
       end.sort
       expect(anki_21_db_indexes).to eq expected_indexes
 
-      col_records_count = anki_package.prepare("select count(*) from col").execute.first["count(*)"]
+      col_records_count = anki_package.anki21_database.prepare("select count(*) from col").execute.first["count(*)"]
       expect(col_records_count).to eq 1
 
       expect(anki_package.open?).to be true

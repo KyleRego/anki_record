@@ -36,7 +36,7 @@ module AnkiRecord
       collection_decks_hash = collection.decks_json
       collection_decks_hash[@id] = to_h
       sql = "update col set decks = ? where id = ?"
-      collection.anki_package.prepare(sql).execute([JSON.generate(collection_decks_hash), collection.id])
+      collection.anki21_database.prepare(sql).execute([JSON.generate(collection_decks_hash), collection.id])
     end
 
     def to_h # :nodoc:

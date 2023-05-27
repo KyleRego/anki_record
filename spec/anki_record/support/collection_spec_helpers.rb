@@ -2,9 +2,9 @@
 
 # rubocop:disable RSpec/ContextWording
 RSpec.shared_context "collection shared helpers" do
-  subject(:collection) { described_class.new(anki_package: anki_package) }
-
-  let(:anki_package) { AnkiRecord::AnkiPackage.new(name: "package_to_test_collection") }
+  subject(:collection) do
+    AnkiRecord::AnkiPackage.new(name: "package_to_test_collection").collection
+  end
 
   after { cleanup_test_files(directory: ".") }
 end

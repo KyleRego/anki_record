@@ -114,7 +114,7 @@ module AnkiRecord
     private
 
       def update_note_in_collection_anki21
-        statement = @collection.anki_package.prepare <<~SQL
+        statement = anki21_database.prepare <<~SQL
           update notes set guid = ?, mid = ?, mod = ?, usn = ?, tags = ?,
                                       flds = ?, sfld = ?, csum = ?, flags = ?, data = ? where id = ?
         SQL
@@ -125,7 +125,7 @@ module AnkiRecord
       end
 
       def insert_new_note_in_collection_anki21
-        statement = @collection.anki_package.prepare <<~SQL
+        statement = anki21_database.prepare <<~SQL
           insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
                       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL
@@ -136,6 +136,10 @@ module AnkiRecord
       end
 
     public
+
+    def anki21_database
+      @collection.anki21_database
+    end
 
     ##
     # Overrides BasicObject#method_missing and creates "ghost methods".

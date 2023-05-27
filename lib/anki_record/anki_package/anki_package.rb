@@ -2,6 +2,9 @@
 
 require "pathname"
 
+require_relative "../anki2_database/anki2_database"
+require_relative "../anki21_database/anki21_database"
+require_relative "../media/media"
 require_relative "../card/card"
 require_relative "../collection/collection"
 require_relative "../note/note"
@@ -14,31 +17,46 @@ module AnkiRecord
   class AnkiPackage
     include AnkiRecord::Helpers::DataQueryHelper
 
-    ##
-    # The package's collection object.
-    attr_reader :collection
+    attr_reader :collection, :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles
 
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     ##
-    # Instantiates a new Anki package object.
-    #
-    # See the README for usage details.
+    # Creates a new Anki package file (see README).
     def initialize(name:, target_directory: Dir.pwd, data: nil, open_path: nil, &closure)
       check_name_argument_is_valid(name:)
       @name = name.end_with?(".apkg") ? name[0, name.length - 5] : name
       @target_directory = target_directory
       @open_path = open_path
       check_directory_argument_is_valid
-      setup_other_package_instance_variables
+      @tmpdir = Dir.mktmpdir
+      @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
+      @anki21_database = Anki21Database.new(tmpdir: tmpdir)
+      @anki2_database = Anki2Database.new(tmpdir: tmpdir)
+      @media = Media.new(tmpdir: tmpdir)
+      @collection = Collection.new(anki21_database: anki21_database)
       insert_existing_data(data: data) if data
 
       execute_closure_and_zip(collection, &closure) if closure
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
 
-    # Returns an SQLite3::Statement object representing the given SQL and coupled to the collection.anki21 database.
-    #
-    # The Statement is executed using Statement#execute (see sqlite3 gem).
-    def prepare(sql)
-      @anki21_database.prepare sql
+    ##
+    # Opens an existing Anki package file (see README).
+    def self.open(path:, target_directory: nil, &closure)
+      pathname = Pathname.new(path)
+      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
+
+      new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
+      data = col_record_and_note_ids_to_copy_over(pathname: pathname)
+
+      if target_directory
+        new(name: new_apkg_name, data: data, open_path: pathname,
+            target_directory: target_directory, &closure)
+      else
+        new(name: new_apkg_name, data: data, open_path: pathname, &closure)
+      end
     end
 
     private
@@ -52,15 +70,6 @@ module AnkiRecord
         zip
       end
 
-      def setup_other_package_instance_variables
-        @tmpdir = Dir.mktmpdir
-        @tmp_files = []
-        @anki21_database = setup_anki21_database_object
-        @anki2_database = setup_anki2_database_object
-        @media_file = setup_media
-        @collection = Collection.new(anki_package: self)
-      end
-
       def check_name_argument_is_valid(name:)
         return if name.instance_of?(String) && !name.empty? && !name.include?(" ")
 
@@ -69,35 +78,6 @@ module AnkiRecord
 
       def check_directory_argument_is_valid
         raise ArgumentError, "No directory was found at the given path." unless File.directory?(@target_directory)
-      end
-
-      def setup_anki21_database_object
-        anki21_file_name = "collection.anki21"
-        db = SQLite3::Database.new "#{@tmpdir}/#{anki21_file_name}", options: {}
-        @tmp_files << anki21_file_name
-        db.execute_batch ANKI_SCHEMA_DEFINITION
-        db.execute INSERT_COLLECTION_ANKI_21_COL_RECORD
-        db.results_as_hash = true
-        db
-      end
-
-      def setup_anki2_database_object
-        anki2_file_name = "collection.anki2"
-        db = SQLite3::Database.new "#{@tmpdir}/#{anki2_file_name}", options: {}
-        @tmp_files << anki2_file_name
-        db.execute_batch ANKI_SCHEMA_DEFINITION
-        db.execute INSERT_COLLECTION_ANKI_2_COL_RECORD
-        db.close
-        db
-      end
-
-      def setup_media
-        media_file_path = FileUtils.touch("#{@tmpdir}/media")[0]
-        media_file = File.open(media_file_path, mode: "w")
-        media_file.write("{}")
-        media_file.close
-        @tmp_files << "media"
-        media_file
       end
 
       def insert_existing_data(data:)
@@ -124,25 +104,6 @@ module AnkiRecord
       end
 
     public
-
-    ##
-    # Instantiates a new Anki package object seeded with data from the opened Anki package.
-    #
-    # See the README for details.
-    def self.open(path:, target_directory: nil, &closure)
-      pathname = Pathname.new(path)
-      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
-
-      new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
-      data = col_record_and_note_ids_to_copy_over(pathname: pathname)
-
-      if target_directory
-        new(name: new_apkg_name, data: data, open_path: pathname,
-            target_directory: target_directory, &closure)
-      else
-        new(name: new_apkg_name, data: data, open_path: pathname, &closure)
-      end
-    end
 
     def was_instantiated_from_existing_apkg? # :nodoc:
       !@open_path.nil?
@@ -206,8 +167,8 @@ module AnkiRecord
 
       def create_zip_file
         Zip::File.open(target_zip_file, create: true) do |zip_file|
-          @tmp_files.each do |file_name|
-            zip_file.add(file_name, File.join(@tmpdir, file_name))
+          tmpfiles.each do |file_name|
+            zip_file.add(file_name, File.join(tmpdir, file_name))
           end
         end
         true
@@ -218,7 +179,7 @@ module AnkiRecord
       end
 
       def destroy_temporary_directory
-        FileUtils.rm_rf(@tmpdir)
+        FileUtils.rm_rf(tmpdir)
       end
 
     public
@@ -230,7 +191,7 @@ module AnkiRecord
 
     # :nodoc:
     def closed?
-      @anki21_database.closed?
+      anki21_database.closed?
     end
   end
 end

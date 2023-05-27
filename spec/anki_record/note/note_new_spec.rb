@@ -4,9 +4,11 @@ RSpec.describe AnkiRecord::Note, "#new" do
   after { cleanup_test_files(directory: ".") }
 
   context "with invalid arguments" do
-    let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
-    let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
-    let(:basic_note_type) { anki_package.collection.find_note_type_by name: "Basic" }
+    let(:collection) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    end
+    let(:default_deck) { collection.find_deck_by name: "Default" }
+    let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
 
     context "when no argument is provided" do
       it "throws an ArgumentError" do
@@ -38,9 +40,11 @@ RSpec.describe AnkiRecord::Note, "#new" do
   context "with valid note_type and deck arguments (new default deck, basic note type note)" do
     subject(:note) { described_class.new deck: default_deck, note_type: basic_note_type }
 
-    let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
-    let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
-    let(:basic_note_type) { anki_package.collection.find_note_type_by name: "Basic" }
+    let(:collection) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    end
+    let(:default_deck) { collection.find_deck_by name: "Default" }
+    let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
 
     it "instantiates a note" do
       expect(note).to be_a described_class
@@ -88,18 +92,21 @@ RSpec.describe AnkiRecord::Note, "#new" do
   end
 
   context "with valid collection and data arguments (existing basic optional reverse note)" do
-    subject(:note_from_existing_record) { described_class.new collection: anki_package.collection, data: note_cards_data }
+    subject(:note_from_existing_record) { described_class.new collection: collection, data: note_cards_data }
 
-    let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
+    let(:collection) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    end
+
     let(:note_cards_data) do
-      default_deck = anki_package.collection.find_deck_by name: "Default"
-      basic_and_reversed_card_note_type = anki_package.collection.find_note_type_by name: "Basic (and reversed card)"
+      default_deck = collection.find_deck_by name: "Default"
+      basic_and_reversed_card_note_type = collection.find_note_type_by name: "Basic (and reversed card)"
       note = described_class.new note_type: basic_and_reversed_card_note_type, deck: default_deck
       note.front = "What is the ABC metric?"
       note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
       note.save
 
-      anki_package.collection.note_cards_data_for_note_id sql_able: anki_package, id: note.id
+      collection.note_cards_data_for_note_id sql_able: collection.anki21_database, id: note.id
     end
     let(:note_data) { note_cards_data[:note_data] }
     let(:cards_data) { note_cards_data[:cards_data] }

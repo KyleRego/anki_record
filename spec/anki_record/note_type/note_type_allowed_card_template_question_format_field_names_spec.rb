@@ -9,8 +9,7 @@ RSpec.describe AnkiRecord::NoteType, "#allowed_card_template_question_format_fie
 
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
-    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_package: anki_package)
+    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
   end
 
   context "when it is a non-cloze note type" do

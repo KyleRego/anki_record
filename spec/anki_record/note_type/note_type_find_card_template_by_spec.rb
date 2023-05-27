@@ -10,8 +10,7 @@ RSpec.describe AnkiRecord::NoteType, "#find_card_template_by" do
   # TODO: Extract to shared context or DRY this as it's repeated in many note_type spec files.
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
-    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_package: anki_package)
+    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
   end
 
   context "when passed a name argument where the note type does not have a card template with that name" do

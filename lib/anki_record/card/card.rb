@@ -76,8 +76,12 @@ module AnkiRecord
 
     private
 
+      def anki21_database
+        @collection.anki21_database
+      end
+
       def update_card_in_collection_anki21
-        statement = @collection.anki_package.prepare <<~SQL
+        statement = anki21_database.prepare <<~SQL
           update cards set nid = ?, did = ?, ord = ?, mod = ?, usn = ?, type = ?,
                             queue = ?, due = ?, ivl = ?, factor = ?, reps = ?, lapses = ?,
                             left = ?, odue = ?, odid = ?, flags = ?, data = ? where id = ?
@@ -89,7 +93,7 @@ module AnkiRecord
       end
 
       def insert_new_card_in_collection_anki21
-        statement = @collection.anki_package.prepare <<~SQL
+        statement = anki21_database.prepare <<~SQL
           insert into cards (id, nid, did, ord,
                             mod, usn, type, queue,
                             due, ivl, factor, reps,

@@ -13,10 +13,12 @@ RSpec.describe AnkiRecord::Note, "#save" do
       note
     end
 
-    let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
-    let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
+    let(:collection) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    end
+    let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:custom_note_type) do
-      custom_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "custom note type"
+      custom_note_type = AnkiRecord::NoteType.new collection: collection, name: "custom note type"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
       custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "custom card 1"
@@ -29,10 +31,10 @@ RSpec.describe AnkiRecord::Note, "#save" do
       custom_note_type
     end
 
-    let(:note_record_data) { anki_package.prepare("select * from notes where id = #{note_with_two_cards.id}").execute.first }
-    let(:cards_records_data) { anki_package.prepare("select * from cards where nid = #{note_with_two_cards.id}").execute.to_a }
-    let(:note_count) { anki_package.prepare("select count(*) from notes;").execute.first["count(*)"] }
-    let(:cards_count) { anki_package.prepare("select count(*) from cards").execute.first["count(*)"] }
+    let(:note_record_data) { collection.anki21_database.prepare("select * from notes where id = #{note_with_two_cards.id}").execute.first }
+    let(:cards_records_data) { collection.anki21_database.prepare("select * from cards where nid = #{note_with_two_cards.id}").execute.to_a }
+    let(:note_count) { collection.anki21_database.prepare("select count(*) from notes;").execute.first["count(*)"] }
+    let(:cards_count) { collection.anki21_database.prepare("select count(*) from cards").execute.first["count(*)"] }
     let(:expected_number_of_notes) { 1 }
     let(:expected_number_of_cards) { 2 }
 
@@ -132,14 +134,16 @@ RSpec.describe AnkiRecord::Note, "#save" do
       note
     end
 
-    let(:anki_package) { AnkiRecord::AnkiPackage.new name: "package_to_test_notes" }
-    let(:note_count) { anki_package.prepare("select count(*) from notes;").execute.first["count(*)"] }
-    let(:cards_count) { anki_package.prepare("select count(*) from cards").execute.first["count(*)"] }
+    let(:collection) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    end
+    let(:note_count) { collection.anki21_database.prepare("select count(*) from notes;").execute.first["count(*)"] }
+    let(:cards_count) { collection.anki21_database.prepare("select count(*) from cards").execute.first["count(*)"] }
     let(:expected_number_of_notes) { 1 }
     let(:expected_number_of_cards) { 2 }
-    let(:default_deck) { anki_package.collection.find_deck_by name: "Default" }
+    let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:custom_note_type) do
-      custom_note_type = AnkiRecord::NoteType.new collection: anki_package.collection, name: "custom note type"
+      custom_note_type = AnkiRecord::NoteType.new collection: collection, name: "custom note type"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
       custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "custom card 1"
@@ -154,8 +158,8 @@ RSpec.describe AnkiRecord::Note, "#save" do
 
     let(:new_custom_front) { "What does the cow say?" }
     let(:new_custom_back) { "Moo" }
-    let(:note_record_data) { anki_package.prepare("select * from notes where id = #{already_saved_note_with_two_cards.id}").execute.first }
-    let(:cards_records_data) { anki_package.prepare("select * from cards where nid = #{already_saved_note_with_two_cards.id}").execute.to_a }
+    let(:note_record_data) { collection.anki21_database.prepare("select * from notes where id = #{already_saved_note_with_two_cards.id}").execute.first }
+    let(:cards_records_data) { collection.anki21_database.prepare("select * from cards where nid = #{already_saved_note_with_two_cards.id}").execute.to_a }
 
     before do
       already_saved_note_with_two_cards.custom_front = new_custom_front
