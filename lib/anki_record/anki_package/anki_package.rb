@@ -10,7 +10,6 @@ require_relative "../collection/collection"
 require_relative "../note/note"
 require_relative "../database_setup_constants"
 
-# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
   # AnkiPackage represents an Anki package deck file.
@@ -44,19 +43,14 @@ module AnkiRecord
 
     ##
     # Opens an existing Anki package file (see README).
-    def self.open(path:, target_directory: nil, &closure)
+    def self.open(path:, &closure)
       pathname = Pathname.new(path)
       raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
 
       new_apkg_name = "#{File.basename(pathname.to_s, ".apkg")}-#{seconds_since_epoch}"
       data = col_record_and_note_ids_to_copy_over(pathname: pathname)
 
-      if target_directory
-        new(name: new_apkg_name, data: data, open_path: pathname,
-            target_directory: target_directory, &closure)
-      else
-        new(name: new_apkg_name, data: data, open_path: pathname, &closure)
-      end
+      new(name: new_apkg_name, data: data, open_path: pathname, &closure)
     end
 
     private
@@ -195,4 +189,3 @@ module AnkiRecord
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

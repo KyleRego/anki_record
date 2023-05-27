@@ -35,15 +35,6 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
       expect_num_anki2_files_in_package_tmp_directory num: 1
       expect_media_file_in_tmp_directory
     end
-
-    context "when passed a target_directory argument" do
-      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
-
-      it "does not create a new *.apkg-number file in the specified directory" do
-        anki_package_from_existing
-        expect(Dir.entries(target_directory_argument).count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 0
-      end
-    end
   end
 
   context "when passed a block" do
@@ -56,15 +47,6 @@ RSpec.describe AnkiRecord::AnkiPackage, ".open" do
       anki_package_from_existing
       expect(Dir.entries(".").count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 1
       expect_the_temporary_directory_to_not_exist
-    end
-
-    context "when passed a target_directory argument" do
-      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
-
-      it "creates a new *.apkg-number file in the specified directory" do
-        anki_package_from_existing
-        expect(Dir.entries(target_directory_argument).count { |file| file.match(UPDATED_ANKI_PACKAGE_REGEX) }).to eq 1
-      end
     end
   end
 
