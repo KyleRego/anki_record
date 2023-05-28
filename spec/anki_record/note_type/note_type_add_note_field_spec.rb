@@ -10,7 +10,7 @@ RSpec.describe AnkiRecord::NoteType, "#add_note_field" do
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
     anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-    AnkiRecord::Collection.new(anki_package: anki_package)
+    anki_package.anki21_database.collection
   end
 
   it "raises an ArgumentError when passed an argument which is not a note field" do

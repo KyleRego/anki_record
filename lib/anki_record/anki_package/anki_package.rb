@@ -14,7 +14,7 @@ module AnkiRecord
   ##
   # AnkiPackage represents an Anki package deck file.
   class AnkiPackage
-    attr_reader :collection, :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
+    attr_reader :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
 
     ##
     # Creates a new Anki package file (see README).
@@ -27,9 +27,8 @@ module AnkiRecord
       @anki21_database = Anki21Database.new(anki_package: self)
       @anki2_database = Anki2Database.new(anki_package: self)
       @media = Media.new(anki_package: self)
-      @collection = Collection.new(anki21_database: anki21_database)
 
-      execute_closure_and_zip(collection, &closure) if closure
+      execute_closure_and_zip(anki21_database, &closure) if closure
     end
 
     ##
@@ -49,11 +48,11 @@ module AnkiRecord
         name.end_with?(".apkg") ? name[0, name.length - 5] : name
       end
 
-      def execute_closure_and_zip(collection)
-        yield(collection)
+      def execute_closure_and_zip(anki21_database)
+        yield(anki21_database)
       rescue StandardError => e
         destroy_temporary_directory
-        output_error(error: e)
+        output_error_occurred(error: e)
       else
         zip
       end
@@ -70,7 +69,7 @@ module AnkiRecord
         raise ArgumentError, "No directory was found at the given path."
       end
 
-      def output_error(error:)
+      def output_error_occurred(error:)
         puts error.backtrace.reverse
         puts error
         puts "Anki Record: An error occurred."

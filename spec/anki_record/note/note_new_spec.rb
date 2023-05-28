@@ -6,7 +6,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
 
   context "with invalid arguments" do
     let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
     end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
@@ -32,7 +32,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
     context "when the note type and deck arguments belong to different collections" do
       it "throws an ArgumentError" do
         second_apkg = AnkiRecord::AnkiPackage.new(name: "second_package")
-        second_collection_deck = second_apkg.collection.find_deck_by name: "Default"
+        second_collection_deck = second_apkg.anki21_database.collection.find_deck_by name: "Default"
         expect { described_class.new note_type: basic_note_type, deck: second_collection_deck }.to raise_error ArgumentError
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
     subject(:note) { described_class.new deck: default_deck, note_type: basic_note_type }
 
     let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
     end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
@@ -99,8 +99,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
       AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database
     end
 
-    # TODO: Fixme LoD
-    let(:collection) { anki21_database.anki_package.collection }
+    let(:collection) { anki21_database.collection }
 
     let(:note_cards_data) do
       default_deck = collection.find_deck_by name: "Default"

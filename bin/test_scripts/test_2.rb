@@ -8,7 +8,8 @@ require "anki_record"
 FileUtils.rm_f("test_2.apkg")
 
 start_time = Time.now
-AnkiRecord::AnkiPackage.new(name: "test_2") do |collection|
+AnkiRecord::AnkiPackage.new(name: "test_2") do |anki21_database|
+  collection = anki21_database.collection
   basic_note_type = collection.find_note_type_by name: "Basic"
   basic_and_reversed_card_note_type = collection.find_note_type_by name: "Basic (and reversed card)"
   basic_and_optional_reversed_card_note_type = collection.find_note_type_by name: "Basic (optional reversed card)"

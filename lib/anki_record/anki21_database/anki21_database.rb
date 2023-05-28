@@ -7,7 +7,7 @@ module AnkiRecord
   # AnkiDatabase represents a collection.anki21 Anki SQLite database.
   class Anki21Database
     include Helpers::DataQueryHelper
-    attr_reader :anki_package, :database
+    attr_reader :anki_package, :collection, :database
 
     FILENAME = "collection.anki21"
 
@@ -17,6 +17,7 @@ module AnkiRecord
       database.execute_batch ANKI_SCHEMA_DEFINITION
       database.execute INSERT_COLLECTION_ANKI_21_COL_RECORD
       database.results_as_hash = true
+      @collection = Collection.new(anki21_database: self)
       database
     end
 

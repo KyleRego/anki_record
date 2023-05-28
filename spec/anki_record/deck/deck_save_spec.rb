@@ -7,7 +7,7 @@ RSpec.describe AnkiRecord::Deck, "#save" do
   describe "when the deck does not exist in the collection.anki21 database" do
     subject(:test_deck) { described_class.new name: test_deck_name, collection: collection }
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_3").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_3").anki21_database.collection }
     let(:test_deck_name) { "test deck for save" }
     let(:decks_json_from_collection) { collection.decks_json }
     let(:test_deck_database_json) { decks_json_from_collection[test_deck.id.to_s] }

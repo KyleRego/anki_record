@@ -14,7 +14,7 @@ RSpec.describe AnkiRecord::Note, "#save" do
     end
 
     let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
     end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:custom_note_type) do
@@ -135,7 +135,7 @@ RSpec.describe AnkiRecord::Note, "#save" do
     end
 
     let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
     end
     let(:note_count) { collection.anki21_database.prepare("select count(*) from notes;").execute.first["count(*)"] }
     let(:cards_count) { collection.anki21_database.prepare("select count(*) from cards").execute.first["count(*)"] }

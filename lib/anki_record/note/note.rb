@@ -41,7 +41,7 @@ module AnkiRecord
 
     # TODO: Need to keep refactoring the object collaboration
     def collection
-      anki21_database.anki_package.collection
+      anki21_database.collection
     end
 
     private

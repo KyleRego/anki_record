@@ -2,22 +2,21 @@
 
 require "anki_record"
 
-note_id = nil
-
 FileUtils.rm_f("test_1.apkg")
 
-AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
-  crazy_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
-  crazy_deck.save
-  crazy_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
-  AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy front"
-  AnkiRecord::NoteField.new note_type: crazy_note_type, name: "crazy back"
-  crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "test 1 card 1"
-  crazy_card_template.question_format = "{{crazy front}}"
-  crazy_card_template.answer_format = "{{crazy back}}"
-  second_crazy_card_template = AnkiRecord::CardTemplate.new note_type: crazy_note_type, name: "test 1 card 2"
-  second_crazy_card_template.question_format = "{{crazy back}}"
-  second_crazy_card_template.answer_format = "{{crazy front}}"
+AnkiRecord::AnkiPackage.new(name: "test_1") do |anki21_database|
+  collection = anki21_database.collection
+  custom_deck = AnkiRecord::Deck.new collection: collection, name: "test_1_deck"
+  custom_deck.save
+  custom_note_type = AnkiRecord::NoteType.new collection: collection, name: "test 1 note type"
+  AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
+  AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
+  custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "test 1 card 1"
+  custom_card_template.question_format = "{{custom front}}"
+  custom_card_template.answer_format = "{{custom back}}"
+  second_custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "test 1 card 2"
+  second_custom_card_template.question_format = "{{custom back}}"
+  second_custom_card_template.answer_format = "{{custom front}}"
 
   css = <<~CSS
     .card {
@@ -28,19 +27,16 @@ AnkiRecord::AnkiPackage.new(name: "test_1") do |collection|
     }
   CSS
 
-  crazy_note_type.css = css
-  crazy_note_type.save
+  custom_note_type.css = css
+  custom_note_type.save
 
-  note = AnkiRecord::Note.new note_type: crazy_note_type, deck: crazy_deck
-  note.crazy_front = "Hello from test 1"
-  note.crazy_back = "World"
+  note = AnkiRecord::Note.new note_type: custom_note_type, deck: custom_deck
+  note.custom_front = "Hello from test 1"
+  note.custom_back = "World"
   note.save
-
   note_id = note.id
-end
 
-AnkiRecord::AnkiPackage.open(path: "./test_1.apkg") do |collection|
-  note = collection.find_note_by id: note_id
-  note.crazy_back = "Ruby"
+  note = anki21_database.find_note_by id: note_id
+  note.custom_back = "Ruby"
   note.save
 end

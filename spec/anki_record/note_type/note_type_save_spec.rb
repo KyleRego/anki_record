@@ -9,7 +9,7 @@ require_relative "../support/note_type_spec_helpers"
 RSpec.describe AnkiRecord::NoteType, "#save" do
   include_context "note type helpers"
 
-  let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection }
+  let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection }
   let(:name) { "custom note type name" }
   let!(:custom_note_type) do
     custom_note_type = described_class.new collection: collection, name: name

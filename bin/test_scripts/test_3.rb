@@ -10,7 +10,8 @@ FileUtils.rm_f("test_3a.apkg")
 
 note_ids = []
 
-AnkiRecord::AnkiPackage.new(name: "test_3a") do |collection|
+AnkiRecord::AnkiPackage.new(name: "test_3a") do |anki21_database|
+  collection = anki21_database.collection
   basic_note_type = collection.find_note_type_by name: "Basic"
   default_deck = collection.find_deck_by name: "Default"
 
@@ -25,7 +26,8 @@ end
 
 FileUtils.rm_f("test_3b.apkg")
 
-AnkiRecord::AnkiPackage.new(name: "test_3b") do |collection|
+AnkiRecord::AnkiPackage.new(name: "test_3b") do |anki21_database|
+  collection = anki21_database.collection
   basic_note_type = collection.find_note_type_by name: "Basic"
   default_deck = collection.find_deck_by name: "Default"
 

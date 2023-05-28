@@ -7,7 +7,8 @@ RSpec.describe AnkiRecord::NoteType, "#field_names_in_order" do
 
   let(:name_argument) { "test note type" }
   let(:collection_argument) do
-    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
+    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
+    anki_package.anki21_database.collection
   end
 
   context "when it is the default Basic note type" do

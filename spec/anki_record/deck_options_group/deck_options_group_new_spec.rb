@@ -4,7 +4,7 @@ RSpec.describe AnkiRecord::DeckOptionsGroup, "#new" do
   after { cleanup_test_files(directory: ".") }
 
   let(:collection_argument) do
-    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
+    AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection
   end
 
   context "with no name or args arguments" do

@@ -4,7 +4,7 @@ RSpec.describe AnkiRecord::Anki21Database, "#find_note_by" do
   let(:anki_package) { AnkiRecord::AnkiPackage.new(name: "test") }
   let(:anki21_database) { anki_package.anki21_database }
   let(:note) do
-    collection = anki_package.collection
+    collection = anki_package.anki21_database.collection
     default_deck = collection.find_deck_by(name: "Default")
     basic_note_type = collection.find_note_type_by(name: "Basic")
     note = AnkiRecord::Note.new(deck: default_deck, note_type: basic_note_type)

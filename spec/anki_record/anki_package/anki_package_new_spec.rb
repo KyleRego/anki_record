@@ -18,7 +18,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
 
     # rubocop:disable RSpec/ExampleLength
     it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
-      expect(anki_package.collection).to be_a AnkiRecord::Collection
+      expect(anki_package.anki21_database).to be_a AnkiRecord::Anki21Database
 
       expect_num_apkg_files_in_directory num: 0, directory: "."
       expect_num_anki21_files_in_package_tmp_directory num: 1
@@ -61,9 +61,9 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
     let(:new_anki_package_name) { "new_anki_package_file_name" }
     let(:closure_argument) { proc {} }
 
-    it "yields an instance of Collection to the block argument" do
+    it "yields an Anki21Database object to the block argument" do
       described_class.new(name: "test") do |yielded_object|
-        expect(yielded_object).to be_a AnkiRecord::Collection
+        expect(yielded_object).to be_a AnkiRecord::Anki21Database
       end
     end
 

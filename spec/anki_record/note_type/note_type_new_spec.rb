@@ -9,7 +9,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   context "when passed a name argument" do
     subject(:note_type) { described_class.new collection: collection, name: name }
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection }
     let(:name) { "test note type" }
 
     it "instantiates a note type with collection attribute equal to the collection argument" do
@@ -84,7 +84,8 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   context "when passed no name or args arguments" do
     let(:note_type_instantiated_with_only_collection) do
       anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-      described_class.new collection: anki_package.collection
+      collection = anki_package.anki21_database.collection
+      described_class.new(collection: collection)
     end
 
     it "throws an ArgumentError" do
@@ -95,7 +96,8 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   context "when passed name and args arguments" do
     let(:note_type_instantiated_with_both_args_and_name) do
       anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection")
-      described_class.new collection: anki_package.collection, name: "namo", args: {}
+      collection = anki_package.anki21_database.collection
+      described_class.new(collection: collection, name: "namo", args: {})
     end
 
     it "throws an ArgumentError" do
@@ -110,7 +112,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
       basic_note_type_from_existing
     end
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection }
 
     it "instantiates a note type with collection attribute equal to the collection argument" do
       expect(basic_note_type_from_existing.collection).to eq collection
@@ -211,7 +213,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   describe "::new when when passed an args hash (of the default basic and reversed card note type)" do
     subject(:basic_and_reversed_card_note_type_from_existing) do
-      collection = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").collection
+      collection = AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection
       described_class.new(collection: collection, args: basic_and_reversed_card_model_hash)
     end
 

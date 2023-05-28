@@ -35,7 +35,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
   end
 
   describe "when passed a card_template argument that belongs to a different note type than the note's" do
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "cards_test_package").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "cards_test_package").anki21_database.collection }
     let(:deck) { AnkiRecord::Deck.new(collection: collection, name: "DECK_A") }
     let(:card_template) do
       note_type = AnkiRecord::NoteType.new collection: collection, name: "NOTE_TYPE_A"
@@ -65,7 +65,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
         `reps`, `lapses`, `left`, `odue`, `odid`, and `flags` attributes equal to 0
     DESC
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "cards_test_package").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "cards_test_package").anki21_database.collection }
     let(:note_type) { AnkiRecord::NoteType.new collection: collection, name: "NOTE_TYPE_A" }
     let(:card_template) do
       card_template = AnkiRecord::CardTemplate.new note_type: note_type, name: "CARD_TYPE_A"

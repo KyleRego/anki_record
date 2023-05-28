@@ -5,7 +5,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   context "when passed a note type, name, and args arguments" do
     subject(:invalid_note_field_instantiation) do
-      collection = AnkiRecord::AnkiPackage.new(name: "note_field_test_package").collection
+      collection = AnkiRecord::AnkiPackage.new(name: "note_field_test_package").anki21_database.collection
       note_type = AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields")
       described_class.new(note_type: note_type, name: "test", args: {})
     end
@@ -18,7 +18,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
   context "when passed a note type and name arguments" do
     subject(:field) { described_class.new(note_type: note_type, name: test_field_name) }
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "note_field_test_package").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "note_field_test_package").anki21_database.collection }
     let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields") }
     let(:test_field_name) { "test field" }
 
@@ -60,7 +60,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   describe "when the note type argument has a field already" do
     subject(:second_field) do
-      collection = AnkiRecord::AnkiPackage.new(name: "note_field_test_package").collection
+      collection = AnkiRecord::AnkiPackage.new(name: "note_field_test_package").anki21_database.collection
       note_type = AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields")
       described_class.new(note_type: note_type, name: "first field")
       described_class.new(note_type: note_type, name: "second field")
@@ -78,7 +78,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
       described_class.new(note_type: note_type, args: front_field_args)
     end
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "note_field_test_package").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "note_field_test_package").anki21_database.collection }
     let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields") }
 
     note_field_integration_test_two = <<~DESC

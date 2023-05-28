@@ -6,7 +6,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
   context "when passed collection and name arguments" do
     subject(:deck) { described_class.new collection: collection, name: "test deck" }
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_1").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_1").anki21_database.collection }
 
     deck_integration_test_one = <<~DESC
       1. instantiates a new Deck object
@@ -45,7 +45,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
   # rubocop:enable RSpec/ExampleLength
 
   context "when passed collection, name, and args arguments" do
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package").anki21_database.collection }
 
     it "throws an ArgumentError" do
       expect { described_class.new(collection: collection, name: "test", args: {}) }.to raise_error ArgumentError
@@ -77,7 +77,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
   context "when passed collection and args arguments (and args is the Default deck hash)" do
     subject(:default_deck_from_existing) { described_class.new(collection: collection, args: default_deck_hash) }
 
-    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_2").collection }
+    let(:collection) { AnkiRecord::AnkiPackage.new(name: "decks_spec_package_2").anki21_database.collection }
 
     deck_integration_test_two = <<~DESC
       1. instantiates a deck with collection attribute equal to the collection argument
