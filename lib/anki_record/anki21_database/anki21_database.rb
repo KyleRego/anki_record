@@ -2,7 +2,7 @@
 
 module AnkiRecord
   ##
-  # AnkiDatabase represents the collection.anki21 Anki SQLite database
+  # AnkiDatabase represents a collection.anki21 Anki SQLite database.
   class Anki21Database
     attr_reader :database
 
@@ -21,16 +21,6 @@ module AnkiRecord
     # Statement#execute executes the statement.
     def prepare(sql)
       database.prepare sql
-    end
-
-    # :nodoc:
-    def open?
-      !closed?
-    end
-
-    # :nodoc:
-    def closed?
-      database.closed?
     end
   end
 end

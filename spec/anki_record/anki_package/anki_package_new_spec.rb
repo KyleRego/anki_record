@@ -40,9 +40,6 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
 
       col_records_count = anki_package.anki21_database.prepare("select count(*) from col").execute.first["count(*)"]
       expect(col_records_count).to eq 1
-
-      expect(anki_package.open?).to be true
-      expect(anki_package.closed?).to be false
     end
 
     context "when passed a directory" do
@@ -55,8 +52,6 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
         expect_num_anki2_files_in_package_tmp_directory num: 1
         expect_media_file_in_tmp_directory
         expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
-        expect(anki_package.open?).to be true
-        expect(anki_package.closed?).to be false
       end
     end
     # rubocop:enable RSpec/ExampleLength
