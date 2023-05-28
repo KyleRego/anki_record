@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-# TODO: Refactor these specs
+require_relative "../support/clean_slate_anki_package"
+
+# TODO: Refactor to not use one expect per example
 RSpec.describe AnkiRecord::Note, "#new" do
+  include_context "when the anki package is a clean slate"
+
   after { cleanup_test_files(directory: ".") }
 
   context "with invalid arguments" do
-    let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
-    end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
 
@@ -31,8 +32,8 @@ RSpec.describe AnkiRecord::Note, "#new" do
 
     context "when the note type and deck arguments belong to different collections" do
       it "throws an ArgumentError" do
-        second_apkg = AnkiRecord::AnkiPackage.new(name: "second_package")
-        second_collection_deck = second_apkg.anki21_database.collection.find_deck_by name: "Default"
+        anki_package2 = AnkiRecord::AnkiPackage.new(name: "second_package")
+        second_collection_deck = anki_package2.anki21_database.collection.find_deck_by name: "Default"
         expect { described_class.new note_type: basic_note_type, deck: second_collection_deck }.to raise_error ArgumentError
       end
     end
@@ -41,9 +42,6 @@ RSpec.describe AnkiRecord::Note, "#new" do
   context "with valid note_type and deck arguments (new default deck, basic note type note)" do
     subject(:note) { described_class.new deck: default_deck, note_type: basic_note_type }
 
-    let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
-    end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
 
@@ -94,12 +92,6 @@ RSpec.describe AnkiRecord::Note, "#new" do
 
   context "with valid anki21_database and data arguments (existing basic optional reverse note)" do
     subject(:note_from_existing_record) { described_class.new anki21_database: anki21_database, data: note_cards_data }
-
-    let(:anki21_database) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database
-    end
-
-    let(:collection) { anki21_database.collection }
 
     let(:note_cards_data) do
       default_deck = collection.find_deck_by name: "Default"

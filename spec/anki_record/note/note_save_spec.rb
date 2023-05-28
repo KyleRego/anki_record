@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
+require_relative "../support/clean_slate_anki_package"
+
+# TODO: Refactor to not use one expect per example
 RSpec.describe AnkiRecord::Note, "#save" do
+  include_context "when the anki package is a clean slate"
+
   after { cleanup_test_files(directory: ".") }
 
   # rubocop:disable RSpec/MultipleMemoizedHelpers
@@ -13,9 +18,6 @@ RSpec.describe AnkiRecord::Note, "#save" do
       note
     end
 
-    let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database.collection
-    end
     let(:default_deck) { collection.find_deck_by name: "Default" }
     let(:custom_note_type) do
       custom_note_type = AnkiRecord::NoteType.new collection: collection, name: "custom note type"

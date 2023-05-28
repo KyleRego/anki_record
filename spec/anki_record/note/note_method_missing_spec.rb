@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
+require_relative "../support/clean_slate_anki_package"
+
+# TODO: Refactor to use less contexts
 RSpec.describe AnkiRecord::Note, "#method_missing" do
   subject(:note) do
-    anki_package = AnkiRecord::AnkiPackage.new(name: "package_to_test_notes")
-    collection = anki_package.anki21_database.collection
     basic_note_type = collection.find_note_type_by name: "Basic"
     default_deck = collection.find_deck_by name: "Default"
     described_class.new deck: default_deck, note_type: basic_note_type
   end
+
+  include_context "when the anki package is a clean slate"
 
   after { cleanup_test_files(directory: ".") }
 
@@ -33,6 +36,7 @@ RSpec.describe AnkiRecord::Note, "#method_missing" do
       end
     end
 
+    # TODO: Look into this pending context
     context "when the method corresponds to one of the snake_card note type field names"
   end
 end
