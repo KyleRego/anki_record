@@ -24,9 +24,9 @@ module AnkiRecord
       @target_directory = target_directory
       @tmpdir = Dir.mktmpdir
       @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
-      @anki21_database = Anki21Database.new(tmpdir: tmpdir)
-      @anki2_database = Anki2Database.new(tmpdir: tmpdir)
-      @media = Media.new(tmpdir: tmpdir)
+      @anki21_database = Anki21Database.new(anki_package: self)
+      @anki2_database = Anki2Database.new(anki_package: self)
+      @media = Media.new(anki_package: self)
       @collection = Collection.new(anki21_database: anki21_database)
 
       execute_closure_and_zip(collection, &closure) if closure

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: Refactor these specs
 RSpec.describe AnkiRecord::Note, "#new" do
   after { cleanup_test_files(directory: ".") }
 
@@ -91,12 +92,15 @@ RSpec.describe AnkiRecord::Note, "#new" do
     end
   end
 
-  context "with valid collection and data arguments (existing basic optional reverse note)" do
-    subject(:note_from_existing_record) { described_class.new collection: collection, data: note_cards_data }
+  context "with valid anki21_database and data arguments (existing basic optional reverse note)" do
+    subject(:note_from_existing_record) { described_class.new anki21_database: anki21_database, data: note_cards_data }
 
-    let(:collection) do
-      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").collection
+    let(:anki21_database) do
+      AnkiRecord::AnkiPackage.new(name: "package_to_test_notes").anki21_database
     end
+
+    # TODO: Fixme LoD
+    let(:collection) { anki21_database.anki_package.collection }
 
     let(:note_cards_data) do
       default_deck = collection.find_deck_by name: "Default"
@@ -106,7 +110,8 @@ RSpec.describe AnkiRecord::Note, "#new" do
       note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
       note.save
 
-      collection.note_cards_data_for_note_id sql_able: collection.anki21_database, id: note.id
+      # TODO: Method passing self as arg
+      anki21_database.note_cards_data_for_note_id sql_able: anki21_database, id: note.id
     end
     let(:note_data) { note_cards_data[:note_data] }
     let(:cards_data) { note_cards_data[:cards_data] }

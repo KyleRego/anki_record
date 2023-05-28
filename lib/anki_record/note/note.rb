@@ -7,7 +7,6 @@ require_relative "../helpers/time_helper"
 require_relative "note_attributes"
 require_relative "note_guid_helper"
 
-# rubocop:disable Metrics/ClassLength
 module AnkiRecord
   ##
   # Represents an Anki note.
@@ -18,39 +17,47 @@ module AnkiRecord
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
+    attr_reader :anki21_database
+
     ##
     # Instantiates a note of type +note_type+ and belonging to deck +deck+.
-    def initialize(note_type: nil, deck: nil, collection: nil, data: nil)
+    def initialize(note_type: nil, deck: nil, anki21_database: nil, data: nil)
       if note_type && deck
-        setup_instance_variables_for_new_note(note_type: note_type, deck: deck)
-      elsif collection && data
-        setup_instance_variables_from_existing(collection: collection,
-                                               note_data: data[:note_data], cards_data: data[:cards_data])
+        setup_new_note(note_type: note_type, deck: deck)
+      elsif anki21_database && data
+        setup_existing_note(anki21_database: anki21_database,
+                            note_data: data[:note_data], cards_data: data[:cards_data])
       else
         raise ArgumentError
       end
     end
 
+    ##
+    # Saves the note and its cards.
+    def save
+      anki21_database.find_note_by(id: @id) ? update_note_in_collection_anki21 : insert_new_note_in_collection_anki21
+      true
+    end
+
+    # TODO: Need to keep refactoring the object collaboration
+    def collection
+      anki21_database.anki_package.collection
+    end
+
     private
 
-      def setup_instance_variables_for_new_note(note_type:, deck:)
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
+      def setup_new_note(note_type:, deck:)
         raise ArgumentError unless note_type.collection == deck.collection
 
-        setup_collaborator_object_instance_variables_for_new_note(note_type: note_type, deck: deck)
-        setup_simple_instance_variables_for_new_note
-      end
-
-      def setup_collaborator_object_instance_variables_for_new_note(note_type:, deck:)
         @note_type = note_type
         @deck = deck
-        @collection = deck.collection
+        @anki21_database = note_type.collection.anki21_database
         @field_contents = setup_empty_field_contents_hash
         @cards = @note_type.card_templates.map do |card_template|
           Card.new(note: self, card_template: card_template)
         end
-      end
-
-      def setup_simple_instance_variables_for_new_note
         @id = milliseconds_since_epoch
         @guid = globally_unique_id
         @last_modified_timestamp = seconds_since_epoch
@@ -60,20 +67,24 @@ module AnkiRecord
         @data = ""
       end
 
-      def setup_instance_variables_from_existing(collection:, note_data:, cards_data:)
-        setup_collaborator_object_instance_variables_from_existing(collection: collection, note_data: note_data,
-                                                                   cards_data: cards_data)
-        setup_simple_instance_variables_from_existing(note_data: note_data)
-      end
-
-      def setup_collaborator_object_instance_variables_from_existing(collection:, note_data:, cards_data:)
-        @collection = collection
+      def setup_existing_note(anki21_database:, note_data:, cards_data:)
+        @anki21_database = anki21_database
         @note_type = collection.find_note_type_by id: note_data["mid"]
         @field_contents = setup_field_contents_hash_from_existing(note_data: note_data)
         @cards = @note_type.card_templates.map.with_index do |_card_template, index|
           Card.new(note: self, card_data: cards_data[index])
         end
+        @id = note_data["id"]
+        @guid = note_data["guid"]
+        @last_modified_timestamp = note_data["mod"]
+        @usn = note_data["usn"]
+        @tags = note_data["tags"].split
+        @flags = note_data["flags"]
+        @data = note_data["data"]
       end
+
+      # rubocop:enable Metrics/AbcSize
+      # rubocop:enable Metrics/MethodLength
 
       def setup_field_contents_hash_from_existing(note_data:)
         field_contents = setup_empty_field_contents_hash
@@ -84,34 +95,11 @@ module AnkiRecord
         field_contents
       end
 
-      def setup_simple_instance_variables_from_existing(note_data:)
-        @id = note_data["id"]
-        @guid = note_data["guid"]
-        @last_modified_timestamp = note_data["mod"]
-        @usn = note_data["usn"]
-        @tags = note_data["tags"].split
-        @flags = note_data["flags"]
-        @data = note_data["data"]
-      end
-
       def setup_empty_field_contents_hash
         field_contents = {}
         note_type.snake_case_field_names.each { |field_name| field_contents[field_name] = "" }
         field_contents
       end
-
-    public
-
-    ##
-    # Saves the note to the collection.anki21 database.
-    #
-    # This also saves the note's cards.
-    def save
-      collection.find_note_by(id: @id) ? update_note_in_collection_anki21 : insert_new_note_in_collection_anki21
-      true
-    end
-
-    private
 
       def update_note_in_collection_anki21
         statement = anki21_database.prepare <<~SQL
@@ -136,10 +124,6 @@ module AnkiRecord
       end
 
     public
-
-    def anki21_database
-      @collection.anki21_database
-    end
 
     ##
     # Overrides BasicObject#method_missing and creates "ghost methods".
@@ -177,4 +161,3 @@ module AnkiRecord
       end
   end
 end
-# rubocop:enable Metrics/ClassLength

@@ -4,7 +4,6 @@ require "json"
 
 require_relative "../deck/deck"
 require_relative "../deck_options_group/deck_options_group"
-require_relative "../helpers/data_query_helper"
 require_relative "../helpers/time_helper"
 require_relative "../note_type/note_type"
 require_relative "collection_attributes"
@@ -14,7 +13,6 @@ module AnkiRecord
   # Collection represents the single record in the Anki collection.anki21 database's `col` table.
   # The note types, decks, and deck options groups data are contained within this record.
   class Collection
-    include Helpers::DataQueryHelper
     include Helpers::TimeHelper
     include CollectionAttributes
 
@@ -102,15 +100,6 @@ module AnkiRecord
     # Returns the collection's deck options group object found by +id+, or nil if it is not found.
     def find_deck_options_group_by(id:)
       deck_options_groups.find { |deck_options_group| deck_options_group.id == id }
-    end
-
-    ##
-    # Returns the collection's note object found by +id+, or nil if it is not found.
-    def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id sql_able: anki21_database, id: id
-      return nil unless note_cards_data
-
-      AnkiRecord::Note.new collection: self, data: note_cards_data
     end
 
     # :nodoc:
