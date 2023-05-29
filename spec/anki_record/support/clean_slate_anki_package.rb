@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.shared_context "when the anki package is a clean slate" do
-  let(:anki_package) do
-    AnkiRecord::AnkiPackage.new(name: "clean_slate")
-  end
+  let(:clean_slate_anki_package_name) { "clean_slate_anki_package" }
 
-  let(:anki21_database) do
-    anki_package.anki21_database
-  end
+  let(:anki_package) { AnkiRecord::AnkiPackage.new(name: clean_slate_anki_package_name) }
 
-  let(:collection) do
-    anki21_database.collection
-  end
+  let(:anki21_database) { anki_package.anki21_database }
+
+  let(:collection) { anki21_database.collection }
+
+  after { cleanup_test_files(directory: ".") }
+
+  let(:tmpdir) { anki_package.tmpdir }
 end
