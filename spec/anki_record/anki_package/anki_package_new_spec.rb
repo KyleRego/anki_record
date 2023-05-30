@@ -57,18 +57,17 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       expect(col_records_count).to eq 1
     end
 
-    shared_context "when there is a test directory" do
-      context "when passed a directory" do
-        let(:target_directory_argument) { TEST_TMP_DIRECTORY }
+    context "when passed a directory" do
+      include_context "when there is a directory for the test"
+      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
 
-        it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
-          anki_package
+      it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
+        anki_package
 
-          expect_num_anki21_files_in_package_tmpdir num: 1
-          expect_num_anki2_files_in_package_tmpdir num: 1
-          expect_media_file_in_tmpdir
-          expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
-        end
+        expect_num_anki21_files_in_package_tmpdir num: 1
+        expect_num_anki2_files_in_package_tmpdir num: 1
+        expect_media_file_in_tmpdir
+        expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
       end
     end
     # rubocop:enable RSpec/ExampleLength
@@ -89,15 +88,14 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       expect_num_apkg_files_in_directory num: 1, directory: "."
     end
 
-    shared_context "when there is a test directory" do
-      context "when passed a directory that exists" do
-        let(:target_directory_argument) { TEST_TMP_DIRECTORY }
+    context "when passed a directory that exists" do
+      include_context "when there is a directory for the test"
+      let(:target_directory_argument) { TEST_TMP_DIRECTORY }
 
-        it "deletes the temporary directory and saves one *.apkg zip file in the specified directory" do
-          anki_package
-          expect_the_temporary_directory_to_not_exist
-          expect_num_apkg_files_in_directory num: 1, directory: target_directory_argument
-        end
+      it "deletes the temporary directory and saves one *.apkg zip file in the specified directory" do
+        anki_package
+        expect_the_temporary_directory_to_not_exist
+        expect_num_apkg_files_in_directory num: 1, directory: target_directory_argument
       end
     end
 
