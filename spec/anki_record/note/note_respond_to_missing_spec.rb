@@ -2,7 +2,6 @@
 
 require_relative "../support/clean_slate_anki_package"
 
-# TODO: Refactor to have less contexts
 RSpec.describe AnkiRecord::Note, "#respond_to_missing?" do
   subject(:note) do
     basic_note_type = collection.find_note_type_by name: "Basic"
@@ -12,33 +11,23 @@ RSpec.describe AnkiRecord::Note, "#respond_to_missing?" do
 
   include_context "when the anki package is a clean slate"
 
-  after { cleanup_test_files(directory: ".") }
-
   context "when the missing method ends with '='" do
-    context "when the method corresponds to one of the snake_case note type field names" do
-      it "returns true" do
-        expect(note.respond_to?(:front=)).to be true
-      end
+    it "returns true if the method corresponds to one of the note type field names" do
+      expect(note.respond_to?(:front=)).to be true
     end
 
-    context "when the method does not correspond to one of the snake_case note type field names" do
-      it "returns false" do
-        expect(note.respond_to?(:made_up=)).to be false
-      end
+    it "returns false if the method does not correspond to one of the note type field names" do
+      expect(note.respond_to?(:made_up=)).to be false
     end
   end
 
-  context "when the missing method does not end with =" do
-    context "when the missing method corresponds to one of the snake_case note type field names" do
-      it "returns true" do
-        expect(note.respond_to?(:front)).to be true
-      end
+  context "when the missing method corresponds to one of the snake_case note type field names" do
+    it "returns true if the method corresponds to one of the note type field names" do
+      expect(note.respond_to?(:front)).to be true
     end
 
-    context "when the missing method does not correspond to one of the snake_case note type field names" do
-      it "returns false" do
-        expect(note.respond_to?(:made_up)).to be false
-      end
+    it "returns false if the method does not correspond to one of the note type field names" do
+      expect(note.respond_to?(:made_up)).to be false
     end
   end
 end
