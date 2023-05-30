@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "./spec/anki_record/support/collection_spec_helpers"
+require "./spec/anki_record/support/clean_slate_anki_package"
 
 RSpec.describe AnkiRecord::Collection, "#find_note_type_by" do
-  include_context "collection shared helpers"
+  include_context "when the anki package is a clean slate"
 
   it "throws an ArgumentError when passed both name and id arguments" do
     expect { collection.find_note_type_by(name: "name", id: "id") }.to raise_error ArgumentError

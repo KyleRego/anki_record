@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "./spec/anki_record/support/collection_spec_helpers"
+require "./spec/anki_record/support/clean_slate_anki_package"
 
 RSpec.describe AnkiRecord::Collection, "#new" do
-  include_context "collection shared helpers"
+  include_context "when the anki package is a clean slate"
 
   # rubocop:disable RSpec/ExampleLength
   it "instantiates a collection with defaults: 1 deck, 1 deck options group, and 5 note types" do
