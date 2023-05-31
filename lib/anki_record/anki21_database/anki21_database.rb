@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "../helpers/data_query_helper"
-
 module AnkiRecord
   ##
   # AnkiDatabase represents a collection.anki21 Anki SQLite database.
   class Anki21Database
-    include Helpers::DataQueryHelper
     attr_reader :anki_package, :collection, :database
 
     FILENAME = "collection.anki21"
@@ -31,10 +28,20 @@ module AnkiRecord
     ##
     # Returns the note found by +id+, or nil if it is not found.
     def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id sql_able: self, id: id
+      note_cards_data = note_cards_data_for_note_id(id: id)
       return nil unless note_cards_data
 
-      AnkiRecord::Note.new anki21_database: self, data: note_cards_data
+      AnkiRecord::Note.new(anki21_database: self, data: note_cards_data)
     end
+
+    private
+
+      def note_cards_data_for_note_id(id:)
+        note_data = prepare("select * from notes where id = ?").execute([id]).first
+        return nil unless note_data
+
+        cards_data = prepare("select * from cards where nid = ?").execute([id]).to_a
+        { note_data: note_data, cards_data: cards_data }
+      end
   end
 end
