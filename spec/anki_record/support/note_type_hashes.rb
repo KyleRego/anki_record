@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable RSpec/ContextWording
-RSpec.shared_context "note type helpers" do
-  after { cleanup_test_files(directory: ".") }
-
+RSpec.shared_context "when the JSON of a note type from the col record is a Ruby hash" do
   # rubocop:disable Layout/LineContinuationLeadingSpace
-  # rubocop:disable Metrics/MethodLength
   ##
   # Returns the Ruby hash representing the default Basic note type args
-  def basic_model_hash
+  let(:basic_model_hash) do
     { "id" => 1_676_902_364_661,
       "name" => "Basic",
       "type" => 0,
@@ -50,9 +46,7 @@ RSpec.shared_context "note type helpers" do
       "req" => [[0, "any", [0]]] }
   end
 
-  ##
-  # Returns the Ruby hash representing the default Basic and Reversed Card note type args
-  def basic_and_reversed_card_model_hash
+  let(:basic_and_reversed_card_model_hash) do
     { "id" => 1_676_902_364_662,
       "name" => "Basic (and reversed card)",
       "type" => 0,
@@ -102,7 +96,5 @@ RSpec.shared_context "note type helpers" do
       "latexsvg" => false,
       "req" => [[0, "any", [0]], [1, "any", [1]]] }
   end
-  # rubocop:enable Metrics/MethodLength
   # rubocop:enable Layout/LineContinuationLeadingSpace
 end
-# rubocop:enable RSpec/ContextWording

@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "../support/note_type_spec_helpers"
+require_relative "../support/clean_slate_anki_package"
 
 # rubocop:disable RSpec/ContextWording
 # rubocop:disable RSpec/NestedGroups
 # rubocop:disable RSpec/MultipleMemoizedHelpers
-# TODO: Specs can be refactored for performance.
-RSpec.describe AnkiRecord::NoteType, "#save" do
-  include_context "note type helpers"
 
-  let(:collection) { AnkiRecord::AnkiPackage.new(name: "package_to_setup_collection").anki21_database.collection }
+RSpec.describe AnkiRecord::NoteType, "#save" do
+  include_context "when the anki package is a clean slate"
+
   let(:name) { "custom note type name" }
   let!(:custom_note_type) do
     custom_note_type = described_class.new collection: collection, name: name
