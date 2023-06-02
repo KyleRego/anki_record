@@ -13,6 +13,7 @@ module AnkiRecord
       database.execute_batch ANKI_SCHEMA_DEFINITION
       database.execute INSERT_COLLECTION_ANKI_2_COL_RECORD
       database.close
+      database
     end
   end
 end

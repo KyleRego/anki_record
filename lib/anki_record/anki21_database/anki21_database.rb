@@ -1,9 +1,15 @@
 # frozen_string_literal: true
 
+require "forwardable"
+
 module AnkiRecord
   ##
-  # AnkiDatabase represents a collection.anki21 Anki SQLite database.
+  # Anki21Database represents a collection.anki21 Anki SQLite database.
   class Anki21Database
+    extend Forwardable
+
+    def_delegators :@collection, :find_deck_by, :find_deck_options_group_by, :find_note_type_by
+
     attr_reader :anki_package, :collection, :database
 
     FILENAME = "collection.anki21"
@@ -15,7 +21,6 @@ module AnkiRecord
       database.execute INSERT_COLLECTION_ANKI_21_COL_RECORD
       database.results_as_hash = true
       @collection = Collection.new(anki21_database: self)
-      database
     end
 
     # Returns an SQLite3::Statement object to be executed against the collection.anki21 database.
