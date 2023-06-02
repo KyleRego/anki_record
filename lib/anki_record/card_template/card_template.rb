@@ -14,9 +14,9 @@ module AnkiRecord
 
       @note_type = note_type
       if args
-        setup_card_template_instance_variables_from_existing(args: args)
+        setup_card_template_instance_variables_from_existing(args:)
       else
-        setup_card_template_instance_variables(name: name)
+        setup_card_template_instance_variables(name:)
       end
 
       @note_type.add_card_template self

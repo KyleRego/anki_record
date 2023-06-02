@@ -8,7 +8,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   include_context "when the anki package is a clean slate"
 
   context "when passed a name argument" do
-    subject(:note_type) { described_class.new collection: collection, name: name }
+    subject(:note_type) { described_class.new collection:, name: }
 
     let(:name) { "test note type" }
 
@@ -83,7 +83,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed no name or args arguments" do
     let(:note_type_instantiated_with_only_collection) do
-      described_class.new(collection: collection)
+      described_class.new(collection:)
     end
 
     it "throws an ArgumentError" do
@@ -93,7 +93,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed name and args arguments" do
     let(:note_type_instantiated_with_both_args_and_name) do
-      described_class.new(collection: collection, name: "namo", args: {})
+      described_class.new(collection:, name: "namo", args: {})
     end
 
     it "throws an ArgumentError" do
@@ -103,7 +103,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed an args hash (of the existing default basic note type)" do
     subject(:basic_note_type_from_hash) do
-      basic_note_type_from_hash = described_class.new(collection: collection, args: basic_model_hash)
+      basic_note_type_from_hash = described_class.new(collection:, args: basic_model_hash)
       basic_note_type_from_hash.save
       basic_note_type_from_hash
     end
@@ -209,7 +209,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed an args hash (of the default basic and reversed card note type)" do
     subject(:basic_and_reversed_card_note_type_from_existing) do
-      described_class.new(collection: collection, args: basic_and_reversed_card_model_hash)
+      described_class.new(collection:, args: basic_and_reversed_card_model_hash)
     end
 
     include_context "when the JSON of a note type from the col record is a Ruby hash"

@@ -7,15 +7,15 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   it "throws an error when passed note_type, name, and args arguments" do
     expect do
-      note_type = AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields")
-      described_class.new(note_type: note_type, name: "test", args: {})
+      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for fields")
+      described_class.new(note_type:, name: "test", args: {})
     end.to raise_error ArgumentError
   end
 
   context "when passed a note type and name arguments" do
-    subject(:field) { described_class.new(note_type: note_type, name: test_field_name) }
+    subject(:field) { described_class.new(note_type:, name: test_field_name) }
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields") }
+    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for fields") }
     let(:test_field_name) { "test field" }
 
     # rubocop:disable RSpec/ExampleLength
@@ -35,9 +35,9 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   context "when the note type argument has a field already" do
     subject(:second_field) do
-      note_type = AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields")
-      described_class.new(note_type: note_type, name: "first field")
-      described_class.new(note_type: note_type, name: "second field")
+      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for fields")
+      described_class.new(note_type:, name: "first field")
+      described_class.new(note_type:, name: "second field")
     end
 
     it "instantiates a note field with the ordinal_number attribute being 1" do
@@ -49,10 +49,10 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
     subject(:note_field_from_existing) do
       front_field_args = { "name" => "Front", "ord" => 0, "sticky" => false,
                            "rtl" => false, "font" => "Arial", "size" => 20, "description" => "" }
-      described_class.new(note_type: note_type, args: front_field_args)
+      described_class.new(note_type:, args: front_field_args)
     end
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for fields") }
+    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for fields") }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a note field from the raw data" do

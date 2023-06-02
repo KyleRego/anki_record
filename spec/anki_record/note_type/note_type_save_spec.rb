@@ -11,7 +11,7 @@ RSpec.describe AnkiRecord::NoteType, "#save" do
 
   let(:name) { "custom note type name" }
   let!(:custom_note_type) do
-    custom_note_type = described_class.new collection: collection, name: name
+    custom_note_type = described_class.new(collection:, name:)
     AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
     AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
     custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "custom card 1"

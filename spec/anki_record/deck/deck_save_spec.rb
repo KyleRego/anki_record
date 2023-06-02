@@ -6,7 +6,7 @@ RSpec.describe AnkiRecord::Deck, "#save" do
   include_context "when the anki package is a clean slate"
 
   context "when the deck does not exist in the collection.anki21 database" do
-    subject(:test_deck) { described_class.new name: test_deck_name, collection: collection }
+    subject(:test_deck) { described_class.new name: test_deck_name, collection: }
 
     let(:test_deck_name) { "test deck for save" }
     let(:decks_json_from_collection) { collection.decks_json }

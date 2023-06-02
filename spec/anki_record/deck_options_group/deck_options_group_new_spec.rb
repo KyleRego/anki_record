@@ -7,12 +7,12 @@ RSpec.describe AnkiRecord::DeckOptionsGroup, "#new" do
   include_context "when the anki package is a clean slate"
 
   it "throws an error when passed no name or args" do
-    expect { described_class.new(collection: collection, name: nil) }.to raise_error ArgumentError
+    expect { described_class.new(collection:, name: nil) }.to raise_error ArgumentError
   end
 
   # rubocop:disable RSpec/ExampleLength
   it "instantiates a deck options group when passed a collection and name" do
-    deck_options_group = described_class.new(collection: collection, name: "deck options group name")
+    deck_options_group = described_class.new(collection:, name: "deck options group name")
     expect(deck_options_group).to be_a described_class
     expect(deck_options_group.collection).to eq collection
     expect(deck_options_group.collection.deck_options_groups).to include deck_options_group
@@ -22,7 +22,7 @@ RSpec.describe AnkiRecord::DeckOptionsGroup, "#new" do
   # rubocop:enable RSpec/ExampleLength
 
   context "with collection and an args arguments (and args is the default deck options group)" do
-    subject(:deck_options_group_from_hash) { described_class.new(collection: collection, args: default_deck_options_group_hash) }
+    subject(:deck_options_group_from_hash) { described_class.new(collection:, args: default_deck_options_group_hash) }
 
     include_context "when the JSON of a deck options group from the col record is a Ruby hash"
 

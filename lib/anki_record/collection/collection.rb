@@ -20,7 +20,7 @@ module AnkiRecord
 
     # :nodoc:
     def initialize(anki21_database:)
-      setup_collection_instance_variables(anki21_database: anki21_database)
+      setup_collection_instance_variables(anki21_database:)
     end
 
     # :nodoc:
@@ -58,7 +58,7 @@ module AnkiRecord
               "You must pass either an id or name keyword argument."
       end
 
-      name ? find_note_type_by_name(name: name) : find_note_type_by_id(id: id)
+      name ? find_note_type_by_name(name:) : find_note_type_by_id(id:)
     end
 
     private
@@ -81,7 +81,7 @@ module AnkiRecord
               "You must pass either an id or name keyword argument."
       end
 
-      name ? find_deck_by_name(name: name) : find_deck_by_id(id: id)
+      name ? find_deck_by_name(name:) : find_deck_by_id(id:)
     end
 
     private

@@ -27,9 +27,9 @@ module AnkiRecord
       @collection = collection
 
       if args
-        setup_note_type_instance_variables_from_existing(args: args)
+        setup_note_type_instance_variables_from_existing(args:)
       else
-        setup_instance_variables_for_new_note_type(name: name)
+        setup_instance_variables_for_new_note_type(name:)
       end
 
       @collection.add_note_type self
@@ -109,8 +109,8 @@ module AnkiRecord
     private
 
       def setup_note_type_instance_variables_from_existing(args:)
-        setup_collaborator_object_instance_variables_from_existing(args: args)
-        setup_simple_instance_variables_from_existing(args: args)
+        setup_collaborator_object_instance_variables_from_existing(args:)
+        setup_simple_instance_variables_from_existing(args:)
       end
 
       def setup_collaborator_object_instance_variables_from_existing(args:)

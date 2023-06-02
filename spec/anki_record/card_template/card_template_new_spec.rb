@@ -7,9 +7,9 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
   include_context "when the anki package is a clean slate"
 
   context "when passed a name and note type that has 0 card templates" do
-    subject(:template) { described_class.new(note_type: note_type, name: name_argument) }
+    subject(:template) { described_class.new(note_type:, name: name_argument) }
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
     let(:name_argument) { "test template" }
 
     # rubocop:disable RSpec/ExampleLength
@@ -27,11 +27,11 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
   end
 
   context "when passed a name and a note type that already has 1 card template" do
-    subject(:template) { described_class.new(note_type: note_type, name: name_argument) }
+    subject(:template) { described_class.new(note_type:, name: name_argument) }
 
     let(:note_type) do
-      note_type = AnkiRecord::NoteType.new(collection: collection, name: "test note type for card template")
-      described_class.new(note_type: note_type, name: "first test template")
+      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for card template")
+      described_class.new(note_type:, name: "first test template")
       note_type
     end
     let(:name_argument) { "test template" }
@@ -43,18 +43,18 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
 
   context "when passed both a name and args hash" do
     include_context "when the JSON of a card template from the col record is a Ruby hash"
-    let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
 
     it "throws an ArgumentError" do
-      expect { described_class.new(note_type: note_type, name: "test", args: {}) }.to raise_error ArgumentError
+      expect { described_class.new(note_type:, name: "test", args: {}) }.to raise_error ArgumentError
     end
   end
 
   context "when passed a hash of data for a card template" do
-    subject(:card_template_from_hash) { described_class.new(note_type: note_type, args: basic_note_first_card_template_hash) }
+    subject(:card_template_from_hash) { described_class.new(note_type:, args: basic_note_first_card_template_hash) }
 
     include_context "when the JSON of a card template from the col record is a Ruby hash"
-    let(:note_type) { AnkiRecord::NoteType.new(collection: collection, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a card template from the raw data" do

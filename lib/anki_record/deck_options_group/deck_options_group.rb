@@ -20,9 +20,9 @@ module AnkiRecord
       @collection = collection
 
       if args
-        setup_deck_options_group_instance_variables_from_existing(args: args)
+        setup_deck_options_group_instance_variables_from_existing(args:)
       else
-        setup_deck_options_group_instance_variables(name: name)
+        setup_deck_options_group_instance_variables(name:)
       end
 
       @collection.add_deck_options_group self

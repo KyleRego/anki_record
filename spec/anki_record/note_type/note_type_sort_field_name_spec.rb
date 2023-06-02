@@ -4,7 +4,7 @@ require_relative "../support/clean_slate_anki_package"
 require_relative "../support/note_type_hashes"
 
 RSpec.describe AnkiRecord::NoteType, "#sort_field_name" do
-  subject(:basic_note_type_from_hash) { described_class.new(collection: collection, args: basic_model_hash) }
+  subject(:basic_note_type_from_hash) { described_class.new(collection:, args: basic_model_hash) }
 
   include_context "when the anki package is a clean slate"
 

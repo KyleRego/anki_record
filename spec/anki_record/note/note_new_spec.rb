@@ -53,7 +53,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
   end
 
   context "when passed an anki21_database and an existing note's raw data (existing basic optional reverse note)" do
-    subject(:note_from_existing_record) { described_class.new anki21_database: anki21_database, data: note_cards_data }
+    subject(:note_from_existing_record) { described_class.new anki21_database:, data: note_cards_data }
 
     let(:note_cards_data) do
       default_deck = collection.find_deck_by name: "Default"

@@ -19,8 +19,8 @@ module AnkiRecord
     ##
     # Creates a new Anki package file (see README).
     def initialize(name:, target_directory: Dir.pwd, &closure)
-      validate_arguments(name: name, target_directory: target_directory)
-      @name = new_apkg_name(name: name)
+      validate_arguments(name:, target_directory:)
+      @name = new_apkg_name(name:)
       @target_directory = target_directory
       @tmpdir = Dir.mktmpdir
       @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
@@ -40,8 +40,8 @@ module AnkiRecord
     private
 
       def validate_arguments(name:, target_directory:)
-        check_name_argument_is_valid(name: name)
-        check_target_directory_argument_is_valid(target_directory: target_directory)
+        check_name_argument_is_valid(name:)
+        check_target_directory_argument_is_valid(target_directory:)
       end
 
       def new_apkg_name(name:)

@@ -28,7 +28,7 @@ module AnkiRecord
     ##
     # Returns the note found by +id+, or nil if it is not found.
     def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id(id: id)
+      note_cards_data = note_cards_data_for_note_id(id:)
       return nil unless note_cards_data
 
       AnkiRecord::Note.new(anki21_database: self, data: note_cards_data)
@@ -41,7 +41,7 @@ module AnkiRecord
         return nil unless note_data
 
         cards_data = prepare("select * from cards where nid = ?").execute([id]).to_a
-        { note_data: note_data, cards_data: cards_data }
+        { note_data:, cards_data: }
       end
   end
 end

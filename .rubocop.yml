@@ -33,9 +33,6 @@ Layout/IndentationConsistency:
 Metrics/ClassLength:
   Max: 120
 
-Style/HashSyntax:
-  EnforcedShorthandSyntax: either
-
 # One expectation per test is a good practice. For this test suite,
 # following this rule would have a very high performance cost.
 RSpec/MultipleExpectations:

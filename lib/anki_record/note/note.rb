@@ -23,9 +23,9 @@ module AnkiRecord
     # Instantiates a note of type +note_type+ and belonging to deck +deck+.
     def initialize(note_type: nil, deck: nil, anki21_database: nil, data: nil)
       if note_type && deck
-        setup_new_note(note_type: note_type, deck: deck)
+        setup_new_note(note_type:, deck:)
       elsif anki21_database && data
-        setup_existing_note(anki21_database: anki21_database,
+        setup_existing_note(anki21_database:,
                             note_data: data[:note_data], cards_data: data[:cards_data])
       else
         raise ArgumentError
@@ -56,7 +56,7 @@ module AnkiRecord
         @anki21_database = note_type.collection.anki21_database
         @field_contents = setup_empty_field_contents_hash
         @cards = @note_type.card_templates.map do |card_template|
-          Card.new(note: self, card_template: card_template)
+          Card.new(note: self, card_template:)
         end
         @id = milliseconds_since_epoch
         @guid = globally_unique_id
@@ -70,7 +70,7 @@ module AnkiRecord
       def setup_existing_note(anki21_database:, note_data:, cards_data:)
         @anki21_database = anki21_database
         @note_type = collection.find_note_type_by id: note_data["mid"]
-        @field_contents = setup_field_contents_hash_from_existing(note_data: note_data)
+        @field_contents = setup_field_contents_hash_from_existing(note_data:)
         @cards = @note_type.card_templates.map.with_index do |_card_template, index|
           Card.new(note: self, card_data: cards_data[index])
         end

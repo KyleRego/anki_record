@@ -15,9 +15,9 @@ module AnkiRecord
     def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
       @note = note
       if card_template
-        setup_instance_variables_for_new_card(card_template: card_template)
+        setup_instance_variables_for_new_card(card_template:)
       elsif card_data
-        setup_instance_variables_from_existing(card_data: card_data)
+        setup_instance_variables_from_existing(card_data:)
       else
         raise ArgumentError
       end
@@ -28,7 +28,7 @@ module AnkiRecord
       def setup_instance_variables_for_new_card(card_template:)
         raise ArgumentError unless @note.note_type == card_template.note_type
 
-        setup_collaborator_object_instance_variables_for_new_card(card_template: card_template)
+        setup_collaborator_object_instance_variables_for_new_card(card_template:)
         setup_simple_instance_variables_for_new_card
       end
 
@@ -49,8 +49,8 @@ module AnkiRecord
       end
 
       def setup_instance_variables_from_existing(card_data:)
-        setup_collaborator_object_instance_variables_from_existing(card_data: card_data)
-        setup_simple_instance_variables_from_existing(card_data: card_data)
+        setup_collaborator_object_instance_variables_from_existing(card_data:)
+        setup_simple_instance_variables_from_existing(card_data:)
       end
 
       def setup_collaborator_object_instance_variables_from_existing(card_data:)

@@ -7,7 +7,7 @@ RSpec.describe AnkiRecord::Deck, "#new" do
   include_context "when the anki package is a clean slate"
 
   context "when passed collection and name arguments" do
-    subject(:deck) { described_class.new collection: collection, name: "test deck" }
+    subject(:deck) { described_class.new collection:, name: "test deck" }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a deck with that name" do
@@ -25,11 +25,11 @@ RSpec.describe AnkiRecord::Deck, "#new" do
   # rubocop:enable RSpec/ExampleLength
 
   it "throws an ArgumentError when passed collection, name, and args arguments" do
-    expect { described_class.new(collection: collection, name: "test", args: {}) }.to raise_error ArgumentError
+    expect { described_class.new(collection:, name: "test", args: {}) }.to raise_error ArgumentError
   end
 
   context "when passed collection and args arguments (and args is the Default deck hash)" do
-    subject(:default_deck_from_hash) { described_class.new(collection: collection, args: default_deck_hash) }
+    subject(:default_deck_from_hash) { described_class.new(collection:, args: default_deck_hash) }
 
     include_context "when the JSON of a deck from the col record is a Ruby hash"
 

@@ -17,9 +17,9 @@ module AnkiRecord
 
       @note_type = note_type
       if args
-        setup_note_field_instance_variables_from_existing(args: args)
+        setup_note_field_instance_variables_from_existing(args:)
       else
-        setup_note_field_instance_variables_for_new_field(name: name)
+        setup_note_field_instance_variables_for_new_field(name:)
       end
 
       @note_type.add_note_field self
