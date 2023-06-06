@@ -5,10 +5,9 @@ require "anki_record"
 FileUtils.rm_f("test_1.apkg")
 
 AnkiRecord::AnkiPackage.new(name: "test_1") do |anki21_database|
-  collection = anki21_database.collection
-  custom_deck = AnkiRecord::Deck.new collection:, name: "test_1_deck"
+  custom_deck = AnkiRecord::Deck.new(anki21_database:, name: "test_1_deck")
   custom_deck.save
-  custom_note_type = AnkiRecord::NoteType.new collection:, name: "test 1 note type"
+  custom_note_type = AnkiRecord::NoteType.new anki21_database:, name: "test 1 note type"
   AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
   AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
   custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "test 1 card 1"

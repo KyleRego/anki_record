@@ -7,7 +7,7 @@ RSpec.describe AnkiRecord::CardTemplate, "#question_format=" do
 
   include_context "when the anki package is a clean slate"
 
-  let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
+  let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for card template") }
   let(:name_argument) { "test template" }
 
   describe "#question_format=" do

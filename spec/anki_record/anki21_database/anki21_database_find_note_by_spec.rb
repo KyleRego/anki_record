@@ -6,8 +6,8 @@ RSpec.describe AnkiRecord::Anki21Database, "#find_note_by" do
   include_context "when the anki package is a clean slate"
 
   let(:note) do
-    default_deck = collection.find_deck_by(name: "Default")
-    basic_note_type = collection.find_note_type_by(name: "Basic")
+    default_deck = anki21_database.find_deck_by(name: "Default")
+    basic_note_type = anki21_database.find_note_type_by(name: "Basic")
     note = AnkiRecord::Note.new(deck: default_deck, note_type: basic_note_type)
     note.save
     note

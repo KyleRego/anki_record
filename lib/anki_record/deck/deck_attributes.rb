@@ -3,9 +3,7 @@
 module AnkiRecord
   # Module with the Deck class's attribute readers, writers, and accessors.
   module DeckAttributes
-    ##
-    # The deck's collection object.
-    attr_reader :collection
+    attr_reader :anki21_database
 
     ##
     # The deck's name.

@@ -21,10 +21,10 @@ module AnkiRecord
     NOTE_TYPES_WITHOUT_TAGS_AND_VERS_VALUES = ["Basic", "Basic (and reversed card)",
                                                "Basic (optional reversed card)", "Basic (type in the answer)"].freeze
 
-    def initialize(collection:, name: nil, args: nil)
+    def initialize(anki21_database:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
-      @collection = collection
+      @anki21_database = anki21_database
 
       if args
         setup_note_type_instance_variables_from_existing(args:)
@@ -32,17 +32,16 @@ module AnkiRecord
         setup_instance_variables_for_new_note_type(name:)
       end
 
-      @collection.add_note_type self
-      save
+      @anki21_database.add_note_type self
     end
 
     ##
     # Saves the note type to the collection.anki21 database
     def save
-      collection_models_hash = collection.models_json
+      collection_models_hash = anki21_database.models_json
       collection_models_hash[@id] = to_h
       sql = "update col set models = ? where id = ?"
-      collection.anki21_database.prepare(sql).execute([JSON.generate(collection_models_hash), collection.id])
+      anki21_database.prepare(sql).execute([JSON.generate(collection_models_hash), anki21_database.collection.id])
     end
 
     def to_h # :nodoc:

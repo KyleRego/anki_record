@@ -4,9 +4,7 @@ module AnkiRecord
   ##
   # Module with the Card class's attribute readers, writers, and accessors.
   module DeckOptionsGroupAttributes
-    ##
-    # The deck options group's collection object.
-    attr_reader :collection
+    attr_reader :anki21_database
 
     ##
     # The deck option group's name.

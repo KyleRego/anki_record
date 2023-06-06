@@ -39,21 +39,16 @@ module AnkiRecord
       true
     end
 
-    # TODO: Need to keep refactoring the object collaboration
-    def collection
-      anki21_database.collection
-    end
-
     private
 
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/MethodLength
       def setup_new_note(note_type:, deck:)
-        raise ArgumentError unless note_type.collection == deck.collection
+        raise ArgumentError unless note_type.anki21_database == deck.anki21_database
 
         @note_type = note_type
         @deck = deck
-        @anki21_database = note_type.collection.anki21_database
+        @anki21_database = note_type.anki21_database
         @field_contents = setup_empty_field_contents_hash
         @cards = @note_type.card_templates.map do |card_template|
           Card.new(note: self, card_template:)
@@ -69,7 +64,7 @@ module AnkiRecord
 
       def setup_existing_note(anki21_database:, note_data:, cards_data:)
         @anki21_database = anki21_database
-        @note_type = collection.find_note_type_by id: note_data["mid"]
+        @note_type = anki21_database.find_note_type_by id: note_data["mid"]
         @field_contents = setup_field_contents_hash_from_existing(note_data:)
         @cards = @note_type.card_templates.map.with_index do |_card_template, index|
           Card.new(note: self, card_data: cards_data[index])

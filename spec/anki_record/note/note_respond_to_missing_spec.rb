@@ -4,8 +4,8 @@ require_relative "../support/clean_slate_anki_package"
 
 RSpec.describe AnkiRecord::Note, "#respond_to_missing?" do
   subject(:note) do
-    basic_note_type = collection.find_note_type_by name: "Basic"
-    default_deck = collection.find_deck_by name: "Default"
+    basic_note_type = anki21_database.find_note_type_by name: "Basic"
+    default_deck = anki21_database.find_deck_by name: "Default"
     described_class.new deck: default_deck, note_type: basic_note_type
   end
 

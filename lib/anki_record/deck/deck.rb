@@ -15,28 +15,28 @@ module AnkiRecord
     include Helpers::TimeHelper
 
     ##
-    # Instantiates a new Deck object belonging to +collection+ with name +name+.
-    def initialize(collection:, name: nil, args: nil)
+    # Instantiates a new Deck object belonging to +anki21_database+ with name +name+.
+    def initialize(anki21_database:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
-      @collection = collection
+      @anki21_database = anki21_database
       if args
         setup_deck_instance_variables_from_existing(args:)
       else
         setup_deck_instance_variables(name:)
       end
 
-      @collection.add_deck self
+      @anki21_database.add_deck self
       save if args
     end
 
     ##
     # Saves the deck to the collection.anki21 database.
     def save
-      collection_decks_hash = collection.decks_json
+      collection_decks_hash = anki21_database.decks_json
       collection_decks_hash[@id] = to_h
       sql = "update col set decks = ? where id = ?"
-      collection.anki21_database.prepare(sql).execute([JSON.generate(collection_decks_hash), collection.id])
+      anki21_database.prepare(sql).execute([JSON.generate(collection_decks_hash), anki21_database.collection.id])
     end
 
     def to_h # :nodoc:
@@ -72,7 +72,7 @@ module AnkiRecord
         @collapsed_in_browser = args["browserCollapsed"]
         @description = args["desc"]
         @dyn = args["dyn"]
-        @deck_options_group = @collection.find_deck_options_group_by id: args["conf"]
+        @deck_options_group = anki21_database.find_deck_options_group_by(id: args["conf"])
         @extend_new = args["extendNew"]
         @extend_review = args["extendRev"]
       end
@@ -90,7 +90,7 @@ module AnkiRecord
         @collapsed_in_browser = default_collapsed
         @description = ""
         @dyn = NON_FILTERED_DECK_DYN
-        @deck_options_group = @collection.find_deck_options_group_by id: default_deck_options_group_id
+        @deck_options_group = anki21_database.find_deck_options_group_by id: default_deck_options_group_id
         @extend_new = 0
         @extend_review = 0
       end

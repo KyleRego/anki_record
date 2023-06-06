@@ -13,11 +13,11 @@ module AnkiRecord
     include Helpers::TimeHelper
 
     ##
-    # Instantiates a new deck options group belonging to +collection+ with name +name+.
-    def initialize(collection:, name: nil, args: nil)
+    # Instantiates a new deck options group belonging to +anki21_database+ with name +name+.
+    def initialize(anki21_database:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 
-      @collection = collection
+      @anki21_database = anki21_database
 
       if args
         setup_deck_options_group_instance_variables_from_existing(args:)
@@ -25,7 +25,7 @@ module AnkiRecord
         setup_deck_options_group_instance_variables(name:)
       end
 
-      @collection.add_deck_options_group self
+      @anki21_database.add_deck_options_group self
     end
 
     private

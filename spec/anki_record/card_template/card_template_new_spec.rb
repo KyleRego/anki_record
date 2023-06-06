@@ -9,7 +9,7 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
   context "when passed a name and note type that has 0 card templates" do
     subject(:template) { described_class.new(note_type:, name: name_argument) }
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for card template") }
     let(:name_argument) { "test template" }
 
     # rubocop:disable RSpec/ExampleLength
@@ -30,7 +30,7 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
     subject(:template) { described_class.new(note_type:, name: name_argument) }
 
     let(:note_type) do
-      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for card template")
+      note_type = AnkiRecord::NoteType.new(anki21_database:, name: "test note type for card template")
       described_class.new(note_type:, name: "first test template")
       note_type
     end
@@ -43,7 +43,7 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
 
   context "when passed both a name and args hash" do
     include_context "when the JSON of a card template from the col record is a Ruby hash"
-    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for card template") }
 
     it "throws an ArgumentError" do
       expect { described_class.new(note_type:, name: "test", args: {}) }.to raise_error ArgumentError
@@ -54,7 +54,7 @@ RSpec.describe AnkiRecord::CardTemplate, ".new" do
     subject(:card_template_from_hash) { described_class.new(note_type:, args: basic_note_first_card_template_hash) }
 
     include_context "when the JSON of a card template from the col record is a Ruby hash"
-    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for card template") }
+    let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for card template") }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a card template from the raw data" do

@@ -8,16 +8,16 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   include_context "when the anki package is a clean slate"
 
   context "when passed a name argument" do
-    subject(:note_type) { described_class.new collection:, name: }
+    subject(:note_type) { described_class.new anki21_database:, name: }
 
     let(:name) { "test note type" }
 
-    it "instantiates a note type with collection attribute equal to the collection argument" do
-      expect(note_type.collection).to eq collection
+    it "instantiates a note type with anki21_database attribute equal to the anki21_database argument" do
+      expect(note_type.anki21_database).to eq anki21_database
     end
 
-    it "instantiates a new note type which is added to the collection's note_types attribute" do
-      expect(note_type.collection.note_types).to include note_type
+    it "instantiates a new note type which is added to the anki21_database's note_types attribute" do
+      expect(note_type.anki21_database.note_types).to include note_type
     end
 
     it "instantiates a note type with an integer id" do
@@ -82,18 +82,18 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
   end
 
   context "when passed no name or args arguments" do
-    let(:note_type_instantiated_with_only_collection) do
-      described_class.new(collection:)
+    let(:note_type_instantiated_with_only_anki21_database) do
+      described_class.new(anki21_database:)
     end
 
     it "throws an ArgumentError" do
-      expect { note_type_instantiated_with_only_collection }.to raise_error ArgumentError
+      expect { note_type_instantiated_with_only_anki21_database }.to raise_error ArgumentError
     end
   end
 
   context "when passed name and args arguments" do
     let(:note_type_instantiated_with_both_args_and_name) do
-      described_class.new(collection:, name: "namo", args: {})
+      described_class.new(anki21_database:, name: "namo", args: {})
     end
 
     it "throws an ArgumentError" do
@@ -103,23 +103,23 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed an args hash (of the existing default basic note type)" do
     subject(:basic_note_type_from_hash) do
-      basic_note_type_from_hash = described_class.new(collection:, args: basic_model_hash)
+      basic_note_type_from_hash = described_class.new(anki21_database:, args: basic_model_hash)
       basic_note_type_from_hash.save
       basic_note_type_from_hash
     end
 
     include_context "when the JSON of a note type from the col record is a Ruby hash"
 
-    it "instantiates a note type with collection attribute equal to the collection argument" do
-      expect(basic_note_type_from_hash.collection).to eq collection
+    it "instantiates a note type with anki21_database attribute equal to the anki21_database argument" do
+      expect(basic_note_type_from_hash.anki21_database).to eq anki21_database
     end
 
-    it "instantiates a new note type which is added to the collection's note_types attribute" do
-      expect(collection.note_types).to include basic_note_type_from_hash
+    it "instantiates a new note type which is added to the anki21_database's note_types attribute" do
+      expect(anki21_database.note_types).to include basic_note_type_from_hash
     end
 
-    it "does not change the number of note types in the collection's note_types attribute" do
-      expect(collection.note_types.count).to eq 5
+    it "does not change the number of note types in the anki21_database's note_types attribute" do
+      expect(anki21_database.note_types.count).to eq 5
     end
 
     it "instantiates a note type object with id the same as the data" do
@@ -209,7 +209,7 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
 
   context "when passed an args hash (of the default basic and reversed card note type)" do
     subject(:basic_and_reversed_card_note_type_from_existing) do
-      described_class.new(collection:, args: basic_and_reversed_card_model_hash)
+      described_class.new(anki21_database:, args: basic_and_reversed_card_model_hash)
     end
 
     include_context "when the JSON of a note type from the col record is a Ruby hash"

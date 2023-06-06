@@ -7,7 +7,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   it "throws an error when passed note_type, name, and args arguments" do
     expect do
-      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for fields")
+      note_type = AnkiRecord::NoteType.new(anki21_database:, name: "test note type for fields")
       described_class.new(note_type:, name: "test", args: {})
     end.to raise_error ArgumentError
   end
@@ -15,7 +15,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
   context "when passed a note type and name arguments" do
     subject(:field) { described_class.new(note_type:, name: test_field_name) }
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for fields") }
+    let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for fields") }
     let(:test_field_name) { "test field" }
 
     # rubocop:disable RSpec/ExampleLength
@@ -35,7 +35,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
 
   context "when the note type argument has a field already" do
     subject(:second_field) do
-      note_type = AnkiRecord::NoteType.new(collection:, name: "test note type for fields")
+      note_type = AnkiRecord::NoteType.new(anki21_database:, name: "test note type for fields")
       described_class.new(note_type:, name: "first field")
       described_class.new(note_type:, name: "second field")
     end
@@ -52,7 +52,7 @@ RSpec.describe AnkiRecord::NoteField, "#new" do
       described_class.new(note_type:, args: front_field_args)
     end
 
-    let(:note_type) { AnkiRecord::NoteType.new(collection:, name: "test note type for fields") }
+    let(:note_type) { AnkiRecord::NoteType.new(anki21_database:, name: "test note type for fields") }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a note field from the raw data" do

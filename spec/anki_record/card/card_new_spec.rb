@@ -11,7 +11,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
 
   describe "when passed a card_template but no note" do
     subject(:card_with_no_note) do
-      note_type = AnkiRecord::NoteType.new collection:, name: "NOTE_TYPE_A"
+      note_type = AnkiRecord::NoteType.new anki21_database:, name: "NOTE_TYPE_A"
       card_template = AnkiRecord::CardTemplate.new note_type:, name: "CARD_TYPE_A"
       described_class.new(card_template:)
     end
@@ -23,8 +23,8 @@ RSpec.describe AnkiRecord::Card, ".new" do
 
   describe "when passed a note but no card_template" do
     subject(:card_with_no_template) do
-      deck = AnkiRecord::Deck.new(collection:, name: "DECK_A")
-      note_type = AnkiRecord::NoteType.new collection:, name: "NOTE_TYPE_A"
+      deck = AnkiRecord::Deck.new(anki21_database:, name: "DECK_A")
+      note_type = AnkiRecord::NoteType.new anki21_database:, name: "NOTE_TYPE_A"
       note = AnkiRecord::Note.new(note_type:, deck:)
       described_class.new(note:)
     end
@@ -35,13 +35,13 @@ RSpec.describe AnkiRecord::Card, ".new" do
   end
 
   describe "when passed a card_template that belongs to a different note type than the note's" do
-    let(:deck) { AnkiRecord::Deck.new(collection:, name: "DECK_A") }
+    let(:deck) { AnkiRecord::Deck.new(anki21_database:, name: "DECK_A") }
     let(:card_template) do
-      note_type = AnkiRecord::NoteType.new collection:, name: "NOTE_TYPE_A"
+      note_type = AnkiRecord::NoteType.new anki21_database:, name: "NOTE_TYPE_A"
       AnkiRecord::CardTemplate.new note_type:, name: "CARD_TYPE_A"
     end
     let(:other_note) do
-      other_note_type = AnkiRecord::NoteType.new collection:, name: "Other note type"
+      other_note_type = AnkiRecord::NoteType.new anki21_database:, name: "Other note type"
       AnkiRecord::Note.new(note_type: other_note_type, deck:)
     end
 
@@ -51,7 +51,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
   end
 
   describe "when passed note and card_template arguments" do
-    let(:note_type) { AnkiRecord::NoteType.new collection:, name: "NOTE_TYPE_A" }
+    let(:note_type) { AnkiRecord::NoteType.new anki21_database:, name: "NOTE_TYPE_A" }
     let(:card_template) do
       card_template = AnkiRecord::CardTemplate.new note_type:, name: "CARD_TYPE_A"
       AnkiRecord::NoteField.new note_type:, name: "FIELD_A"
@@ -61,7 +61,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
       card_template
     end
     let(:note) do
-      deck = AnkiRecord::Deck.new(collection:, name: "DECK_A")
+      deck = AnkiRecord::Deck.new(anki21_database:, name: "DECK_A")
       AnkiRecord::Note.new(note_type:, deck:)
     end
     let(:new_card) { described_class.new(note:, card_template:) }
@@ -71,7 +71,7 @@ RSpec.describe AnkiRecord::Card, ".new" do
       expect(new_card.instance_of?(described_class)).to be true
       expect(new_card.note).to eq note
       expect(new_card.deck).to eq note.deck
-      expect(new_card.collection).to eq note.deck.collection
+      expect(new_card.anki21_database).to eq note.deck.anki21_database
       expect(new_card.card_template).to eq card_template
       expect(new_card.id.instance_of?(Integer)).to be true
       expect(new_card.last_modified_timestamp.instance_of?(Integer)).to be true

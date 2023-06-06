@@ -33,124 +33,15 @@ module AnkiRecord
       @ls = col_record["ls"]
       @configuration = JSON.parse(col_record["conf"])
       @tags = JSON.parse(col_record["tags"])
-      initialize_note_types
-      initialize_deck_options_groups
-      initialize_decks
       remove_instance_variable(:@col_record)
     end
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/MethodLength
 
-    ##
-    # Returns the note type found by either +name+ or +id+, or nil if it is not found.
-    def find_note_type_by(name: nil, id: nil)
-      if (id && name) || (id.nil? && name.nil?)
-        raise ArgumentError,
-              "You must pass either an id or name keyword argument."
-      end
-
-      name ? find_note_type_by_name(name:) : find_note_type_by_id(id:)
-    end
-
-    ##
-    # Returns the deck found by either +name+ or +id+, or nil if it is not found.
-    def find_deck_by(name: nil, id: nil)
-      if (id && name) || (id.nil? && name.nil?)
-        raise ArgumentError,
-              "You must pass either an id or name keyword argument."
-      end
-
-      name ? find_deck_by_name(name:) : find_deck_by_id(id:)
-    end
-
-    ##
-    # Returns the deck options group object found by +id+, or nil if it is not found.
-    def find_deck_options_group_by(id:)
-      deck_options_groups.find { |deck_options_group| deck_options_group.id == id }
-    end
-
-    # :nodoc:
-    def add_note_type(note_type)
-      raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
-
-      existing_note_type = nil
-      note_types.each do |nt|
-        existing_note_type = nt if nt.id == note_type.id
-      end
-      note_types.delete(existing_note_type) if existing_note_type
-
-      note_types << note_type
-    end
-
-    # :nodoc:
-    def add_deck(deck)
-      raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
-
-      decks << deck
-    end
-
-    # :nodoc:
-    def add_deck_options_group(deck_options_group)
-      raise ArgumentError unless deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)
-
-      deck_options_groups << deck_options_group
-    end
-
-    private
-
-      def find_note_type_by_name(name:)
-        note_types.find { |note_type| note_type.name == name }
-      end
-
-      def find_note_type_by_id(id:)
-        note_types.find { |note_type| note_type.id == id }
-      end
-
-      def find_deck_by_name(name:)
-        decks.find { |deck| deck.name == name }
-      end
-
-      def find_deck_by_id(id:)
-        decks.find { |deck| deck.id == id }
-      end
-
-    public
-
-    # :nodoc:
-    def decks_json
-      JSON.parse(anki21_database.prepare("select decks from col;").execute.first["decks"])
-    end
-
-    # :nodoc:
-    def models_json
-      JSON.parse(anki21_database.prepare("select models from col;").execute.first["models"])
-    end
-
     private
 
       def col_record
-        @col_record ||= anki21_database.prepare("select * from col").execute.first
-      end
-
-      def initialize_note_types
-        @note_types = []
-        JSON.parse(col_record["models"]).values.map do |model_hash|
-          NoteType.new(collection: self, args: model_hash)
-        end
-      end
-
-      def initialize_decks
-        @decks = []
-        JSON.parse(col_record["decks"]).values.map do |deck_hash|
-          Deck.new(collection: self, args: deck_hash)
-        end
-      end
-
-      def initialize_deck_options_groups
-        @deck_options_groups = []
-        JSON.parse(col_record["dconf"]).values.map do |dconf_hash|
-          DeckOptionsGroup.new(collection: self, args: dconf_hash)
-        end
+        @col_record ||= anki21_database.col_record
       end
   end
 end

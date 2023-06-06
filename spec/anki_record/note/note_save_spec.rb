@@ -16,9 +16,9 @@ RSpec.describe AnkiRecord::Note, "#save" do
       note
     end
 
-    let(:default_deck) { collection.find_deck_by name: "Default" }
+    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
     let(:custom_note_type) do
-      custom_note_type = AnkiRecord::NoteType.new collection:, name: "custom note type"
+      custom_note_type = AnkiRecord::NoteType.new anki21_database:, name: "custom note type"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
       custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "custom card 1"
@@ -81,9 +81,9 @@ RSpec.describe AnkiRecord::Note, "#save" do
     let(:cards_count) { anki21_database.prepare("select count(*) from cards").execute.first["count(*)"] }
     let(:expected_number_of_notes) { 1 }
     let(:expected_number_of_cards) { 2 }
-    let(:default_deck) { collection.find_deck_by name: "Default" }
+    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
     let(:custom_note_type) do
-      custom_note_type = AnkiRecord::NoteType.new collection:, name: "custom note type"
+      custom_note_type = AnkiRecord::NoteType.new anki21_database:, name: "custom note type"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom front"
       AnkiRecord::NoteField.new note_type: custom_note_type, name: "custom back"
       custom_card_template = AnkiRecord::CardTemplate.new note_type: custom_note_type, name: "custom card 1"

@@ -2,10 +2,10 @@
 
 require "./spec/anki_record/support/clean_slate_anki_package"
 
-RSpec.describe AnkiRecord::Collection, "#add_deck_options_group" do
+RSpec.describe AnkiRecord::Anki21Database, "#add_deck_options_group" do
   include_context "when the anki package is a clean slate"
 
   it "throws an error if the argument object is not an instance of DeckOptionsGroup" do
-    expect { collection.add_deck_options_group("bad object") }.to raise_error ArgumentError
+    expect { anki21_database.add_deck_options_group("bad object") }.to raise_error ArgumentError
   end
 end

@@ -4,9 +4,7 @@ module AnkiRecord
   ##
   # Module with the NoteType class's attribute readers, writers, and accessors.
   module NoteTypeAttributes
-    ##
-    # The note type's collection object.
-    attr_reader :collection
+    attr_reader :anki21_database, :latex_svg, :tags, :req, :vers
 
     ##
     # The note type's id.
@@ -61,7 +59,7 @@ module AnkiRecord
     def deck
       return nil unless @deck_id
 
-      @collection.find_deck_by id: @deck_id
+      anki21_database.find_deck_by id: @deck_id
     end
 
     ##
@@ -74,7 +72,5 @@ module AnkiRecord
 
       @deck_id = deck.id
     end
-
-    attr_reader :latex_svg, :tags, :req, :vers
   end
 end

@@ -4,7 +4,7 @@ require_relative "../support/clean_slate_anki_package"
 require_relative "../support/note_type_hashes"
 
 RSpec.describe AnkiRecord::NoteType, "#allowed_card_template_question_format_field_names" do
-  subject(:basic_note_type_from_hash) { described_class.new(collection:, args: basic_model_hash) }
+  subject(:basic_note_type_from_hash) { described_class.new(anki21_database:, args: basic_model_hash) }
 
   include_context "when the JSON of a note type from the col record is a Ruby hash"
   include_context "when the anki package is a clean slate"

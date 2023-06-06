@@ -7,8 +7,8 @@ RSpec.describe AnkiRecord::Note, "#new" do
   include_context "when the anki package is a clean slate"
 
   context "with invalid arguments" do
-    let(:default_deck) { collection.find_deck_by name: "Default" }
-    let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
+    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
+    let(:basic_note_type) { anki21_database.find_note_type_by name: "Basic" }
 
     it "throws an error when passed no arguments" do
       expect { described_class.new }.to raise_error ArgumentError
@@ -22,23 +22,23 @@ RSpec.describe AnkiRecord::Note, "#new" do
       expect { described_class.new deck: default_deck }.to raise_error ArgumentError
     end
 
-    it "throws an error when passed note_type and deck that belong to different collections" do
+    it "throws an error when passed note_type and deck that belong to different Anki databases" do
       anki_package2 = AnkiRecord::AnkiPackage.new(name: "second_package")
-      second_collection_deck = anki_package2.anki21_database.collection.find_deck_by name: "Default"
-      expect { described_class.new note_type: basic_note_type, deck: second_collection_deck }.to raise_error ArgumentError
+      other_package_deck = anki_package2.anki21_database.find_deck_by name: "Default"
+      expect { described_class.new note_type: basic_note_type, deck: other_package_deck }.to raise_error ArgumentError
     end
   end
 
   context "when passed a valid note_type and deck" do
     subject(:note) { described_class.new deck: default_deck, note_type: basic_note_type }
 
-    let(:default_deck) { collection.find_deck_by name: "Default" }
-    let(:basic_note_type) { collection.find_note_type_by name: "Basic" }
+    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
+    let(:basic_note_type) { anki21_database.find_note_type_by name: "Basic" }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a note of that type and belonging to the deck" do
       expect(note).to be_a described_class
-      expect(note.collection).to be_a AnkiRecord::Collection
+      expect(note.anki21_database).to be_a AnkiRecord::Anki21Database
       expect(note.id).to be_a Integer
       expect(note.guid).to be_a String
       expect(note.guid.length).to eq 10
@@ -56,8 +56,8 @@ RSpec.describe AnkiRecord::Note, "#new" do
     subject(:note_from_existing_record) { described_class.new anki21_database:, data: note_cards_data }
 
     let(:note_cards_data) do
-      default_deck = collection.find_deck_by name: "Default"
-      basic_and_reversed_card_note_type = collection.find_note_type_by name: "Basic (and reversed card)"
+      default_deck = anki21_database.find_deck_by name: "Default"
+      basic_and_reversed_card_note_type = anki21_database.find_note_type_by name: "Basic (and reversed card)"
       note = described_class.new note_type: basic_and_reversed_card_note_type, deck: default_deck
       note.front = "What is the ABC metric?"
       note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
@@ -72,7 +72,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
     it "instantiates a note and card collaborators from the raw data" do
       expect(note_from_existing_record).to be_a described_class
       expect(note_from_existing_record.id).to eq note_data["id"]
-      expect(note_from_existing_record.collection).to be_a AnkiRecord::Collection
+      expect(note_from_existing_record.anki21_database).to be_a AnkiRecord::Anki21Database
       expect(note_from_existing_record.guid).to eq note_data["guid"]
       expect(note_from_existing_record.last_modified_timestamp).to eq note_data["mod"]
       expect(note_from_existing_record.tags).to eq []
@@ -93,7 +93,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
       expect(note_from_existing_record.cards.map(&:id)).to eq(cards_data.map { |cd| cd["id"] })
       expect(note_from_existing_record.cards.map(&:last_modified_timestamp)).to eq(cards_data.map { |cd| cd["mod"] })
       expect(note_from_existing_record.cards.map(&:deck)).to eq(cards_data.map do |cd|
-        note_from_existing_record.collection.find_deck_by id: cd["did"]
+        note_from_existing_record.anki21_database.find_deck_by id: cd["did"]
       end)
 
       %w[usn type queue due ivl factor reps lapses left odue odid flags data].each do |field|

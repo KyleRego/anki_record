@@ -13,10 +13,6 @@ module AnkiRecord
     attr_reader :deck
 
     ##
-    # The card's collection object.
-    attr_reader :collection
-
-    ##
     # The card's card template object.
     attr_reader :card_template
 

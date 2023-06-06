@@ -8,7 +8,7 @@ RSpec.describe AnkiRecord::NoteType, "#snake_case_field_names" do
   include_context "when the anki package is a clean slate"
 
   context "when it is the default Basic note type" do
-    let(:basic_note_type_from_hash) { described_class.new(collection:, args: basic_model_hash) }
+    let(:basic_note_type_from_hash) { described_class.new(anki21_database:, args: basic_model_hash) }
 
     it "returns an array including the values 'front' and 'back'" do
       expect(basic_note_type_from_hash.snake_case_field_names).to eq %w[front back]
@@ -16,7 +16,7 @@ RSpec.describe AnkiRecord::NoteType, "#snake_case_field_names" do
   end
 
   context "when it is a custom note type" do
-    let(:note_type) { described_class.new collection:, name: }
+    let(:note_type) { described_class.new anki21_database:, name: }
     let(:name) { "test note type" }
 
     it "returns an array with 'crazy_note_field_name' if the note field is 'Crazy Note Field Name'" do

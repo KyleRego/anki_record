@@ -12,6 +12,8 @@ module AnkiRecord
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
+    attr_reader :anki21_database
+
     def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
       @note = note
       if card_template
@@ -35,7 +37,7 @@ module AnkiRecord
       def setup_collaborator_object_instance_variables_for_new_card(card_template:)
         @card_template = card_template
         @deck = @note.deck
-        @collection = @deck.collection
+        @anki21_database = @deck.anki21_database
       end
 
       def setup_simple_instance_variables_for_new_card
@@ -54,8 +56,9 @@ module AnkiRecord
       end
 
       def setup_collaborator_object_instance_variables_from_existing(card_data:)
-        @collection = note.note_type.collection
-        @deck = collection.find_deck_by id: card_data["did"]
+        # TODO: LoD
+        @anki21_database = note.note_type.anki21_database
+        @deck = anki21_database.find_deck_by id: card_data["did"]
         @card_template = note.note_type.card_templates.find do |card_template|
           card_template.ordinal_number == card_data["ord"]
         end
@@ -75,10 +78,6 @@ module AnkiRecord
     end
 
     private
-
-      def anki21_database
-        @collection.anki21_database
-      end
 
       def update_card_in_collection_anki21
         statement = anki21_database.prepare <<~SQL
