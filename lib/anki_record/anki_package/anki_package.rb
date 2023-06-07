@@ -12,7 +12,7 @@ require_relative "../database_setup_constants"
 
 module AnkiRecord
   ##
-  # AnkiPackage represents an Anki package deck file.
+  # AnkiPackage represents an Anki deck package file which has the .apkg extension.
   class AnkiPackage
     attr_reader :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
 

@@ -11,7 +11,8 @@ require_relative "collection_attributes"
 module AnkiRecord
   ##
   # Collection represents the single record in the Anki collection.anki21 database's `col` table.
-  # The note types, decks, and deck options groups data are contained within this record.
+  # The note types, decks, and deck options groups data are contained within this record, but
+  # for simplicity of the gem's API, they are managed by the Anki21Database class.
   class Collection
     include Helpers::TimeHelper
     include CollectionAttributes
