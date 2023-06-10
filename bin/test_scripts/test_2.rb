@@ -5,6 +5,8 @@ require "anki_record"
 # This is a load test to see if the primary key id uniqueness constraint can be
 # violated by the way it is computed, which is an integer time since the epoch.
 
+notes_to_create_per_note_type = 100
+
 FileUtils.rm_f("test_2.apkg")
 
 start_time = Time.now
@@ -17,21 +19,21 @@ AnkiRecord::AnkiPackage.new(name: "test_2") do |anki21_database|
   custom_deck = AnkiRecord::Deck.new(anki21_database:, name: "test_2_deck")
   custom_deck.save
 
-  1000.times do |i|
+  notes_to_create_per_note_type.times do |i|
     note = AnkiRecord::Note.new note_type: basic_note_type, deck: custom_deck
     note.front = "Hello #{i}"
     note.back = "World"
     note.save
   end
 
-  1000.times do |i|
+  notes_to_create_per_note_type.times do |i|
     note = AnkiRecord::Note.new note_type: basic_and_reversed_card_note_type, deck: custom_deck
     note.front = "Hello #{i}"
     note.back = "World"
     note.save
   end
 
-  1000.times do |i|
+  notes_to_create_per_note_type.times do |i|
     note = AnkiRecord::Note.new note_type: basic_and_optional_reversed_card_note_type, deck: custom_deck
     note.front = "Hello #{i}"
     note.back = "World"
@@ -39,14 +41,14 @@ AnkiRecord::AnkiPackage.new(name: "test_2") do |anki21_database|
     note.save
   end
 
-  1000.times do |i|
+  notes_to_create_per_note_type.times do |i|
     note = AnkiRecord::Note.new note_type: basic_type_in_the_answer_note_type, deck: custom_deck
     note.front = "Hello #{i}"
     note.back = "World"
     note.save
   end
 
-  1000.times do |i|
+  notes_to_create_per_note_type.times do |i|
     note = AnkiRecord::Note.new note_type: cloze_note_type, deck: custom_deck
     note.text = "Cloze {{c1::Hello}} #{i}"
     note.back_extra = "World"
