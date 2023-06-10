@@ -2,10 +2,10 @@
 
 require "securerandom"
 
+require_relative "../helpers/anki_guid_helper"
 require_relative "../helpers/checksum_helper"
 require_relative "../helpers/time_helper"
 require_relative "note_attributes"
-require_relative "note_guid_helper"
 
 module AnkiRecord
   ##
@@ -13,7 +13,6 @@ module AnkiRecord
   class Note
     include Helpers::ChecksumHelper
     include NoteAttributes
-    include NoteGuidHelper
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
@@ -54,7 +53,7 @@ module AnkiRecord
           Card.new(note: self, card_template:)
         end
         @id = milliseconds_since_epoch
-        @guid = globally_unique_id
+        @guid = Helpers::AnkiGuidHelper.globally_unique_id
         @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
         @tags = []
