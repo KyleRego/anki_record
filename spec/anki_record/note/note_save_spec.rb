@@ -2,7 +2,6 @@
 
 require_relative "../support/clean_slate_anki_package"
 
-# TODO: Refactor to not use one expect per example
 RSpec.describe AnkiRecord::Note, "#save" do
   include_context "when the anki package is a clean slate"
 
