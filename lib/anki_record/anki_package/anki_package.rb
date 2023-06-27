@@ -31,17 +31,34 @@ module AnkiRecord
       execute_closure_and_zip(anki21_database, &closure) if closure
     end
 
-    ##
-    # Zips the Anki package into an apkg file. The temporary directory/files are also deleted.
+    # :nodoc:
     def zip
       create_zip_file && destroy_temporary_directory
     end
+
+    # :nocov:
+    def inspect
+      "[= AnkiPackage name: #{name} target_directory: #{target_directory} =]"
+    end
+    # :nocov:
 
     private
 
       def validate_arguments(name:, target_directory:)
         check_name_argument_is_valid(name:)
         check_target_directory_argument_is_valid(target_directory:)
+      end
+
+      def check_name_argument_is_valid(name:)
+        return if name.instance_of?(String) && !name.empty? && !name.include?(" ")
+
+        raise ArgumentError, "The package name must be a string without spaces."
+      end
+
+      def check_target_directory_argument_is_valid(target_directory:)
+        return if File.directory?(target_directory)
+
+        raise ArgumentError, "No directory was found at the given path."
       end
 
       def new_apkg_name(name:)
@@ -57,16 +74,8 @@ module AnkiRecord
         zip
       end
 
-      def check_name_argument_is_valid(name:)
-        return if name.instance_of?(String) && !name.empty? && !name.include?(" ")
-
-        raise ArgumentError, "The package name must be a string without spaces."
-      end
-
-      def check_target_directory_argument_is_valid(target_directory:)
-        return if File.directory?(target_directory)
-
-        raise ArgumentError, "No directory was found at the given path."
+      def destroy_temporary_directory
+        FileUtils.rm_rf(tmpdir)
       end
 
       def output_error_occurred(error:)
@@ -88,10 +97,6 @@ module AnkiRecord
 
       def target_zip_file
         "#{target_directory}/#{name}.apkg"
-      end
-
-      def destroy_temporary_directory
-        FileUtils.rm_rf(tmpdir)
       end
   end
 end
