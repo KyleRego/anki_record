@@ -5,7 +5,7 @@ module AnkiRecord
   module NoteAttributes
     # :nodoc:
     attr_reader :anki21_database
-  
+
     ##
     # The note's id.
     attr_reader :id

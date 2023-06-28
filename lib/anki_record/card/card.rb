@@ -31,6 +31,7 @@ module AnkiRecord
 
     private
 
+      # rubocop:disable Metrics/MethodLength
       def setup_instance_variables_for_new_card(card_template:)
         raise ArgumentError unless @note.note_type == card_template.note_type
 
@@ -45,6 +46,7 @@ module AnkiRecord
         end
         @data = "{}"
       end
+      # rubocop:enable Metrics/MethodLength
 
       def setup_instance_variables_from_existing(card_data:)
         @anki21_database = note.anki21_database
@@ -57,8 +59,6 @@ module AnkiRecord
           instance_variable_set "@#{instance_variable_name}", card_data[instance_variable_name]
         end
       end
-
-    private
 
       def update_card_in_collection_anki21
         statement = anki21_database.prepare <<~SQL

@@ -3,7 +3,7 @@
 require_relative "../support/clean_slate_anki_package"
 require_relative "../support/note_type_hashes"
 
-# TODO: Specs can be refactored for performance.
+# rubocop:disable RSpec/ExampleLength
 RSpec.describe AnkiRecord::NoteType, ".new" do
   include_context "when the anki package is a clean slate"
 
@@ -102,3 +102,4 @@ RSpec.describe AnkiRecord::NoteType, ".new" do
     end
   end
 end
+# rubocop:enable RSpec/ExampleLength
