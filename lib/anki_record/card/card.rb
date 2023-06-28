@@ -12,9 +12,8 @@ module AnkiRecord
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
-    attr_reader :anki21_database
-
-    def initialize(note:, card_template: nil, card_data: nil) # :nodoc:
+    # :nodoc:
+    def initialize(note:, card_template: nil, card_data: nil)
       @note = note
       if card_template
         setup_instance_variables_for_new_card(card_template:)
@@ -25,22 +24,19 @@ module AnkiRecord
       end
     end
 
+    # :nodoc:
+    def save(note_exists_already: false)
+      note_exists_already ? update_card_in_collection_anki21 : insert_new_card_in_collection_anki21
+    end
+
     private
 
       def setup_instance_variables_for_new_card(card_template:)
         raise ArgumentError unless @note.note_type == card_template.note_type
 
-        setup_collaborator_object_instance_variables_for_new_card(card_template:)
-        setup_simple_instance_variables_for_new_card
-      end
-
-      def setup_collaborator_object_instance_variables_for_new_card(card_template:)
         @card_template = card_template
         @deck = @note.deck
         @anki21_database = @deck.anki21_database
-      end
-
-      def setup_simple_instance_variables_for_new_card
         @id = milliseconds_since_epoch
         @last_modified_timestamp = seconds_since_epoch
         @usn = NEW_OBJECT_USN
@@ -51,31 +47,16 @@ module AnkiRecord
       end
 
       def setup_instance_variables_from_existing(card_data:)
-        setup_collaborator_object_instance_variables_from_existing(card_data:)
-        setup_simple_instance_variables_from_existing(card_data:)
-      end
-
-      def setup_collaborator_object_instance_variables_from_existing(card_data:)
-        # TODO: LoD
-        @anki21_database = note.note_type.anki21_database
+        @anki21_database = note.anki21_database
         @deck = anki21_database.find_deck_by id: card_data["did"]
         @card_template = note.note_type.card_templates.find do |card_template|
           card_template.ordinal_number == card_data["ord"]
         end
-      end
-
-      def setup_simple_instance_variables_from_existing(card_data:)
         @last_modified_timestamp = card_data["mod"]
         %w[id usn type queue due ivl factor reps lapses left odue odid flags data].each do |instance_variable_name|
           instance_variable_set "@#{instance_variable_name}", card_data[instance_variable_name]
         end
       end
-
-    public
-
-    def save(note_exists_already: false) # :nodoc:
-      note_exists_already ? update_card_in_collection_anki21 : insert_new_card_in_collection_anki21
-    end
 
     private
 

@@ -16,8 +16,6 @@ module AnkiRecord
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
-    attr_reader :anki21_database
-
     ##
     # Instantiates a note of type +note_type+ and belonging to deck +deck+.
     def initialize(note_type: nil, deck: nil, anki21_database: nil, data: nil)

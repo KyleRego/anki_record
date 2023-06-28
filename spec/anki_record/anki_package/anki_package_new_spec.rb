@@ -20,11 +20,13 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
 
   after { cleanup_test_files(directory: ".") }
 
-  [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }].each do |invalid_name|
-    let(:new_anki_package_name) { invalid_name }
+  describe "with invalid argument" do
+    [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }].each do |invalid_name|
+      let(:new_anki_package_name) { invalid_name }
 
-    it "throws an ArgumentError if the name argument is not a string with no spaces" do
-      expect { anki_package }.to raise_error ArgumentError
+      it "throws an ArgumentError if the name argument is not a string with no spaces" do
+        expect { anki_package }.to raise_error ArgumentError
+      end
     end
   end
 

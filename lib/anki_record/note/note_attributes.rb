@@ -3,16 +3,22 @@
 module AnkiRecord
   # Module with the Note class's attribute readers, writers, and accessors.
   module NoteAttributes
+    # :nodoc:
+    attr_reader :anki21_database
+  
     ##
     # The note's id.
     attr_reader :id
 
     ##
     # The note's globally unique id.
+    #
+    # This is used by Anki to match an imported note to an existing note and
+    # update it rather than duplicate the note.
     attr_accessor :guid
 
     ##
-    # The number of seconds since the 1970 epoch at which the note was last modified.
+    # The number of seconds since the 1970 epoch when the note was last modified.
     attr_reader :last_modified_timestamp
 
     ##
@@ -28,18 +34,14 @@ module AnkiRecord
     attr_reader :field_contents
 
     ##
-    # The note's deck object.
+    # The note's deck.
     #
-    # When the note is saved, the cards will belong to this deck.
+    # When the note is saved, the note will belong to this deck.
     attr_reader :deck
 
     ##
-    # The note's note type object.
+    # The note's note type.
     attr_reader :note_type
-
-    ##
-    # The note's collection object.
-    attr_reader :collection
 
     ##
     # The note's card objects, as an array.
