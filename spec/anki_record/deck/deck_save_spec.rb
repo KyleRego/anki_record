@@ -40,6 +40,20 @@ RSpec.describe AnkiRecord::Deck, "#save" do
     # rubocop:enable RSpec/ExampleLength
   end
 
-  # TODO: Check that the deck is updated in the database when it is saved with unpersisted changes.
-  context "when the deck does exist in the collection.anki21 database"
+  context "when the deck does exist in the collection.anki21 database and has unpersisted changes" do
+    # rubocop:disable RSpec/ExampleLength
+    it "saves the deck with an updated name and description" do
+      deck = anki21_database.find_deck_by(name: "Default")
+      new_name = "New name"
+      new_description = "New description"
+      deck.name = new_name
+      deck.description = new_description
+      deck.save
+      id = deck.id.to_s
+      database_deck = anki21_database.decks_json[id]
+      expect(database_deck["name"]).to eq new_name
+      expect(database_deck["desc"]).to eq new_description
+    end
+    # rubocop:enable RSpec/ExampleLength
+  end
 end
