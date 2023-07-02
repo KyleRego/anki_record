@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
 require_relative "anki21_database_attributes"
-require_relative "anki21_database_constructor"
+require_relative "anki21_database_initializers"
 
 module AnkiRecord
   ##
   # Anki21Database represents a collection.anki21 Anki SQLite database.
   class Anki21Database
     include Anki21DatabaseAttributes
-    include Anki21DatabaseConstructor
+    include Anki21DatabaseInitializers
+
+    def self.create_new(anki_package:)
+      anki21_database = new
+      anki21_database.create_initialize(anki_package:)
+      anki21_database
+    end
 
     # Returns an SQLite3::Statement object to be executed against the collection.anki21 database.
     #

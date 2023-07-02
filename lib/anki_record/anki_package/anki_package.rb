@@ -30,11 +30,45 @@ module AnkiRecord
       @target_directory = target_directory
       @tmpdir = Dir.mktmpdir
       @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
-      @anki21_database = Anki21Database.new(anki_package: self)
-      @anki2_database = Anki2Database.new(anki_package: self)
-      @media = Media.new(anki_package: self)
+      @anki21_database = Anki21Database.create_new(anki_package: self)
+      @anki2_database = Anki2Database.create_new(anki_package: self)
+      @media = Media.create_new(anki_package: self)
 
       execute_closure_and_zip(anki21_database, &closure) if closure
+    end
+
+    ##
+    # Opens an existing Anki package file
+    def self.update(path:, &closure)
+      anki_package = new
+      anki_package.update_initialize(path:, &closure)
+      anki_package
+    end
+
+    def update_initialize(path:, &closure)
+      validate_path(path:)
+
+      @tmpdir = Dir.mktmpdir
+      copy_and_unzip_apkg_into_tmpdir(path:)
+      @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
+      @anki21_database = Anki21Database.update_new(anki_package: self)
+      @anki2_database = Anki2Database.update_new(anki_package: self)
+      @media = Media.update_new(anki_package: self)
+
+      execute_closure_and_zip(anki21_database, &closure) if closure
+    end
+
+    def validate_path(path:)
+      pathname = Pathname.new(path)
+      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
+
+      @name = File.basename(pathname.to_s, ".apkg")
+    end
+
+    def copy_and_unzip_apkg_into_tmpdir(path:)
+      Bundler::FileUtils.cp(path, tmpdir)
+      require "pry"
+      # binding.pry
     end
 
     # :nodoc:

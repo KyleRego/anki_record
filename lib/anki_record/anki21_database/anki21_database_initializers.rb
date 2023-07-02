@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 module AnkiRecord
-  ##
-  # Module with the Anki21Database class's attribute readers, writers, and accessors.
-  module Anki21DatabaseConstructor
+  # :nodoc:
+  module Anki21DatabaseInitializers
     FILENAME = "collection.anki21"
 
-    def initialize(anki_package:)
+    def create_initialize(anki_package:)
       @anki_package = anki_package
       @database = SQLite3::Database.new "#{anki_package.tmpdir}/#{FILENAME}", options: {}
       database.execute_batch ANKI_SCHEMA_DEFINITION

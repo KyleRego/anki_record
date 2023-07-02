@@ -8,7 +8,13 @@ module AnkiRecord
 
     FILENAME = "collection.anki2"
 
-    def initialize(anki_package:)
+    def self.create_new(anki_package:)
+      anki2_database = new
+      anki2_database.create_initialize(anki_package:)
+      anki2_database
+    end
+
+    def create_initialize(anki_package:)
       @anki_package = anki_package
       @database = SQLite3::Database.new "#{anki_package.tmpdir}/#{FILENAME}", options: {}
       database.execute_batch ANKI_SCHEMA_DEFINITION
