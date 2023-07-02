@@ -4,7 +4,7 @@ require "anki_record"
 
 FileUtils.rm_f("test_1.apkg")
 
-AnkiRecord::AnkiPackage.new(name: "test_1") do |anki21_database|
+AnkiRecord::AnkiPackage.create(name: "test_1") do |anki21_database|
   custom_deck = AnkiRecord::Deck.new(anki21_database:, name: "test_1_deck")
   custom_deck.save
   custom_note_type = AnkiRecord::NoteType.new anki21_database:, name: "test 1 note type"

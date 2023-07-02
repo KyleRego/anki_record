@@ -14,11 +14,17 @@ module AnkiRecord
   ##
   # AnkiPackage represents an Anki deck package file which has the .apkg extension.
   class AnkiPackage
-    attr_reader :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
+    attr_accessor :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
 
     ##
     # Creates a new Anki package file (see README).
-    def initialize(name:, target_directory: Dir.pwd, &closure)
+    def self.create(name:, target_directory: Dir.pwd, &closure)
+      anki_package = new
+      anki_package.create_initialize(name:, target_directory:, &closure)
+      anki_package
+    end
+
+    def create_initialize(name:, target_directory: Dir.pwd, &closure)
       validate_arguments(name:, target_directory:)
       @name = new_apkg_name(name:)
       @target_directory = target_directory
@@ -42,7 +48,7 @@ module AnkiRecord
     end
     # :nocov:
 
-    private
+    protected
 
       def validate_arguments(name:, target_directory:)
         check_name_argument_is_valid(name:)

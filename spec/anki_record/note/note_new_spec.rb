@@ -6,33 +6,33 @@ RSpec.describe AnkiRecord::Note, "#new" do
   include_context "when the anki package is a clean slate"
 
   context "with invalid arguments" do
-    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
-    let(:basic_note_type) { anki21_database.find_note_type_by name: "Basic" }
+    let(:default_deck) { anki21_database.find_deck_by(name: "Default") }
+    let(:basic_note_type) { anki21_database.find_note_type_by(name: "Basic") }
 
     it "throws an error when passed no arguments" do
       expect { described_class.new }.to raise_error ArgumentError
     end
 
     it "throws an error a note_type is passed but a deck is not" do
-      expect { described_class.new note_type: basic_note_type }.to raise_error ArgumentError
+      expect { described_class.new(note_type: basic_note_type) }.to raise_error ArgumentError
     end
 
     it "throws an error a deck is passed but a note_type is not" do
-      expect { described_class.new deck: default_deck }.to raise_error ArgumentError
+      expect { described_class.new(deck: default_deck) }.to raise_error ArgumentError
     end
 
     it "throws an error when passed note_type and deck that belong to different Anki databases" do
-      anki_package2 = AnkiRecord::AnkiPackage.new(name: "second_package")
-      other_package_deck = anki_package2.anki21_database.find_deck_by name: "Default"
-      expect { described_class.new note_type: basic_note_type, deck: other_package_deck }.to raise_error ArgumentError
+      anki_package2 = AnkiRecord::AnkiPackage.create(name: "second_package")
+      other_package_deck = anki_package2.anki21_database.find_deck_by(name: "Default")
+      expect { described_class.new(note_type: basic_note_type, deck: other_package_deck) }.to raise_error ArgumentError
     end
   end
 
   context "when passed a valid note_type and deck" do
-    subject(:note) { described_class.new deck: default_deck, note_type: basic_note_type }
+    subject(:note) { described_class.new(deck: default_deck, note_type: basic_note_type) }
 
-    let(:default_deck) { anki21_database.find_deck_by name: "Default" }
-    let(:basic_note_type) { anki21_database.find_note_type_by name: "Basic" }
+    let(:default_deck) { anki21_database.find_deck_by(name: "Default") }
+    let(:basic_note_type) { anki21_database.find_note_type_by(name: "Basic") }
 
     # rubocop:disable RSpec/ExampleLength
     it "instantiates a note of that type and belonging to the deck" do
@@ -52,12 +52,12 @@ RSpec.describe AnkiRecord::Note, "#new" do
   end
 
   context "when passed an anki21_database and an existing note's raw data (existing basic optional reverse note)" do
-    subject(:note_from_existing_record) { described_class.new anki21_database:, data: note_cards_data }
+    subject(:note_from_existing_record) { described_class.new(anki21_database:, data: note_cards_data) }
 
     let(:note_cards_data) do
-      default_deck = anki21_database.find_deck_by name: "Default"
-      basic_and_reversed_card_note_type = anki21_database.find_note_type_by name: "Basic (and reversed card)"
-      note = described_class.new note_type: basic_and_reversed_card_note_type, deck: default_deck
+      default_deck = anki21_database.find_deck_by(name: "Default")
+      basic_and_reversed_card_note_type = anki21_database.find_note_type_by(name: "Basic (and reversed card)")
+      note = described_class.new(note_type: basic_and_reversed_card_note_type, deck: default_deck)
       note.front = "What is the ABC metric?"
       note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
       note.save

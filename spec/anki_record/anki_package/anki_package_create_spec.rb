@@ -20,16 +20,16 @@ def expect_num_apkg_files_in_directory(num:, directory:)
   end).to eq num
 end
 
-RSpec.describe AnkiRecord::AnkiPackage, ".new" do
+RSpec.describe AnkiRecord::AnkiPackage, ".create" do
   let(:anki_package) do
     if defined?(closure_argument) && defined?(target_directory_argument)
-      described_class.new(name: new_anki_package_name, target_directory: target_directory_argument, &closure_argument)
+      described_class.create(name: create_anki_package_name, target_directory: target_directory_argument, &closure_argument)
     elsif defined?(closure_argument)
-      described_class.new(name: new_anki_package_name, &closure_argument)
+      described_class.create(name: create_anki_package_name, &closure_argument)
     elsif defined?(target_directory_argument)
-      described_class.new(name: new_anki_package_name, target_directory: target_directory_argument)
+      described_class.create(name: create_anki_package_name, target_directory: target_directory_argument)
     else
-      described_class.new(name: new_anki_package_name)
+      described_class.create(name: create_anki_package_name)
     end
   end
 
@@ -37,7 +37,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
 
   describe "with invalid argument" do
     [nil, "", "has spaces", ["a"], 10, { my_key: "my_value" }].each do |invalid_name|
-      let(:new_anki_package_name) { invalid_name }
+      let(:create_anki_package_name) { invalid_name }
 
       it "throws an ArgumentError if the name argument is not a string with no spaces" do
         expect { anki_package }.to raise_error ArgumentError
@@ -46,7 +46,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
   end
 
   context "when not passed a block" do
-    let(:new_anki_package_name) { "new_anki_package_file_name" }
+    let(:create_anki_package_name) { "create_anki_package_file_name" }
 
     # rubocop:disable RSpec/ExampleLength
     it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
@@ -91,11 +91,11 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
   end
 
   describe "when passed a block" do
-    let(:new_anki_package_name) { "new_anki_package_file_name" }
+    let(:create_anki_package_name) { "create_anki_package_file_name" }
     let(:closure_argument) { proc {} }
 
     it "yields an Anki21Database object to the block argument" do
-      described_class.new(name: "test") do |anki21_database|
+      described_class.create(name: "test") do |anki21_database|
         expect(anki21_database).to be_a AnkiRecord::Anki21Database
       end
     end
@@ -126,7 +126,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
   end
 
   context "when passed a block that throws an exception" do
-    let(:new_anki_package_name) { "new_anki_package_file_name" }
+    let(:create_anki_package_name) { "create_anki_package_file_name" }
     let(:closure_argument) { proc { raise "runtime error" } }
 
     it "does not save an apkg file and also deletes the temporary directory" do

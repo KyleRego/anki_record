@@ -4,7 +4,7 @@ require "anki_record"
 
 FileUtils.rm_f("test_0.apkg")
 
-apkg = AnkiRecord::AnkiPackage.new(name: "test_0")
+apkg = AnkiRecord::AnkiPackage.create(name: "test_0")
 anki21_database = apkg.anki21_database
 custom_nested_deck = AnkiRecord::Deck.new(name: "parent::child::nested_deck::super nested", anki21_database:)
 custom_nested_deck.save
