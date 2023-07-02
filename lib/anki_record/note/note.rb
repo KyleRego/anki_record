@@ -36,6 +36,30 @@ module AnkiRecord
       true
     end
 
+    ##
+    # Overrides BasicObject#method_missing and creates "ghost methods".
+    #
+    # The ghost methods are the setters and getters for the note field values.
+    def method_missing(method_name, field_content = nil)
+      raise NoMethodError, "##{method_name} is not defined or a ghost method" unless respond_to_missing? method_name
+
+      method_name = method_name.to_s
+      return @field_contents[method_name] unless method_name.end_with?("=")
+
+      @field_contents[method_name.chomp("=")] = field_content
+    end
+
+    ##
+    # This allows #respond_to? to be accurate for the ghost methods created by #method_missing.
+    def respond_to_missing?(method_name, *)
+      method_name = method_name.to_s
+      if method_name.end_with?("=")
+        note_type.snake_case_field_names.include?(method_name.chomp("="))
+      else
+        note_type.snake_case_field_names.include?(method_name)
+      end
+    end
+
     private
 
       # rubocop:disable Metrics/AbcSize
@@ -114,34 +138,6 @@ module AnkiRecord
                            checksum(sort_field_value), @flags, @data])
         cards.each(&:save)
       end
-
-    public
-
-    ##
-    # Overrides BasicObject#method_missing and creates "ghost methods".
-    #
-    # The ghost methods are the setters and getters for the note field values.
-    def method_missing(method_name, field_content = nil)
-      raise NoMethodError, "##{method_name} is not defined or a ghost method" unless respond_to_missing? method_name
-
-      method_name = method_name.to_s
-      return @field_contents[method_name] unless method_name.end_with?("=")
-
-      @field_contents[method_name.chomp("=")] = field_content
-    end
-
-    ##
-    # This allows #respond_to? to be accurate for the ghost methods created by #method_missing.
-    def respond_to_missing?(method_name, *)
-      method_name = method_name.to_s
-      if method_name.end_with?("=")
-        note_type.snake_case_field_names.include?(method_name.chomp("="))
-      else
-        note_type.snake_case_field_names.include?(method_name)
-      end
-    end
-
-    private
 
       def field_values_separated_by_us
         # The ASCII control code represented by hexadecimal 1F is the Unit Separator (US)
