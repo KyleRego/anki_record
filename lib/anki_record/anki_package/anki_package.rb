@@ -31,6 +31,29 @@ module AnkiRecord
       execute_closure_and_zip(anki21_database, &closure) if closure
     end
 
+    ##
+    # Opens an existing Anki package file
+    def self.open(path:, &closure)
+      validate_path(path:)
+
+      @tmpdir = Dir.mktmpdir
+      copy_apkg_into_tmpdir
+      @tmpfiles = [Anki21Database::FILENAME, Anki2Database::FILENAME, Media::FILENAME]
+      @anki21_database = Anki21Database.open(anki_package: self)
+      @anki2_database = Anki2Database.open(anki_package: self)
+      @media = Media.open(anki_package: self)
+
+      execute_closure_and_zip(anki21_database, &closure) if closure
+    end
+
+    def validate_path(path:)
+      pathname = Pathname.new(path)
+      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
+
+      @name = "#{File.basename(pathname.to_s, ".apkg")}"
+      binding.pry
+    end
+
     # :nodoc:
     def zip
       create_zip_file && destroy_temporary_directory

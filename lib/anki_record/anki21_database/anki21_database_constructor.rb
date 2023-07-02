@@ -2,7 +2,7 @@
 
 module AnkiRecord
   ##
-  # Module with the Anki21Database class's attribute readers, writers, and accessors.
+  # Anki21Database's attribute readers, writers, and accessors.
   module Anki21DatabaseConstructor
     FILENAME = "collection.anki21"
 
