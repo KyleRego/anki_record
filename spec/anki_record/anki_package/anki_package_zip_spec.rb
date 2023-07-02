@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "./spec/anki_record/support/clean_slate_anki_package"
-require "./spec/anki_record/support/anki_package_files_helpers"
 
 RSpec.describe AnkiRecord::AnkiPackage, "#zip" do
   include_context "when the anki package is a clean slate"
@@ -14,7 +13,7 @@ RSpec.describe AnkiRecord::AnkiPackage, "#zip" do
     end
 
     it "deletes the temporary directory" do
-      expect_the_temporary_directory_to_not_exist
+      expect(Dir.exist?(anki_package.tmpdir)).to be false
     end
   end
 
@@ -26,7 +25,7 @@ RSpec.describe AnkiRecord::AnkiPackage, "#zip" do
     end
 
     it "deletes the temporary directory" do
-      expect_the_temporary_directory_to_not_exist
+      expect(Dir.exist?(anki_package.tmpdir)).to be false
     end
   end
 end

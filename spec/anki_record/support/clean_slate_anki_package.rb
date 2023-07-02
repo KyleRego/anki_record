@@ -10,6 +10,4 @@ RSpec.shared_context "when the anki package is a clean slate" do
   let(:collection) { anki21_database.collection }
 
   after { cleanup_test_files(directory: ".") }
-
-  let(:tmpdir) { anki_package.tmpdir }
 end

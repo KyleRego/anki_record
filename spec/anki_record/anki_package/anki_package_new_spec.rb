@@ -1,7 +1,24 @@
 # frozen_string_literal: true
 
 require "./spec/anki_record/support/test_directory"
-require "./spec/anki_record/support/anki_package_files_helpers"
+
+def expect_num_anki21_files_in_tmpdir(num:)
+  expect(Dir.entries(anki_package.tmpdir).count do |file|
+    file.match(ANKI_COLLECTION_21_REGEX)
+  end).to eq num
+end
+
+def expect_num_anki2_files_in_tmpdir(num:)
+  expect(Dir.entries(anki_package.tmpdir).count do |file|
+    file.match(ANKI_COLLECTION_2_REGEX)
+  end).to eq num
+end
+
+def expect_num_apkg_files_in_directory(num:, directory:)
+  expect(Dir.entries(directory).count do |file|
+    file.match(ANKI_PACKAGE_REGEX)
+  end).to eq num
+end
 
 RSpec.describe AnkiRecord::AnkiPackage, ".new" do
   let(:anki_package) do
@@ -15,8 +32,6 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       described_class.new(name: new_anki_package_name)
     end
   end
-
-  let(:tmpdir) { anki_package.tmpdir }
 
   after { cleanup_test_files(directory: ".") }
 
@@ -38,10 +53,10 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       expect(anki_package.anki21_database).to be_a AnkiRecord::Anki21Database
 
       expect_num_apkg_files_in_directory num: 0, directory: "."
-      expect_num_anki21_files_in_package_tmpdir num: 1
-      expect_num_anki2_files_in_package_tmpdir num: 1
-      expect_media_file_in_tmpdir
-      expect(File.read("#{tmpdir}/media")).to eq "{}"
+      expect_num_anki21_files_in_tmpdir num: 1
+      expect_num_anki2_files_in_tmpdir num: 1
+      expect(Dir.entries(anki_package.tmpdir).include?("media")).to be true
+      expect(File.read("#{anki_package.tmpdir}/media")).to eq "{}"
 
       expected_tables = %w[cards col graves notes revlog]
       anki_21_db_tables = anki_package.anki21_database.prepare("select name from sqlite_master where type = 'table'").execute.map do |hash|
@@ -66,9 +81,9 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
       it "does not save an apkg file, but saves collection.anki21, collection.anki2, and media to a temporary directory" do
         anki_package
 
-        expect_num_anki21_files_in_package_tmpdir num: 1
-        expect_num_anki2_files_in_package_tmpdir num: 1
-        expect_media_file_in_tmpdir
+        expect_num_anki21_files_in_tmpdir num: 1
+        expect_num_anki2_files_in_tmpdir num: 1
+        expect(Dir.entries(anki_package.tmpdir).include?("media")).to be true
         expect_num_apkg_files_in_directory num: 0, directory: target_directory_argument
       end
     end
@@ -86,7 +101,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
     end
 
     it "saves an apkg file and deletes the temporary directory" do
-      expect_the_temporary_directory_to_not_exist
+      expect(Dir.exist?(anki_package.tmpdir)).to be false
       expect_num_apkg_files_in_directory num: 1, directory: "."
     end
 
@@ -96,7 +111,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
 
       it "deletes the temporary directory and saves one *.apkg zip file in the specified directory" do
         anki_package
-        expect_the_temporary_directory_to_not_exist
+        expect(Dir.exist?(anki_package.tmpdir)).to be false
         expect_num_apkg_files_in_directory num: 1, directory: target_directory_argument
       end
     end
@@ -117,7 +132,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".new" do
     it "does not save an apkg file and also deletes the temporary directory" do
       expect { anki_package }.to output.to_stdout
       expect_num_apkg_files_in_directory num: 0, directory: "."
-      expect_the_temporary_directory_to_not_exist
+      expect(Dir.exist?(anki_package.tmpdir)).to be false
     end
   end
 end
