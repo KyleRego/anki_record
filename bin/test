@@ -6,3 +6,4 @@ bundle exec rake install
 ruby bin/test_scripts/test_0.rb
 ruby bin/test_scripts/test_1.rb
 ruby bin/test_scripts/test_2.rb
+ruby bin/test_scripts/test_3.rb
