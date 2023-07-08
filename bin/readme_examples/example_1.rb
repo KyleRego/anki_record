@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# rubocop:disable Lint/UselessAssignment
+
 require "anki_record"
 
 AnkiRecord::AnkiPackage.update(path: "./example.apkg") do |anki21_database|
@@ -6,3 +10,5 @@ AnkiRecord::AnkiPackage.update(path: "./example.apkg") do |anki21_database|
 
   # Create more decks, note types, etc. The API for updating is not completely fleshed out yet.
 end
+
+# rubocop:enable Lint/UselessAssignment

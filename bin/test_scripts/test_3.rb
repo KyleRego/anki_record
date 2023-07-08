@@ -10,7 +10,6 @@ AnkiRecord::AnkiPackage.create(name: "test_3") do |anki21_database|
   basic_and_reversed_card_note_type = anki21_database.find_note_type_by name: "Basic (and reversed card)"
   basic_and_optional_reversed_card_note_type = anki21_database.find_note_type_by name: "Basic (optional reversed card)"
   basic_type_in_the_answer_note_type = anki21_database.find_note_type_by name: "Basic (type in the answer)"
-  cloze_note_type = anki21_database.find_note_type_by name: "Cloze"
 
   custom_note_type = AnkiRecord::NoteType.new anki21_database:, name: "test 3 custom note type"
   AnkiRecord::NoteField.new note_type: custom_note_type, name: "front"
@@ -74,7 +73,7 @@ end
 AnkiRecord::AnkiPackage.update(path: "./test_3.apkg") do |anki21_database|
   note_ids.each do |note_id|
     note = anki21_database.find_note_by(id: note_id)
-    note.front = note.front + " - updated"
+    note.front = "#{note.front} - updated"
     note.save
   end
 end
