@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.authors = ["Kyle Rego"]
   spec.email = ["regoky@outlook.com"]
 
-  spec.summary = "Manipulate Anki deck packages with Ruby."
+  spec.summary = "Create and update Anki deck packages with Ruby."
   spec.description = <<-DESC
-  Anki Record lets you create Anki deck packages, or zipped Anki SQLite databases, with the Ruby programming language.
+  Anki Record lets you create Anki deck packages or update existing ones with the Ruby programming language.
   DESC
   spec.homepage = "https://github.com/KyleRego/anki_record"
   spec.license = "MIT"
