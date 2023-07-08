@@ -10,8 +10,6 @@ require_relative "note_type_defaults"
 module AnkiRecord
   ##
   # NoteType represents an Anki note type (also called a model).
-  #
-  # The attributes are documented in the NoteTypeAttributes module.
   class NoteType
     include Helpers::SharedConstantsHelper
     include Helpers::TimeHelper
@@ -21,6 +19,8 @@ module AnkiRecord
     NOTE_TYPES_WITHOUT_TAGS_AND_VERS_VALUES = ["Basic", "Basic (and reversed card)",
                                                "Basic (optional reversed card)", "Basic (type in the answer)"].freeze
 
+    ##
+    # Instantiates a new note type belonging to +anki21_database+ with name +name+
     def initialize(anki21_database:, name: nil, args: nil)
       raise ArgumentError unless (name && args.nil?) || (args && args["name"])
 

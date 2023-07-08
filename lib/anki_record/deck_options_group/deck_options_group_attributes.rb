@@ -2,20 +2,20 @@
 
 module AnkiRecord
   ##
-  # Module with the Card class's attribute readers, writers, and accessors.
+  # Module with DeckOptionsGroup's attribute readers, writers, and accessors.
   module DeckOptionsGroupAttributes
-    attr_reader :anki21_database
+    attr_reader :anki21_database # :nodoc:
 
     ##
-    # The deck option group's name.
+    # The deck option group's name
     attr_accessor :name
 
     ##
-    # The deck option group's id.
+    # The deck option group's id
     attr_reader :id
 
     ##
-    # The number of milliseconds since the 1970 epoch at which the deck options group was modified.
+    # The number of milliseconds since the 1970 epoch at which the deck options group was modified
     attr_reader :last_modified_timestamp
   end
 end

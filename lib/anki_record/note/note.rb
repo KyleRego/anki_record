@@ -9,7 +9,7 @@ require_relative "note_attributes"
 
 module AnkiRecord
   ##
-  # Represents an Anki note.
+  # Note represents Anki notes, which are the main thing that Anki Record is intended to create or update.
   class Note
     include Helpers::ChecksumHelper
     include NoteAttributes
@@ -17,7 +17,7 @@ module AnkiRecord
     include Helpers::SharedConstantsHelper
 
     ##
-    # Instantiates a note of type +note_type+ and belonging to deck +deck+.
+    # Instantiates a note of type +note_type+ and belonging to deck +deck+
     def initialize(note_type: nil, deck: nil, anki21_database: nil, data: nil)
       if note_type && deck
         setup_new_note(note_type:, deck:)
@@ -30,16 +30,18 @@ module AnkiRecord
     end
 
     ##
-    # Saves the note and its cards.
+    # Saves the note and its cards
     def save
       anki21_database.find_note_by(id: @id) ? update_note_in_collection_anki21 : insert_new_note_in_collection_anki21
       true
     end
 
     ##
-    # Overrides BasicObject#method_missing and creates "ghost methods".
+    # Overrides BasicObject#method_missing and creates "ghost methods"
     #
     # The ghost methods are the setters and getters for the note field values.
+    #
+    # For example, if the note type has a field called "front" then there will be two ghost methods: front and front=.
     def method_missing(method_name, field_content = nil)
       raise NoMethodError, "##{method_name} is not defined or a ghost method" unless respond_to_missing? method_name
 
@@ -98,7 +100,6 @@ module AnkiRecord
         @flags = note_data["flags"]
         @data = note_data["data"]
       end
-
       # rubocop:enable Metrics/AbcSize
       # rubocop:enable Metrics/MethodLength
 

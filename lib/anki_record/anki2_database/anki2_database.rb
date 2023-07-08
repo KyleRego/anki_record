@@ -2,11 +2,16 @@
 
 module AnkiRecord
   ##
-  # Anki2Database represents the collection.anki2 Anki SQLite database
+  # Anki2Database represents the collection.anki2 Anki SQLite database in the Anki Package
+  #
+  # This is not the database targeted by the Anki Record gem but it is part of the Anki
+  # package zip file.
   class Anki2Database
-    attr_reader :anki_package, :database
-
     FILENAME = "collection.anki2"
+
+    # :nodoc:
+
+    attr_reader :anki_package, :database
 
     def self.create_new(anki_package:)
       anki2_database = new

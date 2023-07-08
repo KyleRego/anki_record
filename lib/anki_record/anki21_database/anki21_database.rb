@@ -5,24 +5,25 @@ require_relative "anki21_database_constructors"
 
 module AnkiRecord
   ##
-  # Anki21Database represents a collection.anki21 Anki SQLite database.
+  # Anki21Database represents the collection.anki21 Anki SQLite database in the Anki Package
   class Anki21Database
     include Anki21DatabaseAttributes
     include Anki21DatabaseConstructors
 
-    def self.create_new(anki_package:)
+    def self.create_new(anki_package:) # :nodoc:
       anki21_database = new
       anki21_database.create_initialize(anki_package:)
       anki21_database
     end
 
-    def self.update_new(anki_package:)
+    def self.update_new(anki_package:) # :nodoc:
       anki21_database = new
       anki21_database.update_initialize(anki_package:)
       anki21_database
     end
 
-    # Returns an SQLite3::Statement object to be executed against the collection.anki21 database.
+    ##
+    # Returns an SQLite3::Statement object (sqlite3 gem) to be executed against the collection.anki21 database.
     #
     # Statement#execute executes the statement.
     def prepare(sql)
@@ -66,23 +67,19 @@ module AnkiRecord
       deck_options_groups.find { |deck_options_group| deck_options_group.id == id }
     end
 
-    # :nodoc:
-    def decks_json
+    def decks_json # :nodoc:
       JSON.parse(prepare("select decks from col;").execute.first["decks"])
     end
 
-    # :nodoc:
-    def models_json
+    def models_json # :nodoc:
       JSON.parse(prepare("select models from col;").execute.first["models"])
     end
 
-    # :nodoc:
-    def col_record
+    def col_record # :nodoc:
       prepare("select * from col").execute.first
     end
 
-    # :nodoc:
-    def add_note_type(note_type)
+    def add_note_type(note_type) # :nodoc:
       raise ArgumentError unless note_type.instance_of?(AnkiRecord::NoteType)
 
       existing_note_type = nil
@@ -94,22 +91,20 @@ module AnkiRecord
       note_types << note_type
     end
 
-    # :nodoc:
-    def add_deck(deck)
+    def add_deck(deck) # :nodoc:
       raise ArgumentError unless deck.instance_of?(AnkiRecord::Deck)
 
       decks << deck
     end
 
-    # :nodoc:
-    def add_deck_options_group(deck_options_group)
+    def add_deck_options_group(deck_options_group) # :nodoc:
       raise ArgumentError unless deck_options_group.instance_of?(AnkiRecord::DeckOptionsGroup)
 
       deck_options_groups << deck_options_group
     end
 
     # :nocov:
-    def inspect
+    def inspect # :nodoc:
       "[= Anki21Database of package with name #{package.name} =]"
     end
     # :nocov:

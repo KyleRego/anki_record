@@ -2,20 +2,30 @@
 
 module AnkiRecord
   ##
-  # Module with the Anki21Database class's attribute readers, writers, and accessors.
+  # Module with Anki21Database's attribute readers, writers, and accessors
   module Anki21DatabaseAttributes
     ##
-    # The database's note type objects as an array.
+    # The database's note types as an array
     attr_reader :note_types
 
     ##
-    # The database's deck objects as an array
+    # The database's decks as an array
     attr_reader :decks
 
     ##
-    # The database's deck option group objects as an array.
+    # The database's deck option groups as an array
     attr_reader :deck_options_groups
 
-    attr_reader :anki_package, :collection, :database
+    ##
+    # The database's parent Anki package
+    attr_reader :anki_package
+
+    ##
+    # The database's collection record
+    attr_reader :collection
+
+    ##
+    # The database's collection.anki21 SQLite3::Database
+    attr_reader :database
   end
 end

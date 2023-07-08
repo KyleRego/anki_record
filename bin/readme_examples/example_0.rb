@@ -1,22 +1,3 @@
-# Anki Record
-
-Anki Record is a Ruby gem to create and update Anki flashcard deck packages (files with the .apkg extension). It does not support adding media yet.
-
-## Installation
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add anki_record
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install anki_record
-
-## Usage
-
-This example shows how to create a new Anki package and also most of the features of the gem:
-
-```
 require "anki_record"
 
 AnkiRecord::AnkiPackage.create(name: "example") do |anki21_database|
@@ -95,44 +76,3 @@ AnkiRecord::AnkiPackage.create(name: "example") do |anki21_database|
   cloze_note.save
 end
 # The example.apkg package now exists in the current working directory and contains 6 notes.
-
-```
-
-`AnkiRecord::AnkiPackage.new` can also take a `target_directory` keyword argument to specify the directory to save the Anki package. If an error is thrown inside the block argument, temporary files that exist during execution of the block (Anki SQLite databases and the file called `media`) are deleted and no new Anki package is created.
-
-The gem can also be used to update an existing Anki package:
-
-```
-require "anki_record"
-
-AnkiRecord::AnkiPackage.update(path: "./example.apkg") do |anki21_database|
-  amino_acids_deck = anki21_database.find_deck_by(name: "Biochemistry::Amino acids")
-  custom_note_type = anki21_database.find_note_type_by(name: "New custom note type")
-
-  # Create more decks, note types, notes etc. There are not many methods that would be useful here for finding and updating notes yet.
-end
-```
-
-If an error is thrown in the block here, the original Anki package will not be changed.
-
-## Documentation
-
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated from comments in the source code could be useful if the above examples are not sufficient for your use case.
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-<!-- ## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/KyleRego/anki_record. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/KyleRego/anki_record/blob/master/CODE_OF_CONDUCT.md). -->
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Anki Record project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/KyleRego/anki_record/blob/main/CODE_OF_CONDUCT.md).

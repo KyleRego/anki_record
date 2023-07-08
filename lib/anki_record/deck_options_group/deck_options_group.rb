@@ -7,6 +7,8 @@ require_relative "deck_options_group_attributes"
 module AnkiRecord
   ##
   # DeckOptionsGroup represents a set of options that can be applied to an Anki deck.
+  # The interface to this has not been explored much so using the gem with these directly
+  # may involve breaking encapsulation.
   class DeckOptionsGroup
     include DeckOptionsGroupAttributes
     include Helpers::SharedConstantsHelper

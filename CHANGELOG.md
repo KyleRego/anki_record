@@ -46,3 +46,11 @@
 ## [0.3.2] - 05-20-2023
 - The private `Note` method `globally_unique_id` has been moved to `NoteGuidHelper` and included into note.
 - The `guid` attribute also now has a public setter.
+
+## [0.4] - 07-08-2023
+- `AnkiPackage.new` and `AnkiPackage.open` have been removed and replaced with `AnkiPackage.create` and `AnkiPackage.update`.
+- `AnkiPackage.update` is different from `AnkiPackage.open` in that it does not create a new Anki package with a timestamp. It effectively updates the original Anki package file as long as no error is thrown. 
+- `Anki21Database` is yielded to the block of the above methods instead of `Collection`.
+- Responsibilites of `Collection` have been reorganized to `Anki21Database`.
+- The `guid` attribute of notes ic computed in a different way that allows a larger number of possible values.
+- `globally_unique_id` is now a module method rather than an included instance method.

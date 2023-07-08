@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module AnkiRecord
-  # :nodoc:
-  module Anki21DatabaseConstructors
+  module Anki21DatabaseConstructors # :nodoc:
     FILENAME = "collection.anki21"
 
     def create_initialize(anki_package:)

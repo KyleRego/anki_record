@@ -12,19 +12,23 @@ require_relative "../database_setup_constants"
 
 module AnkiRecord
   ##
-  # AnkiPackage represents an Anki deck package file (which has the .apkg extension)
+  # AnkiPackage represents the Anki deck package file which has the .apkg file extension
+  #
+  # This is a zip file containing two SQLite databases (collection.anki21 and collection.anki2),
+  # a media file, and possibly the media (images and sound files). The gem currently does not
+  # have any support for adding or changing media in the Anki package.
   class AnkiPackage
-    attr_accessor :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name
+    attr_accessor :anki21_database, :anki2_database, :media, :tmpdir, :tmpfiles, :target_directory, :name # :nodoc:
 
     ##
-    # Creates a new Anki package file (see README)
+    # Creates a new Anki package file (see the README)
     def self.create(name:, target_directory: Dir.pwd, &closure)
       anki_package = new
       anki_package.create_initialize(name:, target_directory:, &closure)
       anki_package
     end
 
-    def create_initialize(name:, target_directory: Dir.pwd, &closure)
+    def create_initialize(name:, target_directory: Dir.pwd, &closure) # :nodoc:
       validate_arguments(name:, target_directory:)
       @name = new_apkg_name(name:)
       @target_directory = target_directory
@@ -38,14 +42,14 @@ module AnkiRecord
     end
 
     ##
-    # Opens an existing Anki package file
+    # Opens an existing Anki package file to update its contents (see the README)
     def self.update(path:, &closure)
       anki_package = new
       anki_package.update_initialize(path:, &closure)
       anki_package
     end
 
-    def update_initialize(path:, &closure)
+    def update_initialize(path:, &closure) # :nodoc:
       validate_path(path:)
 
       @tmpdir = Dir.mktmpdir
@@ -57,22 +61,6 @@ module AnkiRecord
 
       @updating_existing_apkg = true
       execute_closure_and_zip(anki21_database, &closure) if closure
-    end
-
-    def validate_path(path:)
-      pathname = Pathname.new(path)
-      raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
-
-      @name = File.basename(pathname.to_s, ".apkg")
-      @target_directory = pathname.expand_path.dirname.to_s
-    end
-
-    def unzip_apkg_into_tmpdir(path:)
-      Zip::File.open(path) do |zip_file|
-        zip_file.each do |entry|
-          entry.extract("#{tmpdir}/#{entry.name}")
-        end
-      end
     end
 
     # :nodoc:
@@ -88,6 +76,22 @@ module AnkiRecord
     # :nocov:
 
     private
+
+      def validate_path(path:)
+        pathname = Pathname.new(path)
+        raise "*No .apkg file was found at the given path." unless pathname.file? && pathname.extname == ".apkg"
+
+        @name = File.basename(pathname.to_s, ".apkg")
+        @target_directory = pathname.expand_path.dirname.to_s
+      end
+
+      def unzip_apkg_into_tmpdir(path:)
+        Zip::File.open(path) do |zip_file|
+          zip_file.each do |entry|
+            entry.extract("#{tmpdir}/#{entry.name}")
+          end
+        end
+      end
 
       def validate_arguments(name:, target_directory:)
         check_name_argument_is_valid(name:)

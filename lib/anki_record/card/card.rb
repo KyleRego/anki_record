@@ -6,13 +6,14 @@ require_relative "card_attributes"
 
 module AnkiRecord
   ##
-  # Card represents an Anki card.
+  # Card represents an Anki card. The cards are indirectly created when creating notes.
   class Card
     include CardAttributes
     include Helpers::TimeHelper
     include Helpers::SharedConstantsHelper
 
     # :nodoc:
+
     def initialize(note:, card_template: nil, card_data: nil)
       @note = note
       if card_template
@@ -24,7 +25,6 @@ module AnkiRecord
       end
     end
 
-    # :nodoc:
     def save(note_exists_already: false)
       note_exists_already ? update_card_in_collection_anki21 : insert_new_card_in_collection_anki21
     end

@@ -5,7 +5,7 @@ require_relative "note_field_defaults"
 
 module AnkiRecord
   ##
-  # NoteField represents a field of an Anki note type.
+  # NoteField represents a field of an Anki note type
   class NoteField
     include NoteFieldAttributes
     include NoteFieldDefaults

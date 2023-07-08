@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module AnkiRecord
-  # :nodoc:
-  class Media
+  class Media # :nodoc:
     attr_reader :anki_package, :media_file
 
     FILENAME = "media"
