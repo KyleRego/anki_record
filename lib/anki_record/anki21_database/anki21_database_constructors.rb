@@ -2,7 +2,7 @@
 
 module AnkiRecord
   # :nodoc:
-  module Anki21DatabaseInitializers
+  module Anki21DatabaseConstructors
     FILENAME = "collection.anki21"
 
     def create_initialize(anki_package:)
@@ -10,6 +10,16 @@ module AnkiRecord
       @database = SQLite3::Database.new "#{anki_package.tmpdir}/#{FILENAME}", options: {}
       database.execute_batch ANKI_SCHEMA_DEFINITION
       database.execute INSERT_COLLECTION_ANKI_21_COL_RECORD
+      database.results_as_hash = true
+      @collection = Collection.new(anki21_database: self)
+      initialize_note_types
+      initialize_deck_options_groups
+      initialize_decks
+    end
+
+    def update_initialize(anki_package:)
+      @anki_package = anki_package
+      @database = SQLite3::Database.new("#{anki_package.tmpdir}/#{FILENAME}", options: {})
       database.results_as_hash = true
       @collection = Collection.new(anki21_database: self)
       initialize_note_types

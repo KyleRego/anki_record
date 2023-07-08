@@ -1,18 +1,24 @@
 # frozen_string_literal: true
 
 require_relative "anki21_database_attributes"
-require_relative "anki21_database_initializers"
+require_relative "anki21_database_constructors"
 
 module AnkiRecord
   ##
   # Anki21Database represents a collection.anki21 Anki SQLite database.
   class Anki21Database
     include Anki21DatabaseAttributes
-    include Anki21DatabaseInitializers
+    include Anki21DatabaseConstructors
 
     def self.create_new(anki_package:)
       anki21_database = new
       anki21_database.create_initialize(anki_package:)
+      anki21_database
+    end
+
+    def self.update_new(anki_package:)
+      anki21_database = new
+      anki21_database.update_initialize(anki_package:)
       anki21_database
     end
 
@@ -101,6 +107,12 @@ module AnkiRecord
 
       deck_options_groups << deck_options_group
     end
+
+    # :nocov:
+    def inspect
+      "[= Anki21Database of package with name #{package.name} =]"
+    end
+    # :nocov:
 
     private
 

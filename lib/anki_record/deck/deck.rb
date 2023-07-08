@@ -54,6 +54,7 @@ module AnkiRecord
     def inspect
       "#<AnkiRecord::Deck:#{object_id} id: #{id} name: #{name} description: #{description}>"
     end
+    # :nocov:
 
     private
 

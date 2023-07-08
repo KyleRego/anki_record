@@ -20,5 +20,18 @@ module AnkiRecord
       media_file.write("{}")
       media_file.close
     end
+
+    def self.update_new(anki_package:)
+      media = new
+      media.update_initialize(anki_package:)
+      media
+    end
+
+    def update_initialize(anki_package:)
+      @anki_package = anki_package
+      @media_file = File.open("#{anki_package.tmpdir}/#{FILENAME}", mode: "w")
+      media_file.write("{}")
+      media_file.close
+    end
   end
 end

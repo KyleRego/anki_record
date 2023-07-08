@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "pry"
+
 require "simplecov"
 SimpleCov.start do
   enable_coverage :branch
