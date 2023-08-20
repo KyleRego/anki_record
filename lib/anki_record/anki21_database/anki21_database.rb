@@ -30,6 +30,7 @@ module AnkiRecord
       database.prepare sql
     end
 
+    # rubocop:disable Metrics/MethodLength
     ##
     # Returns the note found by either +sfld" or +id+, or nil if it is not found.
     def find_note_by(sfld: nil, id: nil)
@@ -45,6 +46,25 @@ module AnkiRecord
       return nil unless note_cards_data
 
       AnkiRecord::Note.new(anki21_database: self, data: note_cards_data)
+    end
+    # rubocop:enable Metrics/MethodLength
+
+    ##
+    # Returns an array of notes that have any field value matching +text+
+    def find_notes_by_exact_text_match(text:)
+      return [] if text == ""
+
+      like_matcher = "%#{text}%"
+      note_datas = prepare("select * from notes where flds LIKE ?").execute([like_matcher])
+
+      note_datas.map do |note_data|
+        id = note_data["id"]
+
+        cards_data = prepare("select * from cards where nid = ?").execute([id]).to_a
+        note_cards_data = { note_data:, cards_data: }
+
+        AnkiRecord::Note.new(anki21_database: self, data: note_cards_data)
+      end
     end
 
     ##
