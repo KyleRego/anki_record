@@ -62,6 +62,13 @@ module AnkiRecord
       end
     end
 
+    ##
+    # Returns the text value of the note's sfld (sort field) which is determined by
+    # the note's note type
+    def sort_field_value
+      @field_contents[note_type.snake_case_sort_field_name]
+    end
+
     private
 
       # rubocop:disable Metrics/AbcSize
@@ -143,10 +150,6 @@ module AnkiRecord
       def field_values_separated_by_us
         # The ASCII control code represented by hexadecimal 1F is the Unit Separator (US)
         note_type.snake_case_field_names.map { |field_name| @field_contents[field_name] }.join("\x1F")
-      end
-
-      def sort_field_value
-        @field_contents[note_type.snake_case_sort_field_name]
       end
   end
 end

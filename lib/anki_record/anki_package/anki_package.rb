@@ -112,7 +112,7 @@ module AnkiRecord
       end
 
       def check_anki_package_does_not_already_exist(name:, target_directory:)
-        return unless Pathname.new("#{target_directory}/#{(new_apkg_name(name: name))}.apkg").exist?
+        return unless Pathname.new("#{target_directory}/#{new_apkg_name(name:)}.apkg").exist?
 
         raise ArgumentError, "An Anki package with that name already exists."
       end

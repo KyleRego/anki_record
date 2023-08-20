@@ -62,7 +62,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
       note.back = "A software metric which is a vector of the number of assignments, branches, and conditionals in a method, class, etc."
       note.save
 
-      anki21_database.send(:note_cards_data_for_note_id, id: note.id)
+      anki21_database.send(:note_cards_data_for_note, id: note.id)
     end
     let(:note_data) { note_cards_data[:note_data] }
     let(:cards_data) { note_cards_data[:cards_data] }

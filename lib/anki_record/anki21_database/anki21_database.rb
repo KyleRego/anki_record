@@ -31,9 +31,17 @@ module AnkiRecord
     end
 
     ##
-    # Returns the note found by +id+, or nil if it is not found.
-    def find_note_by(id:)
-      note_cards_data = note_cards_data_for_note_id(id:)
+    # Returns the note found by either +sfld" or +id+, or nil if it is not found.
+    def find_note_by(sfld: nil, id: nil)
+      if (id && sfld) || (id.nil? && sfld.nil?)
+        raise ArgumentError,
+              "You must pass either an id or sfld keyword argument to find_note_by."
+      end
+      note_cards_data = if id
+                          note_cards_data_for_note(id:)
+                        else
+                          note_cards_data_for_note(sfld:)
+                        end
       return nil unless note_cards_data
 
       AnkiRecord::Note.new(anki21_database: self, data: note_cards_data)
@@ -44,7 +52,7 @@ module AnkiRecord
     def find_note_type_by(name: nil, id: nil)
       if (id && name) || (id.nil? && name.nil?)
         raise ArgumentError,
-              "You must pass either an id or name keyword argument."
+              "You must pass either an id or name keyword argument to find_note_type_by."
       end
 
       name ? find_note_type_by_name(name:) : find_note_type_by_id(id:)
@@ -55,7 +63,7 @@ module AnkiRecord
     def find_deck_by(name: nil, id: nil)
       if (id && name) || (id.nil? && name.nil?)
         raise ArgumentError,
-              "You must pass either an id or name keyword argument."
+              "You must pass either an id or name keyword argument to find_deck_by."
       end
 
       name ? find_deck_by_name(name:) : find_deck_by_id(id:)
@@ -127,9 +135,15 @@ module AnkiRecord
         decks.find { |deck| deck.id == id }
       end
 
-      def note_cards_data_for_note_id(id:)
-        note_data = prepare("select * from notes where id = ?").execute([id]).first
+      def note_cards_data_for_note(id: nil, sfld: nil)
+        note_data = if id
+                      prepare("select * from notes where id = ?").execute([id]).first
+                    elsif sfld
+                      prepare("select * from notes where sfld = ?").execute([sfld]).first
+                    end
         return nil unless note_data
+
+        id ||= note_data["id"]
 
         cards_data = prepare("select * from cards where nid = ?").execute([id]).to_a
         { note_data:, cards_data: }

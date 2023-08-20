@@ -48,7 +48,7 @@ RSpec.describe AnkiRecord::AnkiPackage, ".create" do
       let(:create_anki_package_name) { "exists_already" }
 
       before do
-        AnkiRecord::AnkiPackage.create(name: create_anki_package_name).zip
+        described_class.create(name: create_anki_package_name).zip
       end
 
       it "throws an ArgumentError" do
