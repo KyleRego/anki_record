@@ -14,7 +14,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-This example shows how to create a new Anki package and also most of the features of the gem:
+This example shows how to create a new Anki package and most of the API:
 
 ```ruby
 require "anki_record"
@@ -51,30 +51,30 @@ AnkiRecord::AnkiPackage.create(name: "example") do |anki21_database|
   custom_note_type.css = css
   custom_note_type.save
 
-  # Creating a note with the custom note type
+  # Creating a new note with the custom note type
   note = AnkiRecord::Note.new(note_type: custom_note_type, deck: custom_deck)
   note.custom_front = "Content of the 'custom front' field"
   note.custom_back = "Content of the 'custom back' field"
   note.save
 
-  # The default deck
+  # Finding the default deck
   default_deck = anki21_database.find_deck_by(name: "Default")
 
-  # All of the default Anki note types
+  # Finding all of the default Anki note types
   basic_note_type = anki21_database.find_note_type_by(name: "Basic")
   basic_and_reversed_card_note_type = anki21_database.find_note_type_by(name: "Basic (and reversed card)")
   basic_and_optional_reversed_card_note_type = anki21_database.find_note_type_by(name: "Basic (optional reversed card)")
   basic_type_in_the_answer_note_type = anki21_database.find_note_type_by(name: "Basic (type in the answer)")
   cloze_note_type = anki21_database.find_note_type_by(name: "Cloze")
 
-  # Creating notes using the default note types
+  # Creating new notes using the default note types
 
   basic_note = AnkiRecord::Note.new(note_type: basic_note_type, deck: default_deck)
   basic_note.front = "What molecule is most relevant to the name aerobic exercise?"
   basic_note.back = "Oxygen"
   basic_note.save
 
-  # Creating a nested deck
+  # Creating a new nested deck
   amino_acids_deck = AnkiRecord::Deck.new(anki21_database:,
                                           name: "Biochemistry::Amino acids")
   amino_acids_deck.save
@@ -103,8 +103,8 @@ AnkiRecord::AnkiPackage.create(name: "example") do |anki21_database|
   cloze_note.back_extra = "This condition involves one cranial nerve but can have myriad neurological symptoms"
   cloze_note.save
 end
-# The example.apkg package now exists in the current
-# working directory and contains 6 notes.
+# An example.apkg file should be in the current
+# working directory with 6 notes.
 
 ```
 
@@ -127,7 +127,7 @@ If an error is thrown in the block here, the original Anki package will not be c
 
 ## Documentation
 
-The [API Documentation](https://kylerego.github.io/anki_record_docs) is generated from comments in the source code could be useful if the above examples are not sufficient for your use case.
+The [API Documentation](https://kylerego.github.io/anki_record_docs) generated from source code comments might be useful but I think the examples above show everything you can do that you would want to do.
 
 ## Development
 

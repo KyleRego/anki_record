@@ -43,6 +43,18 @@ RSpec.describe AnkiRecord::AnkiPackage, ".create" do
         expect { anki_package }.to raise_error ArgumentError
       end
     end
+
+    context "when the specified name is to an Anki package that already exists" do
+      let(:create_anki_package_name) { "exists_already" }
+
+      before do
+        AnkiRecord::AnkiPackage.create(name: create_anki_package_name).zip
+      end
+
+      it "throws an ArgumentError" do
+        expect { anki_package }.to raise_error ArgumentError
+      end
+    end
   end
 
   context "when not passed a block" do

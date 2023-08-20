@@ -96,6 +96,7 @@ module AnkiRecord
       def validate_arguments(name:, target_directory:)
         check_name_argument_is_valid(name:)
         check_target_directory_argument_is_valid(target_directory:)
+        check_anki_package_does_not_already_exist(name:, target_directory:)
       end
 
       def check_name_argument_is_valid(name:)
@@ -108,6 +109,12 @@ module AnkiRecord
         return if File.directory?(target_directory)
 
         raise ArgumentError, "No directory was found at the given path."
+      end
+
+      def check_anki_package_does_not_already_exist(name:, target_directory:)
+        return unless Pathname.new("#{target_directory}/#{(new_apkg_name(name: name))}.apkg").exist?
+
+        raise ArgumentError, "An Anki package with that name already exists."
       end
 
       def new_apkg_name(name:)
