@@ -85,7 +85,7 @@ module AnkiRecord
         end
         @id = milliseconds_since_epoch
         @guid = Helpers::AnkiGuidHelper.globally_unique_id
-        @last_modified_timestamp = seconds_since_epoch
+        @last_modified_timestamp = nil
         @usn = NEW_OBJECT_USN
         @tags = []
         @flags = 0
@@ -130,7 +130,7 @@ module AnkiRecord
           update notes set guid = ?, mid = ?, mod = ?, usn = ?, tags = ?,
                                       flds = ?, sfld = ?, csum = ?, flags = ?, data = ? where id = ?
         SQL
-        statement.execute([@guid, note_type.id, @last_modified_timestamp,
+        statement.execute([@guid, note_type.id, seconds_since_epoch,
                            @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
                            checksum(sort_field_value), @flags, @data, @id])
         cards.each { |card| card.save(note_exists_already: true) }
@@ -141,7 +141,7 @@ module AnkiRecord
           insert into notes (id, guid, mid, mod, usn, tags, flds, sfld, csum, flags, data)
                       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL
-        statement.execute([@id, @guid, note_type.id, @last_modified_timestamp,
+        statement.execute([@id, @guid, note_type.id, seconds_since_epoch,
                            @usn, @tags.join(" "), field_values_separated_by_us, sort_field_value,
                            checksum(sort_field_value), @flags, @data])
         cards.each(&:save)

@@ -41,7 +41,7 @@ RSpec.describe AnkiRecord::Note, "#new" do
       expect(note.id).to be_a Integer
       expect(note.guid).to be_a String
       expect(note.guid.length).to eq 10
-      expect(note.last_modified_timestamp).to be_a Integer
+      expect(note.last_modified_timestamp).to be_nil
       expect(note.tags).to eq []
       expect(note.deck).to eq default_deck
       expect(note.note_type).to eq basic_note_type

@@ -43,7 +43,6 @@ RSpec.describe AnkiRecord::Note, "#save" do
       expect(note_record_data["id"]).to eq note_with_two_cards.id
       expect(note_record_data["guid"]).to eq note_with_two_cards.guid
       expect(note_record_data["mid"]).to eq note_with_two_cards.note_type.id
-      expect(note_record_data["mod"]).to eq note_with_two_cards.last_modified_timestamp
       expect(note_record_data["usn"]).to eq(-1)
       expect(note_record_data["tags"]).to eq ""
       expect(note_record_data["flds"]).to eq "Hello\x1FWorld"
