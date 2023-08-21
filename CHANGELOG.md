@@ -54,3 +54,9 @@
 - Responsibilites of `Collection` have been reorganized to `Anki21Database`.
 - The `guid` attribute of notes ic computed in a different way that allows a larger number of possible values.
 - `globally_unique_id` is now a module method rather than an included instance method.
+
+## [0.4.1] - 08-21-2023
+- `Anki21Database#find_note_by` now can take the sort field value of a note as argument.
+- `Anki21Database#find_notes_by_exact_text_match` is a new method that returns an array of notes that have in any field text matching the argument.
+- Trying to create an Anki package file with a path/name that already exists raises a more helpful error message.
+- Saving a note to the database saves the `mod` column (last modified time) to make it easier to import an updated package into Anki.

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    anki_record (0.4)
+    anki_record (0.4.1)
       rubyzip (>= 2.3)
       sqlite3 (~> 1.3)
 
